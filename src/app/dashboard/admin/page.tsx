@@ -29,6 +29,7 @@ export type AdminMember = {
   invoiceAmount: string;
   accountActivity: string;
   meetingInfo: string;
+  currentBalance: string;
   status: 'Aktif' | 'Pasif';
   transactionStatus: 'allowed' | 'blocked';
   // Card details

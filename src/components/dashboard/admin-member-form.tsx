@@ -33,6 +33,7 @@ const AdminMemberForm = ({ member, onSave, onCancel }: AdminMemberFormProps) => 
         invoiceAmount: '',
         accountActivity: '',
         meetingInfo: '',
+        currentBalance: '',
         status: 'Aktif' as 'Aktif' | 'Pasif',
         transactionStatus: 'allowed' as 'allowed' | 'blocked',
         cardNumber: '',
@@ -58,6 +59,7 @@ const AdminMemberForm = ({ member, onSave, onCancel }: AdminMemberFormProps) => 
                 invoiceAmount: member.invoiceAmount,
                 accountActivity: member.accountActivity || '',
                 meetingInfo: member.meetingInfo || '',
+                currentBalance: member.currentBalance || '',
                 status: member.status,
                 transactionStatus: member.transactionStatus || 'allowed',
                 cardNumber: member.cardNumber || '',
@@ -81,6 +83,7 @@ const AdminMemberForm = ({ member, onSave, onCancel }: AdminMemberFormProps) => 
                 invoiceAmount: '',
                 accountActivity: '',
                 meetingInfo: '',
+                currentBalance: '',
                 status: 'Aktif',
                 transactionStatus: 'allowed',
                 cardNumber: '',
@@ -157,6 +160,10 @@ const AdminMemberForm = ({ member, onSave, onCancel }: AdminMemberFormProps) => 
                 <div className="space-y-2">
                     <Label htmlFor="invoiceAmount">Fatura Tutarı</Label>
                     <Input id="invoiceAmount" value={formData.invoiceAmount} onChange={handleChange} placeholder="Örn: 1250 TL" required />
+                </div>
+                <div className="space-y-2">
+                    <Label htmlFor="currentBalance">Mevcut Bakiye</Label>
+                    <Input id="currentBalance" value={formData.currentBalance} onChange={handleChange} placeholder="Örn: 2500 TL" required />
                 </div>
                 <div className="space-y-3">
                     <Label>Üyelik Durumu</Label>
