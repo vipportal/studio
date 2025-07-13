@@ -1,10 +1,16 @@
 
 "use client";
 
+import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import Image from "next/image";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
+import { useToast } from "@/hooks/use-toast";
 
 type Member = {
   id: number;
@@ -26,8 +32,30 @@ const initialMembers: Member[] = [
   { id: 8, name: "Hande Ç.", location: "Fatih", img: "https://placehold.co/100x100.png", status: "Müsait", hint: "woman street style"},
 ];
 
-
 export default function MembersPage() {
+    const [selectedMember, setSelectedMember] = useState<Member | null>(null);
+    const [isDialogOpen, setIsDialogOpen] = useState(false);
+    const { toast } = useToast();
+
+    const handleRowClick = (member: Member) => {
+        setSelectedMember(member);
+        setIsDialogOpen(true);
+    };
+
+    const handleSendMessage = (e: React.FormEvent) => {
+        e.preventDefault();
+        setIsDialogOpen(false);
+        const { id, dismiss } = toast({
+            title: "✅ Başarılı",
+            description: `Mesajınız ${selectedMember?.name} kişisine gönderildi.`,
+            className: "toast-center bg-green-100 border-green-300 text-green-800",
+        });
+
+        setTimeout(() => {
+            dismiss(id);
+        }, 4000);
+    };
+
     return (
         <div className="space-y-6">
             <Card>
@@ -49,7 +77,7 @@ export default function MembersPage() {
                         </TableHeader>
                         <TableBody>
                             {initialMembers.map((member) => (
-                                <TableRow key={member.id}>
+                                <TableRow key={member.id} onClick={() => handleRowClick(member)} className="cursor-pointer">
                                     <TableCell>
                                         <div className="relative h-12 w-12 overflow-hidden rounded-full">
                                             <Image 
@@ -75,6 +103,25 @@ export default function MembersPage() {
                     </Table>
                 </CardContent>
             </Card>
+
+            <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+                <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle>Mesaj Gönder: {selectedMember?.name}</DialogTitle>
+                    </DialogHeader>
+                    <form onSubmit={handleSendMessage}>
+                        <div className="grid gap-4 py-4">
+                        <div className="grid gap-2">
+                            <Label htmlFor="message">Mesajınız</Label>
+                            <Textarea id="message" placeholder="Mesajınızı buraya yazın..." required />
+                        </div>
+                        </div>
+                        <DialogFooter>
+                            <Button type="submit">Gönder</Button>
+                        </DialogFooter>
+                    </form>
+                </DialogContent>
+            </Dialog>
         </div>
     );
 }
