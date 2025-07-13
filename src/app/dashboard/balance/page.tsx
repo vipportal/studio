@@ -194,15 +194,14 @@ export default function BalancePage() {
 
       <Card>
         <CardHeader>
-          <CardTitle className="text-3xl font-bold">Para Çek</CardTitle>
+          <CardTitle className="text-3xl font-bold uppercase text-blue-600 dark:text-blue-400">Para Çek</CardTitle>
           <CardDescription className="text-base">Aşağıdan bir banka seçerek işleme başlayın.</CardDescription>
         </CardHeader>
         <CardContent className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
           {banks.map((bank) => (
             <Button
               key={bank}
-              variant="default"
-              className="h-24 break-words p-2 text-center text-base font-semibold"
+              className="h-24 break-words p-2 text-center text-base font-semibold bg-green-600 hover:bg-green-700 text-primary-foreground"
               onClick={() => handleBankSelect(bank)}
             >
               {bank}
