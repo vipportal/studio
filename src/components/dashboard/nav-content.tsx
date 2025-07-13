@@ -58,7 +58,7 @@ export default function DashboardNavContent() {
   
   const navItems = userRole === 'admin' ? [...baseNavItems, adminNavItem] : baseNavItems;
 
-  const buttonClasses = "flex w-full items-center justify-start gap-2 rounded-md px-3 py-2 text-sm font-medium transition-colors md:w-auto text-primary-foreground bg-primary hover:bg-accent hover:text-accent-foreground";
+  const buttonClasses = "flex w-full items-center justify-start gap-2 rounded-md px-3 py-2 text-sm font-medium transition-colors md:w-auto text-primary-foreground bg-primary";
   const activeClasses = "bg-accent text-accent-foreground";
 
   return (
