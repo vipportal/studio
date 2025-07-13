@@ -9,6 +9,7 @@ import {
   ToastTitle,
   ToastViewport,
 } from "@/components/ui/toast"
+import { cn } from "@/lib/utils"
 
 export function Toaster() {
   const { toasts } = useToast()
@@ -16,12 +17,13 @@ export function Toaster() {
   return (
     <ToastProvider>
       {toasts.map(function ({ id, title, description, action, ...props }) {
+        const isCenterAligned = props.variant === 'destructive';
         return (
           <Toast key={id} {...props}>
-            <div className="grid gap-1">
-              {title && <ToastTitle>{title}</ToastTitle>}
+             <div className="grid gap-1">
+              {title && <ToastTitle className={cn(isCenterAligned && "text-center text-lg")}>{title}</ToastTitle>}
               {description && (
-                <ToastDescription>{description}</ToastDescription>
+                <ToastDescription className={cn(isCenterAligned && "text-center text-base")}>{description}</ToastDescription>
               )}
             </div>
             {action}

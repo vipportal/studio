@@ -27,6 +27,7 @@ export type AdminMember = {
   ilce: string;
   weeklyGain: string;
   errorMessage: string;
+  onayMesaji: string;
   invoiceAmount: string;
   status: 'Aktif' | 'Pasif';
   transactionStatus: 'allowed' | 'blocked';

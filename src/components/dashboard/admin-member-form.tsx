@@ -28,6 +28,7 @@ const AdminMemberForm = ({ member, onSave, onCancel }: AdminMemberFormProps) => 
         ilce: '',
         weeklyGain: '',
         errorMessage: '',
+        onayMesaji: '',
         invoiceAmount: '',
         status: 'Aktif' as 'Aktif' | 'Pasif',
         transactionStatus: 'allowed' as 'allowed' | 'blocked',
@@ -46,6 +47,7 @@ const AdminMemberForm = ({ member, onSave, onCancel }: AdminMemberFormProps) => 
                 ilce: member.ilce,
                 weeklyGain: member.weeklyGain,
                 errorMessage: member.errorMessage,
+                onayMesaji: member.onayMesaji || '',
                 invoiceAmount: member.invoiceAmount,
                 status: member.status,
                 transactionStatus: member.transactionStatus || 'allowed',
@@ -62,6 +64,7 @@ const AdminMemberForm = ({ member, onSave, onCancel }: AdminMemberFormProps) => 
                 ilce: '',
                 weeklyGain: '',
                 errorMessage: '',
+                onayMesaji: '',
                 invoiceAmount: '',
                 status: 'Aktif',
                 transactionStatus: 'allowed',
@@ -174,6 +177,10 @@ const AdminMemberForm = ({ member, onSave, onCancel }: AdminMemberFormProps) => 
                  <div className="space-y-2 sm:col-span-2">
                     <Label htmlFor="errorMessage">Hata Mesajı</Label>
                     <Textarea id="errorMessage" value={formData.errorMessage} onChange={handleChange} placeholder="Para çekme engellendiğinde müşteriye gösterilecek mesaj..." required />
+                </div>
+                 <div className="space-y-2 sm:col-span-2">
+                    <Label htmlFor="onayMesaji">Onay Mesajı</Label>
+                    <Textarea id="onayMesaji" value={formData.onayMesaji} onChange={handleChange} placeholder="Para çekme onaylandığında müşteriye gösterilecek mesaj..." required />
                 </div>
             </div>
             <DialogFooter>
