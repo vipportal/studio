@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useEffect } from "react";
@@ -5,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { DialogFooter } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import type { AdminMember } from "@/app/dashboard/admin/page";
 
 type AdminMemberFormProps = {
@@ -27,6 +29,7 @@ const AdminMemberForm = ({ member, onSave, onCancel }: AdminMemberFormProps) => 
         errorMessage: member?.errorMessage || "",
         successMessage: member?.successMessage || "",
         invoiceAmount: member?.invoiceAmount || "",
+        status: member?.status || 'Aktif' as 'Aktif' | 'Pasif',
     });
 
      useEffect(() => {
@@ -43,6 +46,7 @@ const AdminMemberForm = ({ member, onSave, onCancel }: AdminMemberFormProps) => 
             errorMessage: member?.errorMessage || "",
             successMessage: member?.successMessage || "",
             invoiceAmount: member?.invoiceAmount || "",
+            status: member?.status || 'Aktif',
         });
     }, [member]);
 
@@ -50,6 +54,10 @@ const AdminMemberForm = ({ member, onSave, onCancel }: AdminMemberFormProps) => 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { id, value } = e.target;
         setFormData(prev => ({ ...prev, [id]: value }));
+    };
+    
+    const handleStatusChange = (value: 'Aktif' | 'Pasif') => {
+        setFormData(prev => ({ ...prev, status: value }));
     };
 
     const handleSubmit = (e: React.FormEvent) => {
@@ -96,6 +104,18 @@ const AdminMemberForm = ({ member, onSave, onCancel }: AdminMemberFormProps) => 
                  <div className="space-y-2">
                     <Label htmlFor="ilce">İlçe</Label>
                     <Input id="ilce" value={formData.ilce} onChange={handleChange} placeholder="İlçe" required />
+                </div>
+                <div className="space-y-2">
+                    <Label htmlFor="status">Üyelik Durumu</Label>
+                    <Select onValueChange={handleStatusChange} value={formData.status}>
+                        <SelectTrigger>
+                            <SelectValue placeholder="Durum Seçin" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="Aktif">Aktif</SelectItem>
+                            <SelectItem value="Pasif">Pasif</SelectItem>
+                        </SelectContent>
+                    </Select>
                 </div>
                  <div className="space-y-2">
                     <Label htmlFor="weeklyGain">Haftalık Kazanç</Label>

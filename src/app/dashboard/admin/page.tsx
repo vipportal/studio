@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useEffect } from "react";
@@ -10,6 +11,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useRouter } from "next/navigation";
 import AdminMemberForm from "@/components/dashboard/admin-member-form";
 import { getMembers, setMembers as saveMembers } from "@/lib/member-storage";
+import { Badge } from "@/components/ui/badge";
 
 export type AdminMember = {
   id: number;
@@ -25,6 +27,7 @@ export type AdminMember = {
   errorMessage: string;
   successMessage: string;
   invoiceAmount: string;
+  status: 'Aktif' | 'Pasif';
 };
 
 const MEMBERS_PER_PAGE = 20;
@@ -153,6 +156,7 @@ export default function AdminPage() {
                                     <TableHead>Ad Soyad</TableHead>
                                     <TableHead>Telefon</TableHead>
                                     <TableHead>TC</TableHead>
+                                    <TableHead>Durum</TableHead>
                                     <TableHead>Banka</TableHead>
                                     <TableHead>IBAN</TableHead>
                                     <TableHead>İl/İlçe</TableHead>
@@ -167,6 +171,11 @@ export default function AdminPage() {
                                         <TableCell className="font-medium">{member.name}</TableCell>
                                         <TableCell>{member.phone}</TableCell>
                                         <TableCell>{member.tc}</TableCell>
+                                         <TableCell>
+                                            <Badge variant={member.status === 'Aktif' ? 'default' : 'destructive'} className={member.status === 'Aktif' ? 'bg-green-600' : 'bg-red-600'}>
+                                                {member.status}
+                                            </Badge>
+                                        </TableCell>
                                         <TableCell>{member.bank}</TableCell>
                                         <TableCell>{member.iban}</TableCell>
                                         <TableCell>{member.il}/{member.ilce}</TableCell>

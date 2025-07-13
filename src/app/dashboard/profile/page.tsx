@@ -24,6 +24,7 @@ function InfoRow({
   badge = false, 
   valueClassName = "", 
   labelClassName = "",
+  badgeClassName = "",
   icon: Icon
 }: { 
   label: string; 
@@ -31,6 +32,7 @@ function InfoRow({
   badge?: boolean; 
   valueClassName?: string;
   labelClassName?: string;
+  badgeClassName?: string;
   icon?: React.ComponentType<{ className?: string }>; 
 }) {
   return (
@@ -40,7 +42,7 @@ function InfoRow({
         <span>{label}</span>
       </p>
       {badge ? (
-        <Badge variant="default" className="bg-blue-600 hover:bg-blue-700">{value}</Badge>
+        <Badge variant="default" className={cn(badgeClassName)}>{value}</Badge>
       ) : (
         <p className={cn("font-medium", valueClassName)}>{value}</p>
       )}
@@ -64,6 +66,8 @@ export default function ProfilePage() {
   if (!user) {
     return null;
   }
+  
+  const isStatusActive = user.status === 'Aktif';
 
   return (
     <div className="space-y-8">
@@ -101,7 +105,14 @@ export default function ProfilePage() {
             <InfoRow label="İl" value={user.il} icon={MapPin} labelClassName="text-blue-600" />
             <InfoRow label="İlçe" value={user.ilce} icon={Building} labelClassName="text-blue-600" />
             <InfoRow label="Haftalık Kazanç" value={user.weeklyGain} icon={Wallet} labelClassName="text-green-600" valueClassName="text-green-600 font-bold" />
-            <InfoRow label="Üyelik Durumu" value={"VIP Gold"} icon={Award} labelClassName="text-blue-600" badge />
+            <InfoRow 
+              label="Üyelik Durumu" 
+              value={user.status} 
+              icon={Award} 
+              labelClassName="text-blue-600"
+              badge 
+              badgeClassName={isStatusActive ? 'bg-green-600 hover:bg-green-700' : 'bg-red-600 hover:bg-red-700'}
+            />
           </div>
         </CardContent>
       </Card>
