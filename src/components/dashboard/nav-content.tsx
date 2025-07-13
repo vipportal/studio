@@ -58,8 +58,7 @@ export default function DashboardNavContent() {
   
   const navItems = userRole === 'admin' ? [...baseNavItems, adminNavItem] : baseNavItems;
 
-  const buttonClasses = "flex w-full items-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition-colors md:w-auto";
-  const inactiveClasses = "bg-primary text-primary-foreground hover:bg-accent";
+  const buttonClasses = "flex w-full items-center justify-start gap-2 rounded-md px-3 py-2 text-sm font-medium transition-colors md:w-auto text-primary-foreground bg-primary hover:bg-accent hover:text-accent-foreground";
   const activeClasses = "bg-accent text-accent-foreground";
 
   return (
@@ -71,7 +70,7 @@ export default function DashboardNavContent() {
             href={item.href}
             className={cn(
               buttonClasses,
-              pathname.startsWith(item.href) ? activeClasses : inactiveClasses
+              pathname.startsWith(item.href) && activeClasses
             )}
           >
             <item.icon className="h-5 w-5" />
@@ -82,8 +81,7 @@ export default function DashboardNavContent() {
         <DropdownMenu>
             <DropdownMenuTrigger asChild>
                 <Button 
-                  variant="ghost" 
-                  className={cn(buttonClasses, inactiveClasses)}
+                  className={cn(buttonClasses)}
                 >
                     <Menu className="h-5 w-5" />
                     <span>Menü</span>
