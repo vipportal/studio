@@ -130,10 +130,13 @@ export default function ProfilePage() {
         </div>
         <div className="space-y-2 max-w-3xl">
           <h1 className="text-4xl font-headline font-bold">Hoşgeldiniz, {user.name}</h1>
-          <div className="border border-blue-500/30 rounded-md p-3 bg-blue-500/5">
-            <p className="text-xs text-blue-700 dark:text-blue-400">
-              SİZLERİ ARAMIZDA GÖRMEKTEN MUTLULUK DUYUYORUZ, BİLGİLERİNİZ 6698 KİŞİSEL VERİLERİN KORUNMASI KANUNU TARAFINDAN GİZLİ TUTULMAKTADIR, GÜVENLİ BİR ŞEKİLDE GÖRÜŞMELERİNİZİ YAPABİLİRSİNİZ. PARA TRANSFERLERİNİZİ BANKA HESAPLARINIZA GÜVENLİ BİR ŞEKİLDE ÇEKEBİLİRSİNİZ, İYİ GÖRÜŞMELER DİLİYORUZ.
-            </p>
+          <div className="border border-blue-500/40 rounded-lg p-4 bg-blue-500/10">
+            <div className="flex items-start gap-3">
+              <div className="mt-1.5 h-2 w-2 flex-shrink-0 rounded-full bg-blue-600 dark:bg-blue-400"></div>
+              <p className="text-xs text-blue-800 dark:text-blue-300 text-left">
+                SİZLERİ ARAMIZDA GÖRMEKTEN MUTLULUK DUYUYORUZ, BİLGİLERİNİZ 6698 KİŞİSEL VERİLERİN KORUNMASI KANUNU TARAFINDAN GİZLİ TUTULMAKTADIR, GÜVENLİ BİR ŞEKİLDE GÖRÜŞMELERİNİZİ YAPABİLİRSİNİZ. PARA TRANSFERLERİNİZİ BANKA HESAPLARINIZA GÜVENLİ BİR ŞEKİLDE ÇEKEBİLİRSİNİZ, İYİ GÖRÜŞMELER DİLİYORUZ.
+              </p>
+            </div>
           </div>
         </div>
       </div>
