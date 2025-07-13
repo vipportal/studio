@@ -246,7 +246,7 @@ export default function BalancePage() {
                           <form onSubmit={handleIbanSubmit} className="space-y-4 pt-4">
                               <div>
                                   <Label htmlFor="amount" className="text-base">Tutar</Label>
-                                  <Input id="amount" type="number" placeholder="Örn: 500" required />
+                                  <Input id="amount" type="number" required />
                               </div>
                               <DialogFooter>
                                   <Button type="submit" disabled={isLoading} className="w-full text-base sm:text-sm">
