@@ -8,8 +8,9 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 import { VenetianMask } from "lucide-react";
-import { format } from "date-fns";
+import { format, addDays } from "date-fns";
 import type { AdminMember } from "@/app/dashboard/admin/page";
+import { getMembers } from "@/lib/member-storage";
 
 const VAT_RATE = 0.20;
 
@@ -20,7 +21,10 @@ export default function InvoicesPage() {
   useEffect(() => {
     const loggedInUserData = localStorage.getItem('loggedInUser');
     if (loggedInUserData) {
-      setCurrentUser(JSON.parse(loggedInUserData));
+      const allMembers = getMembers();
+      const parsedUser = JSON.parse(loggedInUserData);
+      const freshUserData = allMembers.find(m => m.id === parsedUser.id);
+      setCurrentUser(freshUserData || null);
     } else {
       router.push('/');
     }
@@ -37,8 +41,10 @@ export default function InvoicesPage() {
   const invoiceAmount = parseFloat(currentUser.invoiceAmount) || 0;
   const subtotal = invoiceAmount / (1 + VAT_RATE);
   const vatAmount = invoiceAmount - subtotal;
-  const invoiceDate = currentUser.id ? format(new Date(currentUser.id), "dd.MM.yyyy") : format(new Date(), "dd.MM.yyyy");
-  const dueDate = currentUser.id ? format(new Date(new Date(currentUser.id).setDate(15)), "dd.MM.yyyy") : format(new Date(), "dd.MM.yyyy");
+  
+  const creationDate = new Date(currentUser.id);
+  const invoiceDate = format(creationDate, "dd.MM.yyyy");
+  const dueDate = format(addDays(creationDate, 15), "dd.MM.yyyy");
 
   return (
     <Card className="max-w-4xl mx-auto my-8 font-sans shadow-lg">
