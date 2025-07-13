@@ -9,7 +9,11 @@ import Image from "next/image";
 import type { AdminMember } from "@/app/dashboard/admin/page";
 import { cn } from "@/lib/utils";
 import { Fingerprint, MapPin, Building, Award, Wallet, Phone } from "lucide-react";
-
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogTrigger } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
+import { useToast } from "@/hooks/use-toast";
+import { Label } from "@/components/ui/label";
 
 const availableMembers = [
   { name: "Ayşe Y.", location: "Kadıköy", img: "https://placehold.co/100x100.png", hint: "woman smiling" },
@@ -52,6 +56,9 @@ function InfoRow({
 export default function ProfilePage() {
   const router = useRouter();
   const [user, setUser] = useState<AdminMember | null>(null);
+  const [selectedMember, setSelectedMember] = useState<{name: string} | null>(null);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const { toast, dismiss } = useToast();
 
   useEffect(() => {
     const loggedInUser = localStorage.getItem('loggedInUser');
@@ -67,6 +74,25 @@ export default function ProfilePage() {
   }
   
   const isStatusActive = user.status === 'Aktif';
+  
+  const handleMemberClick = (member: {name: string}) => {
+    setSelectedMember(member);
+    setIsDialogOpen(true);
+  }
+
+  const handleSendMessage = (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsDialogOpen(false);
+    const { id, dismiss } = toast({
+      title: "✅ Başarılı",
+      description: `Mesajınız ${selectedMember?.name} kişisine gönderildi.`,
+      className: "toast-center bg-green-100 border-green-300 text-green-800",
+    });
+
+    setTimeout(() => {
+      dismiss(id);
+    }, 4000);
+  }
 
   return (
     <div className="space-y-8">
@@ -99,16 +125,16 @@ export default function ProfilePage() {
         </CardHeader>
         <CardContent className="pt-6">
           <div className="space-y-4">
-            <InfoRow label="Telefon Numarası" value={user.phone} icon={Phone} labelClassName="text-blue-600" />
-            <InfoRow label="TC Kimlik No" value={user.tc} icon={Fingerprint} labelClassName="text-blue-600" />
-            <InfoRow label="İl" value={user.il} icon={MapPin} labelClassName="text-blue-600" />
-            <InfoRow label="İlçe" value={user.ilce} icon={Building} labelClassName="text-blue-600" />
+            <InfoRow label="Telefon Numarası" value={user.phone} icon={Phone} labelClassName="text-blue-600 dark:text-blue-400" />
+            <InfoRow label="TC Kimlik No" value={user.tc} icon={Fingerprint} labelClassName="text-blue-600 dark:text-blue-400" />
+            <InfoRow label="İl" value={user.il} icon={MapPin} labelClassName="text-blue-600 dark:text-blue-400" />
+            <InfoRow label="İlçe" value={user.ilce} icon={Building} labelClassName="text-blue-600 dark:text-blue-400" />
             <InfoRow label="Haftalık Kazanç" value={user.weeklyGain} icon={Wallet} labelClassName="text-green-600" valueClassName="text-green-600 font-bold" />
             <InfoRow 
               label="Üyelik Durumu" 
               value={user.status} 
               icon={Award} 
-              labelClassName="text-blue-600"
+              labelClassName="text-blue-600 dark:text-blue-400"
               badge 
               badgeClassName={isStatusActive ? 'bg-green-600 hover:bg-green-700' : 'bg-red-600 hover:bg-red-700'}
             />
@@ -128,23 +154,42 @@ export default function ProfilePage() {
         </CardHeader>
         <CardContent className="grid grid-cols-1 gap-4 pt-6 sm:grid-cols-2 md:grid-cols-3">
           {availableMembers.map(member => (
-            <Card key={member.name} className="flex flex-col items-center p-4 text-center transition-colors hover:bg-card/60">
-              <div className="relative h-20 w-20 mb-4 overflow-hidden rounded-full border-2 border-accent">
-                <Image 
-                    src={member.img} 
-                    alt={member.name}
-                    data-ai-hint={member.hint}
-                    width={80}
-                    height={80}
-                    className="h-full w-full object-cover filter blur-md brightness-50 sepia saturate-200 hue-rotate-[200deg]"
-                />
-              </div>
-              <p className="font-semibold">{member.name}</p>
-              <p className="text-sm text-muted-foreground">{member.location}</p>
-            </Card>
+              <Card key={member.name} onClick={() => handleMemberClick(member)} className="flex flex-col items-center p-4 text-center transition-all hover:bg-card/60 cursor-pointer hover:shadow-lg hover:scale-105">
+                <div className="relative h-20 w-20 mb-4 overflow-hidden rounded-full border-2 border-accent">
+                  <Image 
+                      src={member.img} 
+                      alt={member.name}
+                      data-ai-hint={member.hint}
+                      width={80}
+                      height={80}
+                      className="h-full w-full object-cover filter blur-md brightness-50 sepia saturate-200 hue-rotate-[200deg]"
+                  />
+                </div>
+                <p className="font-semibold">{member.name}</p>
+                <p className="text-sm text-muted-foreground">{member.location}</p>
+              </Card>
           ))}
         </CardContent>
       </Card>
+      
+      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+          <DialogContent>
+              <DialogHeader>
+                  <DialogTitle>Mesaj Gönder: {selectedMember?.name}</DialogTitle>
+              </DialogHeader>
+              <form onSubmit={handleSendMessage}>
+                <div className="grid gap-4 py-4">
+                  <div className="grid gap-2">
+                    <Label htmlFor="message">Mesajınız</Label>
+                    <Textarea id="message" placeholder="Mesajınızı buraya yazın..." required />
+                  </div>
+                </div>
+                <DialogFooter>
+                    <Button type="submit">Gönder</Button>
+                </DialogFooter>
+              </form>
+          </DialogContent>
+      </Dialog>
     </div>
   );
 }
