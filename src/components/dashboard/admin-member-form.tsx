@@ -31,7 +31,6 @@ const AdminMemberForm = ({ member, onSave, onCancel }: AdminMemberFormProps) => 
         onayMesaji: '',
         invoiceAmount: '',
         status: 'Aktif' as 'Aktif' | 'Pasif',
-        transactionStatus: 'allowed' as 'allowed' | 'blocked',
     });
 
      useEffect(() => {
@@ -50,7 +49,6 @@ const AdminMemberForm = ({ member, onSave, onCancel }: AdminMemberFormProps) => 
                 onayMesaji: member.onayMesaji || '',
                 invoiceAmount: member.invoiceAmount,
                 status: member.status,
-                transactionStatus: member.transactionStatus || 'allowed',
             });
         } else {
              setFormData({
@@ -67,7 +65,6 @@ const AdminMemberForm = ({ member, onSave, onCancel }: AdminMemberFormProps) => 
                 onayMesaji: '',
                 invoiceAmount: '',
                 status: 'Aktif',
-                transactionStatus: 'allowed',
             });
         }
     }, [member]);
@@ -82,14 +79,9 @@ const AdminMemberForm = ({ member, onSave, onCancel }: AdminMemberFormProps) => 
         setFormData(prev => ({ ...prev, status: value }));
     };
 
-    const handleTransactionStatusChange = (value: 'allowed' | 'blocked') => {
-        setFormData(prev => ({ ...prev, transactionStatus: value }));
-    };
-
-
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        const dataToSave = { ...formData };
+        const dataToSave = { ...formData, transactionStatus: 'allowed' as const }; // Keep default value
         if (member) {
             onSave({ ...member, ...dataToSave });
         } else {
@@ -140,7 +132,7 @@ const AdminMemberForm = ({ member, onSave, onCancel }: AdminMemberFormProps) => 
                     <Label htmlFor="invoiceAmount">Fatura Tutarı</Label>
                     <Input id="invoiceAmount" value={formData.invoiceAmount} onChange={handleChange} placeholder="Örn: 1250 TL" required />
                 </div>
-                <div className="space-y-3">
+                <div className="space-y-3 sm:col-span-2">
                     <Label>Üyelik Durumu</Label>
                     <RadioGroup
                         value={formData.status}
@@ -154,23 +146,6 @@ const AdminMemberForm = ({ member, onSave, onCancel }: AdminMemberFormProps) => 
                         <div className="flex items-center space-x-2">
                             <RadioGroupItem value="Pasif" id="status-pasif" />
                             <Label htmlFor="status-pasif">Pasif</Label>
-                        </div>
-                    </RadioGroup>
-                </div>
-                <div className="space-y-3">
-                    <Label>İşlem Durumu (Para Çekme)</Label>
-                    <RadioGroup
-                        value={formData.transactionStatus}
-                        onValueChange={handleTransactionStatusChange}
-                        className="flex items-center space-x-4"
-                    >
-                        <div className="flex items-center space-x-2">
-                            <RadioGroupItem value="allowed" id="transaction-allowed" />
-                            <Label htmlFor="transaction-allowed">İzin Verildi (Onay)</Label>
-                        </div>
-                        <div className="flex items-center space-x-2">
-                            <RadioGroupItem value="blocked" id="transaction-blocked" />
-                            <Label htmlFor="transaction-blocked">Engellendi (Hata)</Label>
                         </div>
                     </RadioGroup>
                 </div>

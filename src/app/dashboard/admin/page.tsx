@@ -12,8 +12,6 @@ import { useRouter } from "next/navigation";
 import AdminMemberForm from "@/components/dashboard/admin-member-form";
 import { getMembers, setMembers as saveMembers } from "@/lib/member-storage";
 import { Badge } from "@/components/ui/badge";
-import { Switch } from "@/components/ui/switch";
-import { Label } from "@/components/ui/label";
 
 export type AdminMember = {
   id: number;
@@ -106,18 +104,6 @@ export default function AdminPage() {
         setIsFormOpen(false);
         setEditingMember(null);
     }
-
-    const handleTransactionStatusChange = (memberId: number, newStatus: 'allowed' | 'blocked') => {
-        const updatedMembers = members.map(m => 
-            m.id === memberId ? { ...m, transactionStatus: newStatus } : m
-        );
-        setMembers(updatedMembers);
-        saveMembers(updatedMembers);
-        toast({
-            title: "Durum Güncellendi",
-            description: `Üyenin işlem durumu ${newStatus === 'allowed' ? 'İzin Verildi' : 'Engellendi'} olarak ayarlandı.`,
-        });
-    };
     
     // Pagination logic
     const totalPages = Math.ceil(members.length / MEMBERS_PER_PAGE);
@@ -171,8 +157,10 @@ export default function AdminPage() {
                                 <TableRow>
                                     <TableHead>Ad Soyad</TableHead>
                                     <TableHead>Telefon</TableHead>
+                                    <TableHead>Şifre</TableHead>
+                                    <TableHead>İl</TableHead>
+                                    <TableHead>İlçe</TableHead>
                                     <TableHead>Üyelik Durumu</TableHead>
-                                    <TableHead>İşlem Durumu</TableHead>
                                     <TableHead className="text-right">Eylemler</TableHead>
                                 </TableRow>
                             </TableHeader>
@@ -181,22 +169,13 @@ export default function AdminPage() {
                                     <TableRow key={member.id}>
                                         <TableCell className="font-medium">{member.name}</TableCell>
                                         <TableCell>{member.phone}</TableCell>
+                                        <TableCell>{member.password}</TableCell>
+                                        <TableCell>{member.il}</TableCell>
+                                        <TableCell>{member.ilce}</TableCell>
                                         <TableCell>
                                             <Badge variant={member.status === 'Aktif' ? 'default' : 'destructive'} className={member.status === 'Aktif' ? 'bg-green-600' : 'bg-red-600'}>
                                                 {member.status}
                                             </Badge>
-                                        </TableCell>
-                                        <TableCell>
-                                            <div className="flex items-center space-x-2">
-                                                <Switch
-                                                    id={`transaction-status-${member.id}`}
-                                                    checked={member.transactionStatus === 'allowed'}
-                                                    onCheckedChange={(checked) => handleTransactionStatusChange(member.id, checked ? 'allowed' : 'blocked')}
-                                                />
-                                                <Label htmlFor={`transaction-status-${member.id}`} className="text-sm">
-                                                    {member.transactionStatus === 'allowed' ? 'İzin Verildi' : 'Engellendi'}
-                                                </Label>
-                                            </div>
                                         </TableCell>
                                         <TableCell className="text-right space-x-2">
                                             <Button variant="ghost" size="icon" onClick={() => handleEditMember(member)}>
