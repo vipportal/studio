@@ -42,7 +42,7 @@ export default function AddressPage() {
                  </ContactInfo>
                   <Separator />
                  <ContactInfo icon={<Phone size={24} />} title="Destek Hattı">
-                    +90 (555) 123 45 67 (Yalnızca WhatsApp)
+                    +90 (212) 123 45 67 (Yalnızca WhatsApp)
                  </ContactInfo>
                   <Separator />
                  <ContactInfo icon={<Mail size={24} />} title="E-Posta Adresi">
