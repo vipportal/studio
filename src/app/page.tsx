@@ -19,9 +19,14 @@ export default function LoginPage() {
     setIsLoading(true);
     // Simulate API call
     setTimeout(() => {
-      // In a real app, you'd validate credentials here
       setIsLoading(false);
-      router.push("/dashboard");
+      // Admin login check
+      if (phone === "admin" && password === "146161") {
+        router.push("/dashboard/members");
+      } else {
+        // Regular user login
+        router.push("/dashboard");
+      }
     }, 1500);
   };
 
@@ -38,11 +43,11 @@ export default function LoginPage() {
           <form onSubmit={handleLogin}>
             <CardContent className="space-y-6">
               <div className="space-y-2">
-                <Label htmlFor="phone">Telefon Numaranız</Label>
+                <Label htmlFor="phone">Telefon Numaranız veya Kullanıcı Adı</Label>
                 <Input
                   id="phone"
-                  type="tel"
-                  placeholder="555 555 55 55"
+                  type="text"
+                  placeholder="admin veya 555 555 55 55"
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
                   required
