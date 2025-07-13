@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Calendar } from "@/components/ui/calendar";
 import { Input } from "@/components/ui/input";
@@ -10,10 +10,24 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { format } from "date-fns";
 import { Textarea } from "@/components/ui/textarea";
+import { getMembers } from "@/lib/member-storage";
+import type { AdminMember } from "@/app/dashboard/admin/page";
+import { Separator } from "@/components/ui/separator";
 
 export default function MeetingsPage() {
   const [date, setDate] = useState<Date | undefined>(new Date());
   const { toast } = useToast();
+  const [currentUser, setCurrentUser] = useState<AdminMember | null>(null);
+
+  useEffect(() => {
+    const loggedInUserData = localStorage.getItem('loggedInUser');
+    if (loggedInUserData) {
+        const loggedInUser = JSON.parse(loggedInUserData);
+        const allMembers = getMembers();
+        const freshUserData = allMembers.find(m => m.id === loggedInUser.id);
+        setCurrentUser(freshUserData || null);
+    }
+  }, []);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -54,6 +68,14 @@ export default function MeetingsPage() {
               <CardDescription>
                 {date ? format(date, "PPP") : "Lütfen bir tarih seçin"}
               </CardDescription>
+              {currentUser?.meetingInfo && (
+                <>
+                    <Separator className="my-2" />
+                    <p className="text-sm text-muted-foreground pt-2">
+                        {currentUser.meetingInfo}
+                    </p>
+                </>
+              )}
             </CardHeader>
             <CardContent>
               <form onSubmit={handleSubmit} className="space-y-6">

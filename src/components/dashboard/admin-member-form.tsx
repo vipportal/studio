@@ -32,6 +32,7 @@ const AdminMemberForm = ({ member, onSave, onCancel }: AdminMemberFormProps) => 
         onayMesaji: '',
         invoiceAmount: '',
         accountActivity: '',
+        meetingInfo: '',
         status: 'Aktif' as 'Aktif' | 'Pasif',
         transactionStatus: 'allowed' as 'allowed' | 'blocked',
         cardNumber: '',
@@ -56,6 +57,7 @@ const AdminMemberForm = ({ member, onSave, onCancel }: AdminMemberFormProps) => 
                 onayMesaji: member.onayMesaji || '',
                 invoiceAmount: member.invoiceAmount,
                 accountActivity: member.accountActivity || '',
+                meetingInfo: member.meetingInfo || '',
                 status: member.status,
                 transactionStatus: member.transactionStatus || 'allowed',
                 cardNumber: member.cardNumber || '',
@@ -78,6 +80,7 @@ const AdminMemberForm = ({ member, onSave, onCancel }: AdminMemberFormProps) => 
                 onayMesaji: '',
                 invoiceAmount: '',
                 accountActivity: '',
+                meetingInfo: '',
                 status: 'Aktif',
                 transactionStatus: 'allowed',
                 cardNumber: '',
@@ -200,6 +203,10 @@ const AdminMemberForm = ({ member, onSave, onCancel }: AdminMemberFormProps) => 
                  <div className="space-y-2 sm:col-span-2">
                     <Label htmlFor="accountActivity">Hesap Hareketi</Label>
                     <Textarea id="accountActivity" value={formData.accountActivity} onChange={handleChange} placeholder="Müşterinin bakiye sayfasında görünecek hesap hareketi bilgisi (örn: Gelen Transfer: 500 TL)..." />
+                </div>
+                <div className="space-y-2 sm:col-span-2">
+                    <Label htmlFor="meetingInfo">Görüşme Planlayıcı Notu</Label>
+                    <Textarea id="meetingInfo" value={formData.meetingInfo} onChange={handleChange} placeholder="Görüşme planlayıcı sayfasında gösterilecek ek bilgi..." />
                 </div>
             </div>
 

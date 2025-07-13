@@ -28,6 +28,7 @@ export type AdminMember = {
   onayMesaji: string;
   invoiceAmount: string;
   accountActivity: string;
+  meetingInfo: string;
   status: 'Aktif' | 'Pasif';
   transactionStatus: 'allowed' | 'blocked';
   // Card details
