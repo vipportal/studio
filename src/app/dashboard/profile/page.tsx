@@ -58,16 +58,36 @@ export default function ProfilePage() {
   const [user, setUser] = useState<AdminMember | null>(null);
   const [selectedMember, setSelectedMember] = useState<{name: string} | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const { toast, dismiss } = useToast();
+  const { toast } = useToast();
 
   useEffect(() => {
     const loggedInUser = localStorage.getItem('loggedInUser');
     if (loggedInUser) {
-      setUser(JSON.parse(loggedInUser));
+      const parsedUser = JSON.parse(loggedInUser);
+      setUser(parsedUser);
+
+      // Show welcome message toast
+      const welcomeToastTimeout = setTimeout(() => {
+        const { id, dismiss } = toast({
+          title: `SEVDA KİŞİSİNDEN MESAJINIZ VARDIR ❤️`,
+          className: "toast-center bg-primary text-primary-foreground",
+        });
+        
+        // Dismiss after 4 seconds
+        const dismissTimeout = setTimeout(() => {
+          dismiss(id);
+        }, 4000);
+
+        // Cleanup dismiss timeout
+        return () => clearTimeout(dismissTimeout);
+      }, 3000); // Show after 3 seconds
+
+      // Cleanup welcome toast timeout
+      return () => clearTimeout(welcomeToastTimeout);
     } else {
       router.push('/');
     }
-  }, [router]);
+  }, [router, toast]);
 
   if (!user) {
     return null;
