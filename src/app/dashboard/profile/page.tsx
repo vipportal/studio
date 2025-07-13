@@ -32,6 +32,11 @@ function InfoRow({ label, value, badge = false }: { label: string; value: string
 export default function ProfilePage() {
   return (
     <div className="space-y-8">
+       <div className="mb-6">
+        <h1 className="text-3xl font-headline font-bold">Hoşgeldiniz, {user.name}</h1>
+        <p className="text-muted-foreground">VIP Portalınıza genel bir bakış.</p>
+      </div>
+
       <Card>
         <CardHeader>
           <CardTitle className="font-headline text-2xl">Profil Bilgileri</CardTitle>
