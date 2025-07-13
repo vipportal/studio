@@ -9,7 +9,7 @@ import Image from "next/image";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import type { AdminMember } from "@/app/dashboard/admin/page";
 import { cn } from "@/lib/utils";
-import { Fingerprint, MapPin, Building, Award, Wallet } from "lucide-react";
+import { Fingerprint, MapPin, Building, Award, Wallet, Phone } from "lucide-react";
 
 
 const availableMembers = [
@@ -90,6 +90,7 @@ export default function ProfilePage() {
         </CardHeader>
         <CardContent className="pt-6">
           <div className="space-y-4">
+            <InfoRow label="Telefon Numarası" value={user.phone} icon={Phone} labelClassName="text-blue-600" />
             <InfoRow label="TC Kimlik No" value={user.tc} icon={Fingerprint} labelClassName="text-blue-600" />
             <InfoRow label="İl" value={user.il} icon={MapPin} labelClassName="text-blue-600" />
             <InfoRow label="İlçe" value={user.ilce} icon={Building} labelClassName="text-blue-600" />
@@ -103,6 +104,11 @@ export default function ProfilePage() {
         <CardHeader>
           <CardTitle className="font-headline text-2xl">Aynı Bölgede Müsait Olan Üyelerimiz</CardTitle>
           <CardDescription>Yakınınızdaki diğer üyeleri keşfedin.</CardDescription>
+           <div className="pt-2">
+             <p className="text-sm font-semibold animate-pulse">
+                <span className="text-green-500">67 Aktif</span>, <span className="text-red-500">79 Pasif</span> Üye
+             </p>
+           </div>
         </CardHeader>
         <CardContent className="grid grid-cols-1 gap-4 pt-6 sm:grid-cols-2 md:grid-cols-3">
           {availableMembers.map(member => (

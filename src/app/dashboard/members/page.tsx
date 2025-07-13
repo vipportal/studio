@@ -1,3 +1,4 @@
+
 "use client";
 
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -57,7 +58,7 @@ export default function MembersPage() {
                                                 data-ai-hint={member.hint}
                                                 width={48} 
                                                 height={48} 
-                                                className="h-full w-full object-cover filter blur-sm brightness-75 hue-rotate-15"
+                                                className="h-full w-full object-cover filter blur-md brightness-50 sepia saturate-200 hue-rotate-[200deg]"
                                             />
                                         </div>
                                     </TableCell>
