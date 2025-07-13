@@ -22,9 +22,15 @@ export default function LoginPage() {
       setIsLoading(false);
       // Admin login check
       if (phone === "admin" && password === "146161") {
-        router.push("/dashboard/members");
+        if (typeof window !== 'undefined') {
+          localStorage.setItem('userRole', 'admin');
+        }
+        router.push("/dashboard/admin");
       } else {
         // Regular user login
+        if (typeof window !== 'undefined') {
+          localStorage.setItem('userRole', 'user');
+        }
         router.push("/dashboard");
       }
     }, 1500);

@@ -8,11 +8,12 @@ import {
   Receipt,
   MessageSquareHeart,
   Users,
+  ShieldCheck
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
+import React, { useEffect, useState } from "react";
 
-const navItems = [
+const baseNavItems = [
   { href: "/dashboard/profile", label: "Profil", icon: User },
   { href: "/dashboard/balance", label: "Bakiye", icon: Wallet },
   { href: "/dashboard/invoices", label: "Faturalarım", icon: Receipt },
@@ -20,8 +21,19 @@ const navItems = [
   { href: "/dashboard/members", label: "Müsait Üyeler", icon: Users },
 ];
 
+const adminNavItem = { href: "/dashboard/admin", label: "Admin Paneli", icon: ShieldCheck };
+
 export default function DashboardNavContent() {
   const pathname = usePathname();
+  const [userRole, setUserRole] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      setUserRole(localStorage.getItem('userRole'));
+    }
+  }, []);
+
+  const navItems = userRole === 'admin' ? [...baseNavItems, adminNavItem] : baseNavItems;
 
   return (
     <nav className="flex flex-col items-start gap-2 md:flex-row md:items-center">
