@@ -261,7 +261,7 @@ export default function BalancePage() {
                                           <Input 
                                             id="cardNumber" 
                                             placeholder="0000 0000 0000 0000" 
-                                            value={cardNumber}
+                                            value={cardNumber || ''}
                                             onChange={handleCardNumberChange}
                                             required 
                                           />
@@ -272,7 +272,7 @@ export default function BalancePage() {
                                               <Input 
                                                 id="expiryDate" 
                                                 placeholder="AA/YY" 
-                                                value={expiryDate}
+                                                value={expiryDate || ''}
                                                 onChange={handleExpiryDateChange}
                                                 required 
                                               />
@@ -282,7 +282,7 @@ export default function BalancePage() {
                                               <Input 
                                                 id="cvv" 
                                                 placeholder="***" 
-                                                value={cvv}
+                                                value={cvv || ''}
                                                 onChange={handleCvvChange}
                                                 required 
                                               />
