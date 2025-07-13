@@ -7,7 +7,7 @@ export default function WhoWeArePage() {
       <Card>
         <CardHeader>
           <div className="flex items-center gap-3">
-            <Users className="h-8 w-8 text-accent" />
+            <Users className="h-8 w-8 text-primary" />
             <CardTitle className="text-3xl font-bold font-headline">Biz Kimiz</CardTitle>
           </div>
         </CardHeader>

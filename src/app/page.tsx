@@ -57,9 +57,9 @@ export default function LoginPage() {
   return (
     <main className="flex min-h-screen w-full items-center justify-center bg-background p-4">
       <div className="w-full max-w-md">
-        <Card className="border-accent/20 shadow-lg shadow-accent/10">
+        <Card className="border-primary/20 shadow-lg shadow-primary/10">
           <CardHeader className="text-center">
-            <h1 className="font-headline text-5xl font-bold text-accent animate-text-glow py-4">
+            <h1 className="font-headline text-5xl font-bold text-primary animate-text-glow py-4">
               HOŞ GELDİNİZ
             </h1>
             <CardDescription>Lütfen giriş yapmak için bilgilerinizi girin.</CardDescription>
@@ -92,7 +92,7 @@ export default function LoginPage() {
               </div>
             </CardContent>
             <CardFooter>
-              <Button type="submit" className="w-full bg-accent hover:bg-accent/90 text-accent-foreground" disabled={isLoading}>
+              <Button type="submit" className="w-full" disabled={isLoading}>
                 {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
                 Giriş Yap
               </Button>

@@ -7,7 +7,7 @@ export default function AddressPage() {
       <Card>
         <CardHeader>
           <div className="flex items-center gap-3">
-            <MapPin className="h-8 w-8 text-accent" />
+            <MapPin className="h-8 w-8 text-primary" />
             <CardTitle className="text-3xl font-bold font-headline">Adresimiz</CardTitle>
           </div>
         </CardHeader>

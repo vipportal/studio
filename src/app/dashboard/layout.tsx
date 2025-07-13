@@ -23,7 +23,7 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
          <header className="sticky top-0 z-40 w-full border-b bg-background/95 backdrop-blur-sm">
           <div className="container flex h-16 items-center">
               <Link href="/dashboard" className="mr-6 flex items-center space-x-2">
-                  <VenetianMask className="h-8 w-8 text-accent" />
+                  <VenetianMask className="h-8 w-8 text-primary" />
                   <span className="font-headline text-2xl font-bold">
                   VIP Portal
                   </span>
@@ -43,7 +43,7 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
                       </SheetTrigger>
                       <SheetContent side="left">
                       <Link href="/dashboard" className="mb-6 flex items-center space-x-2">
-                          <VenetianMask className="h-8 w-8 text-accent" />
+                          <VenetianMask className="h-8 w-8 text-primary" />
                           <span className="font-headline text-2xl font-bold">
                               VIP Portal
                           </span>
@@ -63,7 +63,7 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
       <footer className="mt-auto border-t bg-background/50">
         <div className="container flex flex-col items-center justify-center gap-4 py-6">
             <div className="flex flex-col items-center gap-2">
-                <p className="text-lg font-semibold text-blue-600 dark:text-blue-400">Bizi Takip Edin:</p>
+                <p className="text-lg font-semibold text-primary">Bizi Takip Edin:</p>
                 <div className="flex gap-4">
                     <a href="#" target="_blank" rel="noopener noreferrer" className="text-muted-foreground transition-colors hover:text-foreground">
                         <Instagram className="h-6 w-6" />

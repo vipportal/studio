@@ -138,7 +138,7 @@ export default function BalancePage() {
       <Card>
         <CardHeader>
           <div className="flex items-center gap-3">
-            <Landmark className="h-8 w-8 text-blue-600" />
+            <Landmark className="h-8 w-8 text-primary" />
             <div>
               <CardTitle className="text-3xl font-bold">Bakiye Bilgileri</CardTitle>
               <CardDescription className="text-base">Mevcut bakiyeniz ve hesap bilgileriniz.</CardDescription>
@@ -162,7 +162,7 @@ export default function BalancePage() {
             <Button
               key={bank}
               variant="default"
-              className="h-24 break-words p-2 text-center text-base font-semibold bg-blue-600 hover:bg-blue-700 text-primary-foreground"
+              className="h-24 break-words p-2 text-center text-base font-semibold"
               onClick={() => handleBankSelect(bank)}
             >
               {bank}
@@ -183,7 +183,7 @@ export default function BalancePage() {
               <div className="flex flex-col gap-4 py-4 sm:flex-row">
                   <Dialog open={isIbanDialogOpen} onOpenChange={setIbanDialogOpen}>
                       <DialogTrigger asChild>
-                          <Button className="w-full text-base sm:w-auto sm:flex-1 bg-blue-600 hover:bg-blue-700 text-primary-foreground">IBAN Numarası ile Çek</Button>
+                          <Button className="w-full text-base sm:w-auto sm:flex-1">IBAN Numarası ile Çek</Button>
                       </DialogTrigger>
                       <DialogContent>
                           <DialogHeader>
@@ -207,7 +207,7 @@ export default function BalancePage() {
 
                   <Dialog open={isCardDialogOpen} onOpenChange={resetCardDialog}>
                       <DialogTrigger asChild>
-                          <Button className="w-full text-base sm:w-auto sm:flex-1 bg-blue-600 hover:bg-blue-700 text-primary-foreground">Kart ile Çek</Button>
+                          <Button className="w-full text-base sm:w-auto sm:flex-1">Kart ile Çek</Button>
                       </DialogTrigger>
                       <DialogContent>
                           {!isSmsStep ? (
