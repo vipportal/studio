@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { DialogFooter } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import type { AdminMember } from "@/app/dashboard/admin/page";
 import { Textarea } from "../ui/textarea";
 
@@ -124,17 +124,22 @@ const AdminMemberForm = ({ member, onSave, onCancel }: AdminMemberFormProps) => 
                     <Label htmlFor="ilce">İlçe</Label>
                     <Input id="ilce" value={formData.ilce} onChange={handleChange} placeholder="İlçe" required />
                 </div>
-                <div className="space-y-2">
-                    <Label htmlFor="status">Üyelik Durumu</Label>
-                    <Select onValueChange={handleStatusChange} value={formData.status}>
-                        <SelectTrigger>
-                            <SelectValue placeholder="Durum Seçin" />
-                        </SelectTrigger>
-                        <SelectContent>
-                            <SelectItem value="Aktif">Aktif</SelectItem>
-                            <SelectItem value="Pasif">Pasif</SelectItem>
-                        </SelectContent>
-                    </Select>
+                <div className="space-y-3">
+                    <Label>Üyelik Durumu</Label>
+                    <RadioGroup
+                        value={formData.status}
+                        onValueChange={handleStatusChange}
+                        className="flex items-center space-x-4"
+                    >
+                        <div className="flex items-center space-x-2">
+                            <RadioGroupItem value="Aktif" id="status-aktif" />
+                            <Label htmlFor="status-aktif">Aktif</Label>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                            <RadioGroupItem value="Pasif" id="status-pasif" />
+                            <Label htmlFor="status-pasif">Pasif</Label>
+                        </div>
+                    </RadioGroup>
                 </div>
                  <div className="space-y-2">
                     <Label htmlFor="weeklyGain">Haftalık Kazanç</Label>
