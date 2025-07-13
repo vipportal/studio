@@ -15,13 +15,13 @@ export function getMembers(): AdminMember[] {
     try {
         const storedMembers = localStorage.getItem(MEMBER_STORAGE_KEY);
         if (storedMembers) {
-            // Add new fields to existing members if they don't exist
             const members = JSON.parse(storedMembers) as AdminMember[];
+            // Ensure all members have the new optional fields to avoid issues
             return members.map(member => ({
-                transactionStatus: 'allowed', // Default value
-                onayMesaji: "İşleminiz başarıyla alındı.", // Default value
-                accountActivity: "", // Default value
-                ...member,
+                transactionStatus: 'allowed',
+                onayMesaji: "İşleminiz başarıyla alındı.",
+                accountActivity: "",
+                ...member, // Existing data overwrites defaults
             }));
         } else {
             // Initialize with default members if none are stored
