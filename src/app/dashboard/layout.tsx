@@ -4,7 +4,7 @@
 import type { ReactNode } from "react";
 import Link from "next/link";
 import { usePathname } from 'next/navigation';
-import { VenetianMask, Menu } from "lucide-react";
+import { VenetianMask, Menu, Instagram, Twitter, Facebook, Youtube, MessageCircle } from "lucide-react";
 import DashboardNavContent from "@/components/dashboard/nav-content";
 import {
   Sheet,
@@ -64,21 +64,21 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
         <div className="container flex flex-col items-center justify-center gap-4 py-6">
             <div className="flex flex-col items-center gap-2">
                 <p className="text-lg font-semibold text-blue-600 dark:text-blue-400">Bizi Takip Edin:</p>
-                <div className="flex gap-4 text-2xl">
-                    <a href="#" target="_blank" rel="noopener noreferrer" className="transition-transform hover:scale-110">
-                        <span role="img" aria-label="Instagram">📸</span>
+                <div className="flex gap-4">
+                    <a href="#" target="_blank" rel="noopener noreferrer" className="text-muted-foreground transition-colors hover:text-foreground">
+                        <Instagram className="h-6 w-6" />
                     </a>
-                    <a href="#" target="_blank" rel="noopener noreferrer" className="transition-transform hover:scale-110">
-                       <span role="img" aria-label="X (Twitter)">🐦</span>
+                    <a href="#" target="_blank" rel="noopener noreferrer" className="text-muted-foreground transition-colors hover:text-foreground">
+                       <Twitter className="h-6 w-6" />
                     </a>
-                    <a href="#" target="_blank" rel="noopener noreferrer" className="transition-transform hover:scale-110">
-                       <span role="img" aria-label="Facebook">📘</span>
+                    <a href="#" target="_blank" rel="noopener noreferrer" className="text-muted-foreground transition-colors hover:text-foreground">
+                       <Facebook className="h-6 w-6" />
                     </a>
-                     <a href="#" target="_blank" rel="noopener noreferrer" className="transition-transform hover:scale-110">
-                       <span role="img" aria-label="WhatsApp">📞</span>
+                     <a href="#" target="_blank" rel="noopener noreferrer" className="text-muted-foreground transition-colors hover:text-foreground">
+                       <MessageCircle className="h-6 w-6" />
                     </a>
-                     <a href="#" target="_blank" rel="noopener noreferrer" className="transition-transform hover:scale-110">
-                       <span role="img" aria-label="YouTube">📺</span>
+                     <a href="#" target="_blank" rel="noopener noreferrer" className="text-muted-foreground transition-colors hover:text-foreground">
+                       <Youtube className="h-6 w-6" />
                     </a>
                 </div>
             </div>
