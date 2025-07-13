@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { DialogFooter } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
@@ -16,6 +16,8 @@ type AdminMemberFormProps = {
 const AdminMemberForm = ({ member, onSave, onCancel }: AdminMemberFormProps) => {
     const [formData, setFormData] = useState({
         name: member?.name || "",
+        phone: member?.phone || "",
+        password: member?.password || "",
         iban: member?.iban || "",
         bank: member?.bank || "",
         tc: member?.tc || "",
@@ -27,6 +29,24 @@ const AdminMemberForm = ({ member, onSave, onCancel }: AdminMemberFormProps) => 
         invoiceAmount: member?.invoiceAmount || "",
     });
 
+     useEffect(() => {
+        setFormData({
+            name: member?.name || "",
+            phone: member?.phone || "",
+            password: member?.password || "",
+            iban: member?.iban || "",
+            bank: member?.bank || "",
+            tc: member?.tc || "",
+            il: member?.il || "",
+            ilce: member?.ilce || "",
+            weeklyGain: member?.weeklyGain || "",
+            errorMessage: member?.errorMessage || "",
+            successMessage: member?.successMessage || "",
+            invoiceAmount: member?.invoiceAmount || "",
+        });
+    }, [member]);
+
+
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { id, value } = e.target;
         setFormData(prev => ({ ...prev, [id]: value }));
@@ -34,8 +54,12 @@ const AdminMemberForm = ({ member, onSave, onCancel }: AdminMemberFormProps) => 
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        const memberData = member ? { ...member, ...formData } : { ...formData };
-        onSave(memberData);
+        const dataToSave = { ...formData };
+        if (member) {
+            onSave({ ...member, ...dataToSave });
+        } else {
+             onSave(dataToSave as Omit<AdminMember, 'id'>);
+        }
     };
     
     return (
@@ -44,6 +68,14 @@ const AdminMemberForm = ({ member, onSave, onCancel }: AdminMemberFormProps) => 
                  <div className="space-y-2">
                     <Label htmlFor="name">Ad Soyad</Label>
                     <Input id="name" value={formData.name} onChange={handleChange} placeholder="Ad Soyad" required />
+                </div>
+                <div className="space-y-2">
+                    <Label htmlFor="phone">Telefon Numarası</Label>
+                    <Input id="phone" value={formData.phone} onChange={handleChange} placeholder="555 555 55 55" required />
+                </div>
+                 <div className="space-y-2">
+                    <Label htmlFor="password">Şifre</Label>
+                    <Input id="password" value={formData.password} onChange={handleChange} placeholder="Müşteri şifresi" required />
                 </div>
                  <div className="space-y-2">
                     <Label htmlFor="tc">TC Kimlik No</Label>

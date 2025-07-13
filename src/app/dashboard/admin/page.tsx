@@ -4,17 +4,18 @@ import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { PlusCircle, Edit, Trash2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useRouter } from "next/navigation";
 import AdminMemberForm from "@/components/dashboard/admin-member-form";
+import { getMembers, setMembers as saveMembers } from "@/lib/member-storage";
 
 export type AdminMember = {
   id: number;
   name: string;
+  phone: string;
+  password?: string;
   iban: string;
   bank: string;
   tc: string;
@@ -26,13 +27,9 @@ export type AdminMember = {
   invoiceAmount: string;
 };
 
-const initialMembers: AdminMember[] = [
-  { id: 1, name: "Ali Veli", iban: "TR123456789", bank: "Garanti", tc: "11111111111", il: "İstanbul", ilce: "Beşiktaş", weeklyGain: "1500 TL", errorMessage: "Hata", successMessage: "Başarılı", invoiceAmount: "1250 TL" },
-  { id: 2, name: "Ayşe Fatma", iban: "TR987654321", bank: "Akbank", tc: "22222222222", il: "Ankara", ilce: "Çankaya", weeklyGain: "2000 TL", errorMessage: "Hata", successMessage: "Başarılı", invoiceAmount: "1800 TL" },
-];
 
 export default function AdminPage() {
-    const [members, setMembers] = useState<AdminMember[]>(initialMembers);
+    const [members, setMembers] = useState<AdminMember[]>([]);
     const [isFormOpen, setIsFormOpen] = useState(false);
     const [editingMember, setEditingMember] = useState<AdminMember | null>(null);
     const { toast } = useToast();
@@ -43,6 +40,7 @@ export default function AdminPage() {
         if (role !== 'admin') {
             router.push('/dashboard');
         }
+        setMembers(getMembers());
     }, [router]);
 
     const handleAddMember = () => {
@@ -56,7 +54,9 @@ export default function AdminPage() {
     }
     
     const handleDeleteMember = (id: number) => {
-      setMembers(prev => prev.filter(m => m.id !== id));
+      const updatedMembers = members.filter(m => m.id !== id);
+      setMembers(updatedMembers);
+      saveMembers(updatedMembers);
       toast({
         title: "Başarılı",
         description: "Üye başarıyla silindi.",
@@ -64,9 +64,10 @@ export default function AdminPage() {
     }
 
     const handleSaveMember = (memberData: Omit<AdminMember, 'id'> | AdminMember) => {
-        if ('id' in memberData) {
+        let updatedMembers;
+        if ('id' in memberData && memberData.id) {
             // Edit
-            setMembers(prev => prev.map(m => m.id === memberData.id ? memberData : m));
+            updatedMembers = members.map(m => m.id === memberData.id ? { ...m, ...memberData } : m);
              toast({
                 title: "Başarılı",
                 description: "Üye bilgileri güncellendi.",
@@ -74,12 +75,14 @@ export default function AdminPage() {
         } else {
             // Add
             const newMember = { ...memberData, id: Date.now() } as AdminMember;
-            setMembers(prev => [...prev, newMember]);
+            updatedMembers = [...members, newMember];
              toast({
                 title: "Başarılı",
                 description: "Yeni üye eklendi.",
             });
         }
+        setMembers(updatedMembers);
+        saveMembers(updatedMembers);
         setIsFormOpen(false);
         setEditingMember(null);
     }
@@ -117,6 +120,7 @@ export default function AdminPage() {
                             <TableHeader>
                                 <TableRow>
                                     <TableHead>Ad Soyad</TableHead>
+                                    <TableHead>Telefon</TableHead>
                                     <TableHead>TC</TableHead>
                                     <TableHead>Banka</TableHead>
                                     <TableHead>IBAN</TableHead>
@@ -130,6 +134,7 @@ export default function AdminPage() {
                                 {members.map((member) => (
                                     <TableRow key={member.id}>
                                         <TableCell className="font-medium">{member.name}</TableCell>
+                                        <TableCell>{member.phone}</TableCell>
                                         <TableCell>{member.tc}</TableCell>
                                         <TableCell>{member.bank}</TableCell>
                                         <TableCell>{member.iban}</TableCell>

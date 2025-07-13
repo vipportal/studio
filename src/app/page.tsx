@@ -7,31 +7,49 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Loader2 } from "lucide-react";
+import { getMembers } from "@/lib/member-storage";
+import { useToast } from "@/hooks/use-toast";
 
 export default function LoginPage() {
   const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
+  const { toast } = useToast();
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
+    
     // Simulate API call
     setTimeout(() => {
       setIsLoading(false);
+
+      if (typeof window === 'undefined') {
+        return;
+      }
+
       // Admin login check
       if (phone === "admin" && password === "146161") {
-        if (typeof window !== 'undefined') {
-          localStorage.setItem('userRole', 'admin');
-        }
+        localStorage.setItem('userRole', 'admin');
         router.push("/dashboard/admin");
-      } else {
-        // Regular user login
-        if (typeof window !== 'undefined') {
-          localStorage.setItem('userRole', 'user');
-        }
+        return;
+      }
+
+      // Customer login check
+      const members = getMembers();
+      const customer = members.find(m => m.phone === phone && m.password === password);
+
+      if (customer) {
+        localStorage.setItem('userRole', 'user');
+        localStorage.setItem('loggedInUser', JSON.stringify(customer)); // Store user data
         router.push("/dashboard");
+      } else {
+        toast({
+          variant: "destructive",
+          title: "Giriş Başarısız",
+          description: "Telefon numarası veya şifre hatalı.",
+        });
       }
     }, 1500);
   };
@@ -49,7 +67,7 @@ export default function LoginPage() {
           <form onSubmit={handleLogin}>
             <CardContent className="space-y-6">
               <div className="space-y-2">
-                <Label htmlFor="phone">Telefon Numaranız veya Kullanıcı Adı</Label>
+                <Label htmlFor="phone">Telefon Numaranız</Label>
                 <Input
                   id="phone"
                   type="text"
