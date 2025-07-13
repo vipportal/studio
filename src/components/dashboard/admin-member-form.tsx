@@ -28,7 +28,6 @@ const AdminMemberForm = ({ member, onSave, onCancel }: AdminMemberFormProps) => 
         ilce: '',
         weeklyGain: '',
         errorMessage: '',
-        successMessage: '',
         invoiceAmount: '',
         status: 'Aktif' as 'Aktif' | 'Pasif',
     });
@@ -46,7 +45,6 @@ const AdminMemberForm = ({ member, onSave, onCancel }: AdminMemberFormProps) => 
                 ilce: member.ilce,
                 weeklyGain: member.weeklyGain,
                 errorMessage: member.errorMessage,
-                successMessage: member.successMessage,
                 invoiceAmount: member.invoiceAmount,
                 status: member.status,
             });
@@ -62,7 +60,6 @@ const AdminMemberForm = ({ member, onSave, onCancel }: AdminMemberFormProps) => 
                 ilce: '',
                 weeklyGain: '',
                 errorMessage: '',
-                successMessage: '',
                 invoiceAmount: '',
                 status: 'Aktif',
             });
@@ -150,12 +147,8 @@ const AdminMemberForm = ({ member, onSave, onCancel }: AdminMemberFormProps) => 
                     <Input id="invoiceAmount" value={formData.invoiceAmount} onChange={handleChange} placeholder="Örn: 1250 TL" required />
                 </div>
                  <div className="space-y-2 sm:col-span-2">
-                    <Label htmlFor="successMessage">Onay Mesajı</Label>
-                    <Textarea id="successMessage" value={formData.successMessage} onChange={handleChange} placeholder="Görüşme onaylandığında müşteriye gösterilecek mesaj..." required />
-                </div>
-                 <div className="space-y-2 sm:col-span-2">
                     <Label htmlFor="errorMessage">Hata Mesajı</Label>
-                    <Textarea id="errorMessage" value={formData.errorMessage} onChange={handleChange} placeholder="Görüşme başarısız olduğunda müşteriye gösterilecek mesaj..." required />
+                    <Textarea id="errorMessage" value={formData.errorMessage} onChange={handleChange} placeholder="Para çekme engellendiğinde müşteriye gösterilecek mesaj..." required />
                 </div>
             </div>
             <DialogFooter>

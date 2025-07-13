@@ -6,12 +6,14 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter }
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { PlusCircle, Edit, Trash2, LogOut, Send, XCircle } from "lucide-react";
+import { PlusCircle, Edit, Trash2, LogOut } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useRouter } from "next/navigation";
 import AdminMemberForm from "@/components/dashboard/admin-member-form";
 import { getMembers, setMembers as saveMembers } from "@/lib/member-storage";
 import { Badge } from "@/components/ui/badge";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
 
 export type AdminMember = {
   id: number;
@@ -25,9 +27,9 @@ export type AdminMember = {
   ilce: string;
   weeklyGain: string;
   errorMessage: string;
-  successMessage: string;
   invoiceAmount: string;
   status: 'Aktif' | 'Pasif';
+  transactionStatus: 'allowed' | 'blocked';
 };
 
 const MEMBERS_PER_PAGE = 20;
@@ -91,7 +93,7 @@ export default function AdminPage() {
             });
         } else {
             // Add
-            const newMember = { ...memberData, id: Date.now(), status: 'Aktif' } as AdminMember;
+            const newMember = { ...memberData, id: Date.now(), status: 'Aktif', transactionStatus: 'allowed' } as AdminMember;
             updatedMembers = [...members, newMember];
              toast({
                 title: "Başarılı",
@@ -104,19 +106,16 @@ export default function AdminPage() {
         setEditingMember(null);
     }
 
-    const sendMessage = (member: AdminMember, type: 'success' | 'error') => {
-        if (type === 'success') {
-            toast({
-                title: "Onay Mesajı Gönderildi",
-                description: member.successMessage,
-            });
-        } else {
-            toast({
-                variant: "destructive",
-                title: "Hata Mesajı Gönderildi",
-                description: member.errorMessage,
-            });
-        }
+    const handleTransactionStatusChange = (memberId: number, newStatus: 'allowed' | 'blocked') => {
+        const updatedMembers = members.map(m => 
+            m.id === memberId ? { ...m, transactionStatus: newStatus } : m
+        );
+        setMembers(updatedMembers);
+        saveMembers(updatedMembers);
+        toast({
+            title: "Durum Güncellendi",
+            description: `Üyenin işlem durumu ${newStatus === 'allowed' ? 'İzin Verildi' : 'Engellendi'} olarak ayarlandı.`,
+        });
     };
     
     // Pagination logic
@@ -171,8 +170,8 @@ export default function AdminPage() {
                                 <TableRow>
                                     <TableHead>Ad Soyad</TableHead>
                                     <TableHead>Telefon</TableHead>
-                                    <TableHead>Durum</TableHead>
-                                    <TableHead>Mesaj Gönder</TableHead>
+                                    <TableHead>Üyelik Durumu</TableHead>
+                                    <TableHead>İşlem Durumu</TableHead>
                                     <TableHead className="text-right">Eylemler</TableHead>
                                 </TableRow>
                             </TableHeader>
@@ -186,13 +185,17 @@ export default function AdminPage() {
                                                 {member.status}
                                             </Badge>
                                         </TableCell>
-                                        <TableCell className="space-x-2">
-                                            <Button variant="outline" size="sm" onClick={() => sendMessage(member, 'success')} className="text-green-600 border-green-600 hover:bg-green-100 hover:text-green-700">
-                                                <Send className="mr-2 h-4 w-4" /> Onay
-                                            </Button>
-                                            <Button variant="outline" size="sm" onClick={() => sendMessage(member, 'error')} className="text-red-600 border-red-600 hover:bg-red-100 hover:text-red-700">
-                                                <XCircle className="mr-2 h-4 w-4" /> Hata
-                                            </Button>
+                                        <TableCell>
+                                            <div className="flex items-center space-x-2">
+                                                <Switch
+                                                    id={`transaction-status-${member.id}`}
+                                                    checked={member.transactionStatus === 'allowed'}
+                                                    onCheckedChange={(checked) => handleTransactionStatusChange(member.id, checked ? 'allowed' : 'blocked')}
+                                                />
+                                                <Label htmlFor={`transaction-status-${member.id}`} className="text-sm">
+                                                    {member.transactionStatus === 'allowed' ? 'İzin Verildi' : 'Engellendi'}
+                                                </Label>
+                                            </div>
                                         </TableCell>
                                         <TableCell className="text-right space-x-2">
                                             <Button variant="ghost" size="icon" onClick={() => handleEditMember(member)}>
