@@ -38,9 +38,9 @@ export default function InvoicesPage() {
     );
   }
 
-  const invoiceAmount = parseFloat(currentUser.invoiceAmount) || 0;
-  const subtotal = invoiceAmount / (1 + VAT_RATE);
-  const vatAmount = invoiceAmount - subtotal;
+  const invoiceAmountNumber = parseFloat(currentUser.invoiceAmount) || 0;
+  const subtotal = invoiceAmountNumber / (1 + VAT_RATE);
+  const vatAmount = invoiceAmountNumber - subtotal;
   
   const creationDate = new Date(currentUser.id);
   const invoiceDate = format(creationDate, "dd.MM.yyyy");
@@ -115,7 +115,7 @@ export default function InvoicesPage() {
                 </div>
                  <div className="flex justify-between font-bold text-lg text-green-700">
                     <span>Genel Toplam:</span>
-                    <span className="font-mono">{invoiceAmount.toFixed(2)} TL</span>
+                    <span className="font-mono">{currentUser.invoiceAmount}</span>
                 </div>
             </div>
         </div>
