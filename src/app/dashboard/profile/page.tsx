@@ -1,7 +1,16 @@
+
+"use client";
+
+import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import Image from "next/image";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { MoreVertical, LogOut, Info, MapPin, Users } from "lucide-react";
 
 const user = {
   name: "Ali Veli",
@@ -33,9 +42,55 @@ function InfoRow({ label, value, badge = false }: { label: string; value: string
 }
 
 export default function ProfilePage() {
+  const router = useRouter();
+  const [dialogContent, setDialogContent] = useState<{ title: string; description: string } | null>(null);
+
+  const handleLogout = () => {
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('userRole');
+    }
+    router.push("/");
+  };
+
+  const menuItems = [
+    { 
+      label: "Hakkımızda", 
+      icon: Info,
+      action: () => setDialogContent({ 
+        title: "Hakkımızda", 
+        description: "VIP Portal olarak, üyelerimize en üst düzeyde kaliteli, güvenli ve özel bir hizmet sunmayı amaçlıyoruz. Platformumuz, gizlilik ve memnuniyet ilkeleri üzerine kurulmuştur. Her zaman en iyisini sunmak için buradayız."
+      }) 
+    },
+    { 
+      label: "Adresimiz", 
+      icon: MapPin,
+      action: () => setDialogContent({ 
+        title: "Adresimiz", 
+        description: "Size daha iyi hizmet verebilmek için merkezi bir konumda bulunuyoruz. Tüm operasyonlarımız İstanbul merkez ofisimizden yürütülmektedir. Güvenliğiniz ve gizliliğiniz için fiziki ziyaretler yerine platformumuz üzerinden hizmet vermekteyiz."
+      }) 
+    },
+    { 
+      label: "Biz Kimiz", 
+      icon: Users,
+      action: () => setDialogContent({ 
+        title: "Biz Kimiz", 
+        description: "Deneyimli ve profesyonel bir ekiple, üyelerimizin beklentilerini en üst seviyede karşılamak için çalışıyoruz. Ekibimiz, sizlere güvenilir ve kesintisiz bir deneyim yaşatmak adına teknoloji ve insan odaklı çözümler üretmektedir."
+      }) 
+    },
+  ];
+
   return (
     <div className="space-y-8">
-      <div className="flex items-center justify-between mb-8">
+      <Dialog open={!!dialogContent} onOpenChange={(isOpen) => !isOpen && setDialogContent(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{dialogContent?.title}</DialogTitle>
+            <DialogDescription>{dialogContent?.description}</DialogDescription>
+          </DialogHeader>
+        </DialogContent>
+      </Dialog>
+      
+      <div className="flex items-start justify-between mb-8">
         <div className="space-y-2 max-w-3xl">
           <h1 className="text-4xl font-headline font-bold">Hoşgeldiniz, {user.name}</h1>
           <div className="border border-blue-500/30 rounded-md p-3 bg-blue-500/5">
@@ -44,10 +99,33 @@ export default function ProfilePage() {
             </p>
           </div>
         </div>
-        <Avatar className="h-24 w-24 border-4 border-accent/50 ml-8 shrink-0">
-            <AvatarImage src={user.avatar} alt={user.name} data-ai-hint={user.avatarHint} />
-            <AvatarFallback>{user.name.charAt(0)}</AvatarFallback>
-        </Avatar>
+        <div className="flex items-center gap-2">
+            <Avatar className="h-24 w-24 border-4 border-accent/50 shrink-0">
+                <AvatarImage src={user.avatar} alt={user.name} data-ai-hint={user.avatarHint} />
+                <AvatarFallback>{user.name.charAt(0)}</AvatarFallback>
+            </Avatar>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="icon">
+                  <MoreVertical className="h-5 w-5" />
+                  <span className="sr-only">Menüyü aç</span>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                {menuItems.map((item) => (
+                  <DropdownMenuItem key={item.label} onClick={item.action} className="cursor-pointer">
+                    <item.icon className="mr-2 h-4 w-4" />
+                    <span>{item.label}</span>
+                  </DropdownMenuItem>
+                ))}
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={handleLogout} className="text-destructive focus:text-destructive cursor-pointer">
+                  <LogOut className="mr-2 h-4 w-4" />
+                  <span>Çıkış Yap</span>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+        </div>
       </div>
 
       <Card>
