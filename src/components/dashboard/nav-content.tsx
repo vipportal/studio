@@ -1,3 +1,4 @@
+
 "use client";
 
 import Link from "next/link";
@@ -57,6 +58,10 @@ export default function DashboardNavContent() {
   
   const navItems = userRole === 'admin' ? [...baseNavItems, adminNavItem] : baseNavItems;
 
+  const buttonClasses = "flex w-full items-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition-colors md:w-auto";
+  const inactiveClasses = "bg-primary text-primary-foreground hover:bg-accent";
+  const activeClasses = "bg-accent text-accent-foreground";
+
   return (
     <>
       <nav className="flex flex-col items-start gap-2 md:flex-row md:items-center">
@@ -65,10 +70,8 @@ export default function DashboardNavContent() {
             key={item.href}
             href={item.href}
             className={cn(
-              "flex w-full items-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition-colors md:w-auto",
-              pathname.startsWith(item.href)
-                ? "bg-primary text-primary-foreground hover:bg-primary/90"
-                : "bg-accent text-accent-foreground hover:bg-accent/80"
+              buttonClasses,
+              pathname.startsWith(item.href) ? activeClasses : inactiveClasses
             )}
           >
             <item.icon className="h-5 w-5" />
@@ -78,7 +81,10 @@ export default function DashboardNavContent() {
 
         <DropdownMenu>
             <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className={cn("flex w-full items-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition-colors hover:bg-accent/80 md:w-auto text-muted-foreground")}>
+                <Button 
+                  variant="ghost" 
+                  className={cn(buttonClasses, inactiveClasses)}
+                >
                     <Menu className="h-5 w-5" />
                     <span>Menü</span>
                 </Button>
