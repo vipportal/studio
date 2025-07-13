@@ -4,14 +4,9 @@
 import type { ReactNode } from "react";
 import Link from "next/link";
 import { usePathname } from 'next/navigation';
-import { VenetianMask, Menu, Instagram, Twitter, Facebook, Youtube, MessageCircle } from "lucide-react";
+import { VenetianMask, Instagram, Twitter, Facebook, Youtube, MessageCircle } from "lucide-react";
 import DashboardNavContent from "@/components/dashboard/nav-content";
-import {
-  Sheet,
-  SheetContent,
-  SheetTrigger,
-} from "@/components/ui/sheet";
-import { Button } from "@/components/ui/button";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 export default function DashboardLayout({ children }: { children: ReactNode }) {
   const pathname = usePathname();
@@ -21,7 +16,7 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
     <div className="flex min-h-screen w-full flex-col">
        {!isAdminPage && (
          <header className="sticky top-0 z-40 w-full border-b bg-background/95 backdrop-blur-sm">
-          <div className="container flex h-16 items-center">
+          <div className="container flex h-auto flex-col items-start gap-4 py-2 md:h-16 md:flex-row md:items-center">
               <Link href="/dashboard" className="mr-6 flex items-center space-x-2">
                   <VenetianMask className="h-8 w-8 text-primary" />
                   <span className="font-headline text-2xl font-bold">
@@ -29,30 +24,10 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
                   </span>
               </Link>
 
-              <div className="hidden flex-1 items-center justify-end space-x-4 md:flex">
-                  <DashboardNavContent />
-              </div>
-
-              <div className="flex flex-1 items-center justify-end md:hidden">
-                  <Sheet>
-                      <SheetTrigger asChild>
-                      <Button variant="ghost" size="icon">
-                          <Menu className="h-6 w-6" />
-                          <span className="sr-only">Menüyü Aç</span>
-                      </Button>
-                      </SheetTrigger>
-                      <SheetContent side="left">
-                      <Link href="/dashboard" className="mb-6 flex items-center space-x-2">
-                          <VenetianMask className="h-8 w-8 text-primary" />
-                          <span className="font-headline text-2xl font-bold">
-                              VIP Portal
-                          </span>
-                      </Link>
-                      <div className="flex flex-col space-y-2">
-                          <DashboardNavContent />
-                      </div>
-                      </SheetContent>
-                  </Sheet>
+              <div className="w-full flex-1 md:flex md:items-center md:justify-end">
+                <ScrollArea className="w-full whitespace-nowrap md:w-auto">
+                    <DashboardNavContent />
+                </ScrollArea>
               </div>
           </div>
         </header>

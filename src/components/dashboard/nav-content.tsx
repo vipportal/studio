@@ -67,84 +67,61 @@ export default function DashboardNavContent() {
     }
   ];
 
-  const buttonClasses = "flex w-full items-center justify-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition-colors text-primary-foreground bg-primary flex-1 text-center";
+  const buttonClasses = "inline-flex items-center justify-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition-colors text-primary-foreground bg-primary flex-shrink-0";
   const activeClasses = "bg-accent text-accent-foreground";
 
   return (
-    <div className="flex w-full flex-col gap-2 md:gap-4">
-      {/* First Row */}
-      <div className="flex w-full flex-col gap-2 md:flex-row">
-          {allNavLinks.slice(0, 3).map((item, index) => {
-              if (item.isMenu) return null; // Should not happen here
+    <div className="flex w-full flex-row gap-2 md:gap-4">
+      {allNavLinks.map((item, index) => {
+          if (item.isMenu) {
               return (
-                  <Link
-                      key={item.href}
-                      href={item.href}
-                      className={cn(
-                          buttonClasses,
-                          pathname.startsWith(item.href) && activeClasses
-                      )}
-                  >
-                      <item.icon className="h-5 w-5" />
-                      <span>{item.label}</span>
-                  </Link>
-              );
-          })}
-      </div>
-
-      {/* Second Row */}
-      <div className="flex w-full flex-col gap-2 md:flex-row">
-          {allNavLinks.slice(3, 6).map((item, index) => {
-              if (item.isMenu) {
-                  return (
-                       <DropdownMenu key={item.label}>
-                          <DropdownMenuTrigger asChild>
-                              <Button className={cn(buttonClasses)}>
-                                  <item.icon className="h-5 w-5" />
-                                  <span>{item.label}</span>
-                              </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end">
-                          {item.items.map((subItem) => (
-                              <DropdownMenuItem key={subItem.href} asChild className="cursor-pointer">
-                                <Link href={subItem.href}>
-                                  <subItem.icon className="mr-2 h-4 w-4" />
-                                  <span>{subItem.label}</span>
-                                </Link>
-                              </DropdownMenuItem>
-                          ))}
-                          <DropdownMenuSeparator />
-                          {userRole === 'admin' && (
-                             <DropdownMenuItem asChild className="cursor-pointer">
-                               <Link href={adminNavItem.href}>
-                                 <adminNavItem.icon className="mr-2 h-4 w-4" />
-                                 <span>{adminNavItem.label}</span>
-                               </Link>
-                             </DropdownMenuItem>
-                          )}
-                          <DropdownMenuItem onClick={handleLogout} className="text-destructive focus:text-destructive cursor-pointer">
-                              <LogOut className="mr-2 h-4 w-4" />
-                              <span>Çıkış Yap</span>
+                   <DropdownMenu key={item.label}>
+                      <DropdownMenuTrigger asChild>
+                          <Button className={cn(buttonClasses)}>
+                              <item.icon className="h-5 w-5" />
+                              <span>{item.label}</span>
+                          </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end">
+                      {item.items.map((subItem) => (
+                          <DropdownMenuItem key={subItem.href} asChild className="cursor-pointer">
+                            <Link href={subItem.href}>
+                              <subItem.icon className="mr-2 h-4 w-4" />
+                              <span>{subItem.label}</span>
+                            </Link>
                           </DropdownMenuItem>
-                          </DropdownMenuContent>
-                      </DropdownMenu>
-                  )
-              }
-               return (
-                  <Link
-                      key={item.href}
-                      href={item.href}
-                      className={cn(
-                          buttonClasses,
-                          pathname.startsWith(item.href) && activeClasses
+                      ))}
+                      <DropdownMenuSeparator />
+                      {userRole === 'admin' && (
+                         <DropdownMenuItem asChild className="cursor-pointer">
+                           <Link href={adminNavItem.href}>
+                             <adminNavItem.icon className="mr-2 h-4 w-4" />
+                             <span>{adminNavItem.label}</span>
+                           </Link>
+                         </DropdownMenuItem>
                       )}
-                  >
-                      <item.icon className="h-5 w-5" />
-                      <span>{item.label}</span>
-                  </Link>
-              );
-          })}
-      </div>
+                      <DropdownMenuItem onClick={handleLogout} className="text-destructive focus:text-destructive cursor-pointer">
+                          <LogOut className="mr-2 h-4 w-4" />
+                          <span>Çıkış Yap</span>
+                      </DropdownMenuItem>
+                      </DropdownMenuContent>
+                  </DropdownMenu>
+              )
+          }
+           return (
+              <Link
+                  key={item.href}
+                  href={item.href}
+                  className={cn(
+                      buttonClasses,
+                      pathname.startsWith(item.href) && activeClasses
+                  )}
+              >
+                  <item.icon className="h-5 w-5" />
+                  <span>{item.label}</span>
+              </Link>
+          );
+      })}
     </div>
   );
 }
