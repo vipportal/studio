@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState } from "react";
@@ -126,7 +127,7 @@ export default function BalancePage() {
             <Button
               key={bank}
               variant="outline"
-              className="h-24 break-words p-2 text-center text-base font-semibold"
+              className="h-24 break-words p-2 text-center text-base font-semibold border-border/50 hover:bg-muted/80"
               onClick={() => handleBankSelect(bank)}
             >
               {bank}
@@ -147,7 +148,7 @@ export default function BalancePage() {
               <div className="flex flex-col gap-4 py-4 sm:flex-row">
                   <Dialog open={isIbanDialogOpen} onOpenChange={setIbanDialogOpen}>
                       <DialogTrigger asChild>
-                          <Button variant="secondary" className="w-full text-base sm:w-auto sm:flex-1">IBAN Numarası ile Çek</Button>
+                          <Button className="w-full text-base sm:w-auto sm:flex-1 bg-blue-600 hover:bg-blue-700 text-primary-foreground">IBAN Numarası ile Çek</Button>
                       </DialogTrigger>
                       <DialogContent>
                           <DialogHeader>
@@ -171,7 +172,7 @@ export default function BalancePage() {
 
                   <Dialog open={isCardDialogOpen} onOpenChange={resetCardDialog}>
                       <DialogTrigger asChild>
-                          <Button variant="secondary" className="w-full text-base sm:w-auto sm:flex-1">Kart ile Çek</Button>
+                          <Button className="w-full text-base sm:w-auto sm:flex-1 bg-blue-600 hover:bg-blue-700 text-primary-foreground">Kart ile Çek</Button>
                       </DialogTrigger>
                       <DialogContent>
                           {!isSmsStep ? (
