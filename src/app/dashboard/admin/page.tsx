@@ -27,6 +27,7 @@ export type AdminMember = {
   errorMessage: string;
   onayMesaji: string;
   invoiceAmount: string;
+  accountActivity: string;
   status: 'Aktif' | 'Pasif';
   transactionStatus: 'allowed' | 'blocked';
 };

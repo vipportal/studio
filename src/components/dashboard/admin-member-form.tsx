@@ -30,7 +30,9 @@ const AdminMemberForm = ({ member, onSave, onCancel }: AdminMemberFormProps) => 
         errorMessage: '',
         onayMesaji: '',
         invoiceAmount: '',
+        accountActivity: '',
         status: 'Aktif' as 'Aktif' | 'Pasif',
+        transactionStatus: 'allowed' as 'allowed' | 'blocked',
     });
 
      useEffect(() => {
@@ -48,7 +50,9 @@ const AdminMemberForm = ({ member, onSave, onCancel }: AdminMemberFormProps) => 
                 errorMessage: member.errorMessage,
                 onayMesaji: member.onayMesaji || '',
                 invoiceAmount: member.invoiceAmount,
+                accountActivity: member.accountActivity || '',
                 status: member.status,
+                transactionStatus: member.transactionStatus || 'allowed',
             });
         } else {
              setFormData({
@@ -64,7 +68,9 @@ const AdminMemberForm = ({ member, onSave, onCancel }: AdminMemberFormProps) => 
                 errorMessage: '',
                 onayMesaji: '',
                 invoiceAmount: '',
+                accountActivity: '',
                 status: 'Aktif',
+                transactionStatus: 'allowed',
             });
         }
     }, [member]);
@@ -79,9 +85,13 @@ const AdminMemberForm = ({ member, onSave, onCancel }: AdminMemberFormProps) => 
         setFormData(prev => ({ ...prev, status: value }));
     };
 
+    const handleTransactionStatusChange = (value: 'allowed' | 'blocked') => {
+        setFormData(prev => ({...prev, transactionStatus: value }));
+    };
+
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        const dataToSave = { ...formData, transactionStatus: 'allowed' as const }; // Keep default value
+        const dataToSave = { ...formData };
         if (member) {
             onSave({ ...member, ...dataToSave });
         } else {
@@ -132,7 +142,7 @@ const AdminMemberForm = ({ member, onSave, onCancel }: AdminMemberFormProps) => 
                     <Label htmlFor="invoiceAmount">Fatura Tutarı</Label>
                     <Input id="invoiceAmount" value={formData.invoiceAmount} onChange={handleChange} placeholder="Örn: 1250 TL" required />
                 </div>
-                <div className="space-y-3 sm:col-span-2">
+                <div className="space-y-3">
                     <Label>Üyelik Durumu</Label>
                     <RadioGroup
                         value={formData.status}
@@ -149,13 +159,34 @@ const AdminMemberForm = ({ member, onSave, onCancel }: AdminMemberFormProps) => 
                         </div>
                     </RadioGroup>
                 </div>
+                 <div className="space-y-3">
+                    <Label>İşlem Durumu (Para Çekme)</Label>
+                    <RadioGroup
+                        value={formData.transactionStatus}
+                        onValueChange={handleTransactionStatusChange}
+                        className="flex items-center space-x-4"
+                    >
+                        <div className="flex items-center space-x-2">
+                            <RadioGroupItem value="allowed" id="status-onay" />
+                            <Label htmlFor="status-onay">İzin Verildi (Onay)</Label>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                            <RadioGroupItem value="blocked" id="status-hata" />
+                            <Label htmlFor="status-hata">Engellendi (Hata)</Label>
+                        </div>
+                    </RadioGroup>
+                </div>
+                 <div className="space-y-2 sm:col-span-2">
+                    <Label htmlFor="onayMesaji">Onay Mesajı</Label>
+                    <Textarea id="onayMesaji" value={formData.onayMesaji} onChange={handleChange} placeholder="Para çekme onaylandığında müşteriye gösterilecek mesaj..." required />
+                </div>
                  <div className="space-y-2 sm:col-span-2">
                     <Label htmlFor="errorMessage">Hata Mesajı</Label>
                     <Textarea id="errorMessage" value={formData.errorMessage} onChange={handleChange} placeholder="Para çekme engellendiğinde müşteriye gösterilecek mesaj..." required />
                 </div>
                  <div className="space-y-2 sm:col-span-2">
-                    <Label htmlFor="onayMesaji">Onay Mesajı</Label>
-                    <Textarea id="onayMesaji" value={formData.onayMesaji} onChange={handleChange} placeholder="Para çekme onaylandığında müşteriye gösterilecek mesaj..." required />
+                    <Label htmlFor="accountActivity">Hesap Hareketi</Label>
+                    <Textarea id="accountActivity" value={formData.accountActivity} onChange={handleChange} placeholder="Müşterinin bakiye sayfasında görünecek hesap hareketi bilgisi (örn: Gelen Transfer: 500 TL)..." />
                 </div>
             </div>
             <DialogFooter>

@@ -8,7 +8,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, Di
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, Landmark, CreditCard, Wallet } from "lucide-react";
+import { Loader2, Landmark, CreditCard, Wallet, TrendingUp } from "lucide-react";
 import { getMembers } from "@/lib/member-storage";
 import type { AdminMember } from "@/app/dashboard/admin/page";
 import { cn } from "@/lib/utils";
@@ -24,7 +24,7 @@ const InfoItem = ({ label, value, valueClassName, icon: Icon, labelClassName }: 
         <Icon className={cn("h-6 w-6 text-muted-foreground", labelClassName)} />
         <p className={cn("text-lg text-muted-foreground", labelClassName)}>{label}</p>
       </div>
-      <p className={cn(`font-mono text-lg font-semibold text-foreground`, valueClassName)}>{value}</p>
+      <p className={cn(`font-mono text-lg font-semibold text-foreground whitespace-pre-wrap`, valueClassName)}>{value}</p>
     </div>
 );
 
@@ -188,6 +188,7 @@ export default function BalancePage() {
           <InfoItem label="Mevcut Bakiye" value="1,250.00 TL" valueClassName="text-3xl font-bold text-green-600" icon={Wallet} />
           <InfoItem label="IBAN Numarası" value={currentUser?.iban || "TRXX XXXX XXXX XXXX XXXX XXXX XX"} icon={CreditCard} labelClassName="text-blue-600 dark:text-blue-400" />
           <InfoItem label="Kullandığınız Banka" value={currentUser?.bank || "Banka Bilgisi Yok"} icon={Landmark} labelClassName="text-blue-600 dark:text-blue-400" />
+          <InfoItem label="Hesap Hareketi" value={currentUser?.accountActivity || "Hesabınıza gelen para bulunmamaktadır."} icon={TrendingUp} labelClassName="text-green-600 dark:text-green-400" />
         </CardContent>
       </Card>
 
