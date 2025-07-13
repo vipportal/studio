@@ -143,7 +143,7 @@ export default function ProfilePage() {
 
       <Card>
         <CardHeader>
-          <CardTitle className="font-headline text-2xl">Profil Bilgileri</CardTitle>
+          <CardTitle className="font-headline text-2xl uppercase text-green-600">Profil Bilgileri</CardTitle>
           <CardDescription>Kişisel bilgileriniz ve üyelik durumunuz.</CardDescription>
         </CardHeader>
         <CardContent className="pt-6">
