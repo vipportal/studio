@@ -8,6 +8,8 @@ import { Badge } from "@/components/ui/badge";
 import Image from "next/image";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import type { AdminMember } from "@/app/dashboard/admin/page";
+import { cn } from "@/lib/utils";
+import { Fingerprint, MapPin, Building, Award, Wallet } from "lucide-react";
 
 
 const availableMembers = [
@@ -16,14 +18,31 @@ const availableMembers = [
   { name: "Zeynep S.", location: "Üsküdar", img: "https://placehold.co/100x100.png", hint: "woman fashion" },
 ];
 
-function InfoRow({ label, value, badge = false, valueClassName = "" }: { label: string; value: string; badge?: boolean; valueClassName?: string; }) {
+function InfoRow({ 
+  label, 
+  value, 
+  badge = false, 
+  valueClassName = "", 
+  labelClassName = "",
+  icon: Icon
+}: { 
+  label: string; 
+  value: string; 
+  badge?: boolean; 
+  valueClassName?: string;
+  labelClassName?: string;
+  icon?: React.ComponentType<{ className?: string }>; 
+}) {
   return (
     <div className="flex flex-col items-start gap-1 border-b border-border/50 pb-3 sm:flex-row sm:items-center sm:justify-between">
-      <p className="text-muted-foreground">{label}</p>
+      <p className={cn("flex items-center gap-2 font-medium text-muted-foreground", labelClassName)}>
+        {Icon && <Icon className="h-5 w-5" />}
+        <span>{label}</span>
+      </p>
       {badge ? (
-        <Badge variant="default" className="bg-green-600 hover:bg-green-700">{value}</Badge>
+        <Badge variant="default" className="bg-blue-600 hover:bg-blue-700">{value}</Badge>
       ) : (
-        <p className={`font-medium ${valueClassName}`}>{value}</p>
+        <p className={cn("font-medium", valueClassName)}>{value}</p>
       )}
     </div>
   );
@@ -38,13 +57,12 @@ export default function ProfilePage() {
     if (loggedInUser) {
       setUser(JSON.parse(loggedInUser));
     } else {
-      // Redirect to login if no user data found
       router.push('/');
     }
   }, [router]);
 
   if (!user) {
-    return null; // or a loading spinner
+    return null;
   }
 
   return (
@@ -72,11 +90,11 @@ export default function ProfilePage() {
         </CardHeader>
         <CardContent className="pt-6">
           <div className="space-y-4">
-            <InfoRow label="TC Kimlik No" value={user.tc} />
-            <InfoRow label="İl" value={user.il} />
-            <InfoRow label="İlçe" value={user.ilce} />
-            <InfoRow label="Haftalık Kazanç" value={user.weeklyGain} valueClassName="text-green-600 font-bold" />
-            <InfoRow label="Üyelik Durumu" value={"VIP Gold"} badge />
+            <InfoRow label="TC Kimlik No" value={user.tc} icon={Fingerprint} labelClassName="text-blue-600" />
+            <InfoRow label="İl" value={user.il} icon={MapPin} labelClassName="text-blue-600" />
+            <InfoRow label="İlçe" value={user.ilce} icon={Building} labelClassName="text-blue-600" />
+            <InfoRow label="Haftalık Kazanç" value={user.weeklyGain} icon={Wallet} labelClassName="text-green-600" valueClassName="text-green-600 font-bold" />
+            <InfoRow label="Üyelik Durumu" value={"VIP Gold"} icon={Award} labelClassName="text-blue-600" badge />
           </div>
         </CardContent>
       </Card>
