@@ -43,7 +43,11 @@ export default function ProfilePage() {
   return (
     <div className="space-y-8">
       
-      <div className="flex items-start justify-between mb-8">
+      <div className="flex flex-col items-center text-center space-y-4 mb-8">
+        <Avatar className="h-28 w-28 border-4 border-accent/50">
+          <AvatarImage src={user.avatar} alt={user.name} data-ai-hint={user.avatarHint} />
+          <AvatarFallback>{user.name.charAt(0)}</AvatarFallback>
+        </Avatar>
         <div className="space-y-2 max-w-3xl">
           <h1 className="text-4xl font-headline font-bold">Hoşgeldiniz, {user.name}</h1>
           <div className="border border-blue-500/30 rounded-md p-3 bg-blue-500/5">
@@ -51,12 +55,6 @@ export default function ProfilePage() {
               SİZLERİ ARAMIZDA GÖRMEKTEN MUTLULUK DUYUYORUZ, BİLGİLERİNİZ 6698 KİŞİSEL VERİLERİN KORUNMASI KANUNU TARAFINDAN GİZLİ TUTULMAKTADIR, GÜVENLİ BİR ŞEKİLDE GÖRÜŞMELERİNİZİ YAPABİLİRSİNİZ. PARA TRANSFERLERİNİZİ BANKA HESAPLARINIZA GÜVENLİ BİR ŞEKİLDE ÇEKEBİLİRSİNİZ, İYİ GÖRÜŞMELER DİLİYORUZ.
             </p>
           </div>
-        </div>
-        <div className="flex items-center gap-2">
-            <Avatar className="h-24 w-24 border-4 border-accent/50 shrink-0">
-                <AvatarImage src={user.avatar} alt={user.name} data-ai-hint={user.avatarHint} />
-                <AvatarFallback>{user.name.charAt(0)}</AvatarFallback>
-            </Avatar>
         </div>
       </div>
 
@@ -67,7 +65,6 @@ export default function ProfilePage() {
         </CardHeader>
         <CardContent className="pt-6">
           <div className="space-y-4">
-            <InfoRow label="Ad Soyad" value={user.name} />
             <InfoRow label="TC Kimlik No" value={user.tc} />
             <InfoRow label="İl" value={user.city} />
             <InfoRow label="İlçe" value={user.district} />
