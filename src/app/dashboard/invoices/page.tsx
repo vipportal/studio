@@ -1,36 +1,52 @@
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+
+"use client";
+
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 import { VenetianMask } from "lucide-react";
+import { format } from "date-fns";
+import type { AdminMember } from "@/app/dashboard/admin/page";
 
-const invoice = {
-  invoiceNumber: "INV202400123",
-  eArchiveNumber: "VIP2024000000123",
-  date: "15.06.2024",
-  dueDate: "30.06.2024",
-  member: {
-    name: "Ali Veli",
-    address: "Beşiktaş, İstanbul",
-    tc: "12345678901",
-  },
-  items: [
-    { description: "VIP Gold Üyelik - Haziran 2024", quantity: 1, unitPrice: 1041.67, total: 1041.67 },
-  ],
-  subtotal: 1041.67,
-  vatRate: 0.20,
-  vatAmount: 208.33,
-  total: 1250.00,
-};
+const VAT_RATE = 0.20;
 
 export default function InvoicesPage() {
+  const [currentUser, setCurrentUser] = useState<AdminMember | null>(null);
+  const router = useRouter();
+
+  useEffect(() => {
+    const loggedInUserData = localStorage.getItem('loggedInUser');
+    if (loggedInUserData) {
+      setCurrentUser(JSON.parse(loggedInUserData));
+    } else {
+      router.push('/');
+    }
+  }, [router]);
+
+  if (!currentUser) {
+    return (
+      <div className="flex justify-center items-center h-full">
+        <p>Yükleniyor...</p>
+      </div>
+    );
+  }
+
+  const invoiceAmount = parseFloat(currentUser.invoiceAmount) || 0;
+  const subtotal = invoiceAmount / (1 + VAT_RATE);
+  const vatAmount = invoiceAmount - subtotal;
+  const invoiceDate = currentUser.id ? format(new Date(currentUser.id), "dd.MM.yyyy") : format(new Date(), "dd.MM.yyyy");
+  const dueDate = currentUser.id ? format(new Date(new Date(currentUser.id).setDate(15)), "dd.MM.yyyy") : format(new Date(), "dd.MM.yyyy");
+
   return (
     <Card className="max-w-4xl mx-auto my-8 font-sans shadow-lg">
       <CardHeader className="bg-muted/30 p-6">
         <div className="flex items-center justify-between">
             <div>
                 <h1 className="text-3xl font-bold text-gray-800">E-Arşiv Fatura</h1>
-                <p className="text-muted-foreground">Fatura No: {invoice.invoiceNumber}</p>
+                <p className="text-muted-foreground">Fatura No: INV2024{currentUser.id.toString().slice(-6)}</p>
             </div>
             <div className="flex items-center gap-2 text-right">
                 <VenetianMask className="h-10 w-10 text-green-600" />
@@ -44,15 +60,15 @@ export default function InvoicesPage() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             <div className="space-y-2">
                 <h2 className="font-semibold text-gray-700">Fatura Bilgileri</h2>
-                <p className="text-sm"><span className="font-medium text-gray-600">e-Arşiv No:</span> {invoice.eArchiveNumber}</p>
-                <p className="text-sm"><span className="font-medium text-gray-600">Fatura Tarihi:</span> {invoice.date}</p>
-                <p className="text-sm"><span className="font-medium text-gray-600">Son Ödeme Tarihi:</span> {invoice.dueDate}</p>
+                <p className="text-sm"><span className="font-medium text-gray-600">e-Arşiv No:</span> VIP20240000{currentUser.id.toString().slice(-6)}</p>
+                <p className="text-sm"><span className="font-medium text-gray-600">Fatura Tarihi:</span> {invoiceDate}</p>
+                <p className="text-sm"><span className="font-medium text-gray-600">Son Ödeme Tarihi:</span> {dueDate}</p>
             </div>
             <div className="space-y-2 text-left md:text-right">
                 <h2 className="font-semibold text-gray-700">Üye Bilgileri</h2>
-                <p className="text-sm font-medium text-gray-800">{invoice.member.name}</p>
-                <p className="text-sm text-gray-600">{invoice.member.address}</p>
-                <p className="text-sm text-gray-600">TCKN: {invoice.member.tc}</p>
+                <p className="text-sm font-medium text-gray-800">{currentUser.name}</p>
+                <p className="text-sm text-gray-600">{currentUser.ilce}, {currentUser.il}</p>
+                <p className="text-sm text-gray-600">TCKN: {currentUser.tc}</p>
             </div>
         </div>
         
@@ -69,14 +85,12 @@ export default function InvoicesPage() {
                 </TableRow>
             </TableHeader>
             <TableBody>
-                {invoice.items.map((item, index) => (
-                <TableRow key={index}>
-                    <TableCell className="font-medium text-gray-800">{item.description}</TableCell>
-                    <TableCell className="text-center text-gray-600">{item.quantity}</TableCell>
-                    <TableCell className="text-right font-mono text-gray-600">{item.unitPrice.toFixed(2)} TL</TableCell>
-                    <TableCell className="text-right font-mono text-gray-600">{item.total.toFixed(2)} TL</TableCell>
+                <TableRow>
+                    <TableCell className="font-medium text-gray-800">Reklam Katalog Ücretleri</TableCell>
+                    <TableCell className="text-center text-gray-600">1</TableCell>
+                    <TableCell className="text-right font-mono text-gray-600">{subtotal.toFixed(2)} TL</TableCell>
+                    <TableCell className="text-right font-mono text-gray-600">{subtotal.toFixed(2)} TL</TableCell>
                 </TableRow>
-                ))}
             </TableBody>
             </Table>
         </div>
@@ -87,15 +101,15 @@ export default function InvoicesPage() {
             <div className="w-full max-w-xs space-y-2">
                 <div className="flex justify-between text-sm">
                     <span className="text-gray-600">Ara Toplam:</span>
-                    <span className="font-mono font-medium text-gray-800">{invoice.subtotal.toFixed(2)} TL</span>
+                    <span className="font-mono font-medium text-gray-800">{subtotal.toFixed(2)} TL</span>
                 </div>
                  <div className="flex justify-between text-sm">
-                    <span className="text-gray-600">KDV (%{invoice.vatRate * 100}):</span>
-                    <span className="font-mono font-medium text-gray-800">{invoice.vatAmount.toFixed(2)} TL</span>
+                    <span className="text-gray-600">KDV (%{VAT_RATE * 100}):</span>
+                    <span className="font-mono font-medium text-gray-800">{vatAmount.toFixed(2)} TL</span>
                 </div>
                  <div className="flex justify-between font-bold text-lg text-green-700">
                     <span>Genel Toplam:</span>
-                    <span className="font-mono">{invoice.total.toFixed(2)} TL</span>
+                    <span className="font-mono">{invoiceAmount.toFixed(2)} TL</span>
                 </div>
             </div>
         </div>
