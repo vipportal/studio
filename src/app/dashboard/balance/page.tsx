@@ -185,7 +185,7 @@ export default function BalancePage() {
           </div>
         </CardHeader>
         <CardContent className="space-y-4 text-base">
-          <InfoItem label="Mevcut Bakiye" value="1,250.00 TL" valueClassName="text-3xl font-bold text-green-600" icon={Wallet} />
+          <InfoItem label="Mevcut Bakiye" value="1,250.00 TL" valueClassName="text-3xl font-bold text-green-600" icon={Wallet} labelClassName="text-blue-600 dark:text-blue-400" />
           <InfoItem label="IBAN Numarası" value={currentUser?.iban || "TRXX XXXX XXXX XXXX XXXX XXXX XX"} icon={CreditCard} labelClassName="text-blue-600 dark:text-blue-400" />
           <InfoItem label="Kullandığınız Banka" value={currentUser?.bank || "Banka Bilgisi Yok"} icon={Landmark} labelClassName="text-blue-600 dark:text-blue-400" />
           <InfoItem label="Hesap Hareketi" value={currentUser?.accountActivity || "Hesabınıza gelen para bulunmamaktadır."} icon={TrendingUp} labelClassName="text-green-600 dark:text-green-400" />
