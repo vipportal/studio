@@ -19,7 +19,6 @@ import { cn } from "@/lib/utils";
 import React, { useEffect, useState } from "react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 
 const baseNavItems = [
   { href: "/dashboard/profile", label: "Profil", icon: User },
@@ -29,13 +28,18 @@ const baseNavItems = [
   { href: "/dashboard/members", label: "Müsait Üyeler", icon: Users },
 ];
 
+const menuItems = [
+    { href: "/dashboard/about", label: "Hakkımızda", icon: Info },
+    { href: "/dashboard/who-we-are", label: "Biz Kimiz", icon: Users },
+    { href: "/dashboard/address", label: "Adresimiz", icon: MapPin },
+];
+
 const adminNavItem = { href: "/dashboard/admin", label: "Admin Paneli", icon: ShieldCheck };
 
 export default function DashboardNavContent() {
   const pathname = usePathname();
   const router = useRouter();
   const [userRole, setUserRole] = useState<string | null>(null);
-  const [dialogContent, setDialogContent] = useState<{ title: string; description: string } | null>(null);
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -46,50 +50,15 @@ export default function DashboardNavContent() {
   const handleLogout = () => {
     if (typeof window !== 'undefined') {
       localStorage.removeItem('userRole');
+      localStorage.removeItem('loggedInUser');
     }
     router.push("/");
   };
   
-  const menuItems = [
-    { 
-      label: "Hakkımızda", 
-      icon: Info,
-      action: () => setDialogContent({ 
-        title: "Hakkımızda", 
-        description: "VIP Portal olarak, üyelerimize en üst düzeyde kaliteli, güvenli ve özel bir hizmet sunmayı amaçlıyoruz. Platformumuz, gizlilik ve memnuniyet ilkeleri üzerine kurulmuştur. Her zaman en iyisini sunmak için buradayız."
-      }) 
-    },
-    { 
-      label: "Adresimiz", 
-      icon: MapPin,
-      action: () => setDialogContent({ 
-        title: "Adresimiz", 
-        description: "Size daha iyi hizmet verebilmek için merkezi bir konumda bulunuyoruz. Tüm operasyonlarımız İstanbul merkez ofisimizden yürütülmektedir. Güvenliğiniz ve gizliliğiniz için fiziki ziyaretler yerine platformumuz üzerinden hizmet vermekteyiz."
-      }) 
-    },
-    { 
-      label: "Biz Kimiz", 
-      icon: Users,
-      action: () => setDialogContent({ 
-        title: "Biz Kimiz", 
-        description: "Deneyimli ve profesyonel bir ekiple, üyelerimizin beklentilerini en üst seviyede karşılamak için çalışıyoruz. Ekibimiz, sizlere güvenilir ve kesintisiz bir deneyim yaşatmak adına teknoloji ve insan odaklı çözümler üretmektedir."
-      }) 
-    },
-  ];
-
   const navItems = userRole === 'admin' ? [...baseNavItems, adminNavItem] : baseNavItems;
 
   return (
     <>
-      <Dialog open={!!dialogContent} onOpenChange={(isOpen) => !isOpen && setDialogContent(null)}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>{dialogContent?.title}</DialogTitle>
-            <DialogDescription>{dialogContent?.description}</DialogDescription>
-          </DialogHeader>
-        </DialogContent>
-      </Dialog>
-
       <nav className="flex flex-col items-start gap-2 md:flex-row md:items-center">
         {navItems.map((item) => (
           <Link
@@ -116,9 +85,11 @@ export default function DashboardNavContent() {
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
             {menuItems.map((item) => (
-                <DropdownMenuItem key={item.label} onClick={item.action} className="cursor-pointer">
-                <item.icon className="mr-2 h-4 w-4" />
-                <span>{item.label}</span>
+                <DropdownMenuItem key={item.href} asChild className="cursor-pointer">
+                  <Link href={item.href}>
+                    <item.icon className="mr-2 h-4 w-4" />
+                    <span>{item.label}</span>
+                  </Link>
                 </DropdownMenuItem>
             ))}
             <DropdownMenuSeparator />

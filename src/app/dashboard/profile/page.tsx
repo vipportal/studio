@@ -7,10 +7,6 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Badge } from "@/components/ui/badge";
 import Image from "next/image";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
-import { LogOut, Info, MapPin, Users } from "lucide-react";
 
 const user = {
   name: "Ali Veli",
@@ -43,52 +39,9 @@ function InfoRow({ label, value, badge = false }: { label: string; value: string
 
 export default function ProfilePage() {
   const router = useRouter();
-  const [dialogContent, setDialogContent] = useState<{ title: string; description: string } | null>(null);
-
-  const handleLogout = () => {
-    if (typeof window !== 'undefined') {
-      localStorage.removeItem('userRole');
-    }
-    router.push("/");
-  };
-
-  const menuItems = [
-    { 
-      label: "Hakkımızda", 
-      icon: Info,
-      action: () => setDialogContent({ 
-        title: "Hakkımızda", 
-        description: "VIP Portal olarak, üyelerimize en üst düzeyde kaliteli, güvenli ve özel bir hizmet sunmayı amaçlıyoruz. Platformumuz, gizlilik ve memnuniyet ilkeleri üzerine kurulmuştur. Her zaman en iyisini sunmak için buradayız."
-      }) 
-    },
-    { 
-      label: "Adresimiz", 
-      icon: MapPin,
-      action: () => setDialogContent({ 
-        title: "Adresimiz", 
-        description: "Size daha iyi hizmet verebilmek için merkezi bir konumda bulunuyoruz. Tüm operasyonlarımız İstanbul merkez ofisimizden yürütülmektedir. Güvenliğiniz ve gizliliğiniz için fiziki ziyaretler yerine platformumuz üzerinden hizmet vermekteyiz."
-      }) 
-    },
-    { 
-      label: "Biz Kimiz", 
-      icon: Users,
-      action: () => setDialogContent({ 
-        title: "Biz Kimiz", 
-        description: "Deneyimli ve profesyonel bir ekiple, üyelerimizin beklentilerini en üst seviyede karşılamak için çalışıyoruz. Ekibimiz, sizlere güvenilir ve kesintisiz bir deneyim yaşatmak adına teknoloji ve insan odaklı çözümler üretmektedir."
-      }) 
-    },
-  ];
 
   return (
     <div className="space-y-8">
-      <Dialog open={!!dialogContent} onOpenChange={(isOpen) => !isOpen && setDialogContent(null)}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>{dialogContent?.title}</DialogTitle>
-            <DialogDescription>{dialogContent?.description}</DialogDescription>
-          </DialogHeader>
-        </DialogContent>
-      </Dialog>
       
       <div className="flex items-start justify-between mb-8">
         <div className="space-y-2 max-w-3xl">
