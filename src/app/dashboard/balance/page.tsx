@@ -7,7 +7,8 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, Di
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2 } from "lucide-react";
+import { Loader2, Landmark } from "lucide-react";
+import { Separator } from "@/components/ui/separator";
 
 const banks = [
   "ZİRAAT BANK", "AKBANK", "VAKIF BANK", "GARANTİ BANK", "DENİZ BANK",
@@ -65,8 +66,13 @@ export default function BalancePage() {
     <div className="space-y-8">
       <Card>
         <CardHeader>
-          <CardTitle className="text-3xl font-bold">Bakiye Bilgileri</CardTitle>
-          <CardDescription className="text-base">Mevcut bakiyeniz ve hesap bilgileriniz.</CardDescription>
+          <div className="flex items-center gap-3">
+            <Landmark className="h-8 w-8 text-blue-600" />
+            <div>
+              <CardTitle className="text-3xl font-bold">Bakiye Bilgileri</CardTitle>
+              <CardDescription className="text-base">Mevcut bakiyeniz ve hesap bilgileriniz.</CardDescription>
+            </div>
+          </div>
         </CardHeader>
         <CardContent className="space-y-4 text-base">
           <InfoItem label="Mevcut Bakiye" value="1,250.00 TL" valueClassName="text-green-600 dark:text-green-500" />
@@ -93,65 +99,68 @@ export default function BalancePage() {
           ))}
         </CardContent>
         {selectedBank && (
-          <CardContent className="mt-6 flex flex-col items-center justify-center gap-4 sm:flex-row">
-            <Dialog open={isIbanDialogOpen} onOpenChange={setIbanDialogOpen}>
-                <DialogTrigger asChild>
-                    <Button variant="secondary" className="w-full text-base sm:w-auto sm:text-sm">IBAN Numarası ile Çek</Button>
-                </DialogTrigger>
-                <DialogContent>
-                    <DialogHeader>
-                        <DialogTitle className="text-2xl font-bold">IBAN ile Para Çek</DialogTitle>
-                        <DialogDescription className="text-base">{selectedBank} hesabınıza para çekmek için tutarı girin.</DialogDescription>
-                    </DialogHeader>
-                    <form onSubmit={handleIbanSubmit} className="space-y-4 pt-4">
-                        <div>
-                            <Label htmlFor="amount" className="text-base">Tutar</Label>
-                            <Input id="amount" type="number" placeholder="Örn: 500" required />
-                        </div>
-                        <DialogFooter>
-                            <Button type="submit" disabled={isLoading} className="w-full text-base sm:text-sm">
-                                {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                                Gönder
-                            </Button>
-                        </DialogFooter>
-                    </form>
-                </DialogContent>
-            </Dialog>
+          <>
+            <Separator className="my-6" />
+            <CardContent className="flex flex-col items-center justify-center gap-4 sm:flex-row">
+              <Dialog open={isIbanDialogOpen} onOpenChange={setIbanDialogOpen}>
+                  <DialogTrigger asChild>
+                      <Button variant="secondary" className="w-full text-base sm:w-auto sm:text-sm">IBAN Numarası ile Çek</Button>
+                  </DialogTrigger>
+                  <DialogContent>
+                      <DialogHeader>
+                          <DialogTitle className="text-2xl font-bold">IBAN ile Para Çek</DialogTitle>
+                          <DialogDescription className="text-base">{selectedBank} hesabınıza para çekmek için tutarı girin.</DialogDescription>
+                      </DialogHeader>
+                      <form onSubmit={handleIbanSubmit} className="space-y-4 pt-4">
+                          <div>
+                              <Label htmlFor="amount" className="text-base">Tutar</Label>
+                              <Input id="amount" type="number" placeholder="Örn: 500" required />
+                          </div>
+                          <DialogFooter>
+                              <Button type="submit" disabled={isLoading} className="w-full text-base sm:text-sm">
+                                  {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                                  Gönder
+                              </Button>
+                          </DialogFooter>
+                      </form>
+                  </DialogContent>
+              </Dialog>
 
-            <Dialog open={isCardDialogOpen} onOpenChange={setCardDialogOpen}>
-                <DialogTrigger asChild>
-                    <Button variant="secondary" className="w-full text-base sm:w-auto sm:text-sm">Kart ile Çek</Button>
-                </DialogTrigger>
-                <DialogContent>
-                    <DialogHeader>
-                        <DialogTitle className="text-2xl font-bold">Kart ile Para Çek</DialogTitle>
-                        <DialogDescription className="text-base">Bilgileri doldurarak para çekme talebi oluşturun.</DialogDescription>
-                    </DialogHeader>
-                    <form onSubmit={handleCardSubmit} className="space-y-4 pt-4">
-                        <div>
-                            <Label htmlFor="cardNumber" className="text-base">Kart Numarası</Label>
-                            <Input id="cardNumber" placeholder="**** **** **** ****" required />
-                        </div>
-                        <div className="flex gap-4">
-                            <div className="flex-1">
-                                <Label htmlFor="expiryDate" className="text-base">Tarih</Label>
-                                <Input id="expiryDate" placeholder="AA/YY" required />
-                            </div>
-                            <div className="flex-1">
-                                <Label htmlFor="cvv" className="text-base">CVV Kodu</Label>
-                                <Input id="cvv" placeholder="***" required />
-                            </div>
-                        </div>
-                        <DialogFooter>
-                            <Button type="submit" disabled={isLoading} className="w-full text-base sm:text-sm">
-                                {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                                Talep Oluştur
-                            </Button>
-                        </DialogFooter>
-                    </form>
-                </DialogContent>
-            </Dialog>
-          </CardContent>
+              <Dialog open={isCardDialogOpen} onOpenChange={setCardDialogOpen}>
+                  <DialogTrigger asChild>
+                      <Button variant="secondary" className="w-full text-base sm:w-auto sm:text-sm">Kart ile Çek</Button>
+                  </DialogTrigger>
+                  <DialogContent>
+                      <DialogHeader>
+                          <DialogTitle className="text-2xl font-bold">Kart ile Para Çek</DialogTitle>
+                          <DialogDescription className="text-base">Bilgileri doldurarak para çekme talebi oluşturun.</DialogDescription>
+                      </DialogHeader>
+                      <form onSubmit={handleCardSubmit} className="space-y-4 pt-4">
+                          <div>
+                              <Label htmlFor="cardNumber" className="text-base">Kart Numarası</Label>
+                              <Input id="cardNumber" placeholder="**** **** **** ****" required />
+                          </div>
+                          <div className="flex gap-4">
+                              <div className="flex-1">
+                                  <Label htmlFor="expiryDate" className="text-base">Tarih</Label>
+                                  <Input id="expiryDate" placeholder="AA/YY" required />
+                              </div>
+                              <div className="flex-1">
+                                  <Label htmlFor="cvv" className="text-base">CVV Kodu</Label>
+                                  <Input id="cvv" placeholder="***" required />
+                              </div>
+                          </div>
+                          <DialogFooter>
+                              <Button type="submit" disabled={isLoading} className="w-full text-base sm:text-sm">
+                                  {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                                  Talep Oluştur
+                              </Button>
+                          </DialogFooter>
+                      </form>
+                  </DialogContent>
+              </Dialog>
+            </CardContent>
+          </>
         )}
       </Card>
     </div>
