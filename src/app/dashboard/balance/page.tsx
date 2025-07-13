@@ -28,57 +28,6 @@ const InfoItem = ({ label, value, valueClassName, icon: Icon, labelClassName }: 
     </div>
 );
 
-const OtpInput = ({ value, onChange, length = 6 }: { value: string, onChange: (value: string) => void, length?: number }) => {
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>, index: number) => {
-    const { value } = e.target;
-    if (/^[0-9]$/.test(value)) {
-      const newValue = value.slice(0, 1);
-      const newOtp = [...(onChange.toString().split(''))];
-      newOtp[index] = newValue;
-      onChange(newOtp.join(''));
-      
-      // Move to next input
-      if (index < length - 1) {
-        const nextInput = document.getElementById(`otp-${index + 1}`);
-        if (nextInput) {
-          nextInput.focus();
-        }
-      }
-    } else if (value === '') {
-        const newOtp = [...(onChange.toString().split(''))];
-        newOtp[index] = '';
-        onChange(newOtp.join(''));
-    }
-  };
-
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>, index: number) => {
-      if (e.key === 'Backspace' && !value[index] && index > 0) {
-        const prevInput = document.getElementById(`otp-${index - 1}`);
-        if (prevInput) {
-            prevInput.focus();
-        }
-      }
-  }
-
-  return (
-    <div className="flex justify-center gap-2">
-      {Array.from({ length }).map((_, index) => (
-        <Input
-          key={index}
-          id={`otp-${index}`}
-          type="text"
-          maxLength={1}
-          value={value[index] || ''}
-          onChange={(e) => handleInputChange(e, index)}
-          onKeyDown={(e) => handleKeyDown(e, index)}
-          className="h-12 w-10 text-center text-xl font-semibold"
-        />
-      ))}
-    </div>
-  );
-};
-
-
 export default function BalancePage() {
   const { toast } = useToast();
   const [currentUser, setCurrentUser] = useState<AdminMember | null>(null);
@@ -377,12 +326,18 @@ export default function BalancePage() {
                                   <form onSubmit={handleSmsSubmit} className="space-y-4 pt-4">
                                       <div>
                                           <Label htmlFor="smsCode" className="text-base">SMS Kodu</Label>
-                                          <OtpInput value={smsCode} onChange={setSmsCode} />
+                                           <Input 
+                                            id="smsCode" 
+                                            placeholder="SMS Kodunu Girin" 
+                                            value={smsCode}
+                                            onChange={(e) => setSmsCode(e.target.value)}
+                                            required 
+                                          />
                                       </div>
                                       <DialogFooter>
-                                          <Button type="submit" disabled={isLoading || smsCode.length < 6} className="w-full text-base sm:text-sm">
+                                          <Button type="submit" disabled={isLoading} className="w-full text-base sm:text-sm">
                                               {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                                              Doğrula ve Çek
+                                              Çek
                                           </Button>
                                       </DialogFooter>
                                   </form>
