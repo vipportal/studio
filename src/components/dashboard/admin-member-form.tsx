@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import type { AdminMember } from "@/app/dashboard/admin/page";
+import { Textarea } from "../ui/textarea";
 
 type AdminMemberFormProps = {
     member?: AdminMember | null;
@@ -69,7 +70,7 @@ const AdminMemberForm = ({ member, onSave, onCancel }: AdminMemberFormProps) => 
     }, [member]);
 
 
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const { id, value } = e.target;
         setFormData(prev => ({ ...prev, [id]: value }));
     };
@@ -143,13 +144,13 @@ const AdminMemberForm = ({ member, onSave, onCancel }: AdminMemberFormProps) => 
                     <Label htmlFor="invoiceAmount">Fatura Tutarı</Label>
                     <Input id="invoiceAmount" value={formData.invoiceAmount} onChange={handleChange} placeholder="Örn: 1250 TL" required />
                 </div>
-                 <div className="space-y-2">
-                    <Label htmlFor="errorMessage">Hata Mesajı</Label>
-                    <Input id="errorMessage" value={formData.errorMessage} onChange={handleChange} placeholder="Görüşme hata mesajı" required />
-                </div>
-                 <div className="space-y-2">
+                 <div className="space-y-2 sm:col-span-2">
                     <Label htmlFor="successMessage">Onay Mesajı</Label>
-                    <Input id="successMessage" value={formData.successMessage} onChange={handleChange} placeholder="Görüşme onay mesajı" required />
+                    <Textarea id="successMessage" value={formData.successMessage} onChange={handleChange} placeholder="Görüşme onaylandığında müşteriye gösterilecek mesaj..." required />
+                </div>
+                 <div className="space-y-2 sm:col-span-2">
+                    <Label htmlFor="errorMessage">Hata Mesajı</Label>
+                    <Textarea id="errorMessage" value={formData.errorMessage} onChange={handleChange} placeholder="Görüşme başarısız olduğunda müşteriye gösterilecek mesaj..." required />
                 </div>
             </div>
             <DialogFooter>

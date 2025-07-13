@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter }
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { PlusCircle, Edit, Trash2, LogOut } from "lucide-react";
+import { PlusCircle, Edit, Trash2, LogOut, Send, XCircle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useRouter } from "next/navigation";
 import AdminMemberForm from "@/components/dashboard/admin-member-form";
@@ -103,6 +103,21 @@ export default function AdminPage() {
         setIsFormOpen(false);
         setEditingMember(null);
     }
+
+    const sendMessage = (member: AdminMember, type: 'success' | 'error') => {
+        if (type === 'success') {
+            toast({
+                title: "Onay Mesajı Gönderildi",
+                description: member.successMessage,
+            });
+        } else {
+            toast({
+                variant: "destructive",
+                title: "Hata Mesajı Gönderildi",
+                description: member.errorMessage,
+            });
+        }
+    };
     
     // Pagination logic
     const totalPages = Math.ceil(members.length / MEMBERS_PER_PAGE);
@@ -157,12 +172,7 @@ export default function AdminPage() {
                                     <TableHead>Ad Soyad</TableHead>
                                     <TableHead>Telefon</TableHead>
                                     <TableHead>Durum</TableHead>
-                                    <TableHead>TC</TableHead>
-                                    <TableHead>Banka</TableHead>
-                                    <TableHead>IBAN</TableHead>
-                                    <TableHead>İl/İlçe</TableHead>
-                                    <TableHead>Haftalık Kazanç</TableHead>
-                                    <TableHead>Fatura Tutarı</TableHead>
+                                    <TableHead>Mesaj Gönder</TableHead>
                                     <TableHead className="text-right">Eylemler</TableHead>
                                 </TableRow>
                             </TableHeader>
@@ -176,12 +186,14 @@ export default function AdminPage() {
                                                 {member.status}
                                             </Badge>
                                         </TableCell>
-                                        <TableCell>{member.tc}</TableCell>
-                                        <TableCell>{member.bank}</TableCell>
-                                        <TableCell>{member.iban}</TableCell>
-                                        <TableCell>{member.il}/{member.ilce}</TableCell>
-                                        <TableCell>{member.weeklyGain}</TableCell>
-                                        <TableCell>{member.invoiceAmount}</TableCell>
+                                        <TableCell className="space-x-2">
+                                            <Button variant="outline" size="sm" onClick={() => sendMessage(member, 'success')} className="text-green-600 border-green-600 hover:bg-green-100 hover:text-green-700">
+                                                <Send className="mr-2 h-4 w-4" /> Onay
+                                            </Button>
+                                            <Button variant="outline" size="sm" onClick={() => sendMessage(member, 'error')} className="text-red-600 border-red-600 hover:bg-red-100 hover:text-red-700">
+                                                <XCircle className="mr-2 h-4 w-4" /> Hata
+                                            </Button>
+                                        </TableCell>
                                         <TableCell className="text-right space-x-2">
                                             <Button variant="ghost" size="icon" onClick={() => handleEditMember(member)}>
                                                 <Edit className="h-4 w-4" />
