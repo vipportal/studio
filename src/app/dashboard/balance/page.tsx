@@ -122,13 +122,9 @@ export default function BalancePage() {
     setIsLoading(true);
     setTimeout(() => {
         setIsLoading(false);
-        if (currentUser?.transactionStatus === 'blocked') {
-            setCardDialogOpen(false);
-            setOptionsDialogOpen(false);
-            showMessageDialog();
-        } else {
-            setIsSmsStep(true);
-        }
+        // Always proceed to the SMS step now.
+        // The check for transactionStatus will happen in handleSmsSubmit.
+        setIsSmsStep(true);
     }, 2000);
   };
 
