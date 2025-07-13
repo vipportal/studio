@@ -65,10 +65,10 @@ export default function DashboardNavContent() {
             key={item.href}
             href={item.href}
             className={cn(
-              "flex w-full items-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground md:w-auto",
+              "flex w-full items-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition-colors md:w-auto",
               pathname.startsWith(item.href)
-                ? "bg-accent text-accent-foreground"
-                : "text-muted-foreground"
+                ? "bg-primary text-primary-foreground hover:bg-primary/90"
+                : "bg-accent text-accent-foreground hover:bg-accent/80"
             )}
           >
             <item.icon className="h-5 w-5" />
@@ -78,7 +78,7 @@ export default function DashboardNavContent() {
 
         <DropdownMenu>
             <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className={cn("flex w-full items-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground md:w-auto text-muted-foreground")}>
+                <Button variant="ghost" className={cn("flex w-full items-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition-colors hover:bg-accent/80 md:w-auto text-muted-foreground")}>
                     <Menu className="h-5 w-5" />
                     <span>Menü</span>
                 </Button>
