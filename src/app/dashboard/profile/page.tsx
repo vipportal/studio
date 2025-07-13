@@ -69,8 +69,8 @@ export default function ProfilePage() {
       // Show welcome message toast
       const welcomeToastTimeout = setTimeout(() => {
         const { id, dismiss } = toast({
-          title: `SEVDA KİŞİSİNDEN MESAJINIZ VARDIR ❤️`,
-          className: "toast-center bg-primary text-primary-foreground",
+          title: `SEVDA KİŞİSİNDEN MESAJINIZ VAR`,
+          className: "toast-center bg-green-100 border-green-300 text-green-800",
         });
         
         // Dismiss after 4 seconds
