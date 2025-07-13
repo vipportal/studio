@@ -10,7 +10,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
-import { MoreVertical, LogOut, Info, MapPin, Users } from "lucide-react";
+import { LogOut, Info, MapPin, Users } from "lucide-react";
 
 const user = {
   name: "Ali Veli",
@@ -104,27 +104,6 @@ export default function ProfilePage() {
                 <AvatarImage src={user.avatar} alt={user.name} data-ai-hint={user.avatarHint} />
                 <AvatarFallback>{user.name.charAt(0)}</AvatarFallback>
             </Avatar>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="icon">
-                  <MoreVertical className="h-5 w-5" />
-                  <span className="sr-only">Menüyü aç</span>
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                {menuItems.map((item) => (
-                  <DropdownMenuItem key={item.label} onClick={item.action} className="cursor-pointer">
-                    <item.icon className="mr-2 h-4 w-4" />
-                    <span>{item.label}</span>
-                  </DropdownMenuItem>
-                ))}
-                <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={handleLogout} className="text-destructive focus:text-destructive cursor-pointer">
-                  <LogOut className="mr-2 h-4 w-4" />
-                  <span>Çıkış Yap</span>
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
         </div>
       </div>
 
