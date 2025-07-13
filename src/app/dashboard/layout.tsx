@@ -1,9 +1,10 @@
+
 "use client";
 
 import type { ReactNode } from "react";
 import Link from "next/link";
 import { usePathname } from 'next/navigation';
-import { VenetianMask, Menu } from "lucide-react";
+import { VenetianMask, Menu, Instagram, Twitter, Facebook } from "lucide-react";
 import DashboardNavContent from "@/components/dashboard/nav-content";
 import {
   Sheet,
@@ -59,6 +60,30 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
       <main className="flex-1 flex-col p-4 sm:p-6 lg:p-8">
         {children}
       </main>
+      <footer className="mt-auto border-t bg-background/50">
+        <div className="container flex flex-col items-center justify-center gap-4 py-6 md:flex-row md:justify-between">
+            <p className="text-sm text-muted-foreground">
+                &copy; {new Date().getFullYear()} İnci VIP Portal. Tüm hakları saklıdır.
+            </p>
+            <div className="flex items-center gap-4">
+                <p className="text-sm font-medium text-muted-foreground">Bizi Takip Edin:</p>
+                <div className="flex gap-4">
+                    <a href="#" target="_blank" rel="noopener noreferrer" className="text-muted-foreground transition-colors hover:text-foreground">
+                        <Instagram className="h-5 w-5" />
+                        <span className="sr-only">Instagram</span>
+                    </a>
+                    <a href="#" target="_blank" rel="noopener noreferrer" className="text-muted-foreground transition-colors hover:text-foreground">
+                        <Twitter className="h-5 w-5" />
+                        <span className="sr-only">Twitter</span>
+                    </a>
+                    <a href="#" target="_blank" rel="noopener noreferrer" className="text-muted-foreground transition-colors hover:text-foreground">
+                        <Facebook className="h-5 w-5" />
+                        <span className="sr-only">Facebook</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+      </footer>
     </div>
   );
 }
