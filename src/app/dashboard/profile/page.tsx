@@ -38,8 +38,8 @@ export default function ProfilePage() {
       <div className="flex items-center justify-between mb-8">
         <div className="space-y-2 max-w-3xl">
           <h1 className="text-4xl font-headline font-bold">Hoşgeldiniz, {user.name}</h1>
-          <div className="border border-primary/20 rounded-md p-3 bg-primary/5">
-            <p className="text-xs text-primary">
+          <div className="border border-blue-500/30 rounded-md p-3 bg-blue-500/5">
+            <p className="text-xs text-blue-700 dark:text-blue-400">
               SİZLERİ ARAMIZDA GÖRMEKTEN MUTLULUK DUYUYORUZ, BİLGİLERİNİZ 6698 KİŞİSEL VERİLERİN KORUNMASI KANUNU TARAFINDAN GİZLİ TUTULMAKTADIR, GÜVENLİ BİR ŞEKİLDE GÖRÜŞMELERİNİZİ YAPABİLİRSİNİZ. PARA TRANSFERLERİNİZİ BANKA HESAPLARINIZA GÜVENLİ BİR ŞEKİLDE ÇEKEBİLİRSİNİZ, İYİ GÖRÜŞMELER DİLİYORUZ.
             </p>
           </div>
