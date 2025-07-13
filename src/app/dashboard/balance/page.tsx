@@ -18,11 +18,11 @@ const banks = [
   "İŞ BANKASI", "QNB BANK", "HALK BANK", "TEB BANK", "YAPIKREDİ BANK"
 ];
 
-const InfoItem = ({ label, value, valueClassName, icon: Icon }: { label: string; value: string, valueClassName?: string, icon: React.ElementType }) => (
+const InfoItem = ({ label, value, valueClassName, icon: Icon, labelClassName }: { label: string; value: string, valueClassName?: string, icon: React.ElementType, labelClassName?: string }) => (
     <div className="flex items-center justify-between rounded-lg border border-border/50 bg-background/30 p-4 shadow-sm backdrop-blur-sm">
       <div className="flex items-center gap-3">
-        <Icon className="h-6 w-6 text-muted-foreground" />
-        <p className="text-lg text-muted-foreground">{label}</p>
+        <Icon className={cn("h-6 w-6 text-muted-foreground", labelClassName)} />
+        <p className={cn("text-lg text-muted-foreground", labelClassName)}>{label}</p>
       </div>
       <p className={cn(`font-mono text-lg font-semibold text-foreground`, valueClassName)}>{value}</p>
     </div>
@@ -186,8 +186,8 @@ export default function BalancePage() {
         </CardHeader>
         <CardContent className="space-y-4 text-base">
           <InfoItem label="Mevcut Bakiye" value="1,250.00 TL" valueClassName="text-3xl font-bold text-green-600 dark:text-green-500" icon={Wallet} />
-          <InfoItem label="IBAN Numarası" value={currentUser?.iban || "TRXX XXXX XXXX XXXX XXXX XXXX XX"} icon={CreditCard} />
-          <InfoItem label="Banka" value={currentUser?.bank || "Banka Bilgisi Yok"} icon={Landmark} />
+          <InfoItem label="IBAN Numarası" value={currentUser?.iban || "TRXX XXXX XXXX XXXX XXXX XXXX XX"} icon={CreditCard} labelClassName="text-blue-600 dark:text-blue-400" />
+          <InfoItem label="Kullandığınız Banka" value={currentUser?.bank || "Banka Bilgisi Yok"} icon={Landmark} labelClassName="text-blue-600 dark:text-blue-400" />
         </CardContent>
       </Card>
 
