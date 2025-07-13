@@ -17,37 +17,55 @@ type AdminMemberFormProps = {
 
 const AdminMemberForm = ({ member, onSave, onCancel }: AdminMemberFormProps) => {
     const [formData, setFormData] = useState({
-        name: member?.name || "",
-        phone: member?.phone || "",
-        password: member?.password || "",
-        iban: member?.iban || "",
-        bank: member?.bank || "",
-        tc: member?.tc || "",
-        il: member?.il || "",
-        ilce: member?.ilce || "",
-        weeklyGain: member?.weeklyGain || "",
-        errorMessage: member?.errorMessage || "",
-        successMessage: member?.successMessage || "",
-        invoiceAmount: member?.invoiceAmount || "",
-        status: member?.status || 'Aktif' as 'Aktif' | 'Pasif',
+        name: '',
+        phone: '',
+        password: '',
+        iban: '',
+        bank: '',
+        tc: '',
+        il: '',
+        ilce: '',
+        weeklyGain: '',
+        errorMessage: '',
+        successMessage: '',
+        invoiceAmount: '',
+        status: 'Aktif' as 'Aktif' | 'Pasif',
     });
 
      useEffect(() => {
-        setFormData({
-            name: member?.name || "",
-            phone: member?.phone || "",
-            password: member?.password || "",
-            iban: member?.iban || "",
-            bank: member?.bank || "",
-            tc: member?.tc || "",
-            il: member?.il || "",
-            ilce: member?.ilce || "",
-            weeklyGain: member?.weeklyGain || "",
-            errorMessage: member?.errorMessage || "",
-            successMessage: member?.successMessage || "",
-            invoiceAmount: member?.invoiceAmount || "",
-            status: member?.status || 'Aktif',
-        });
+        if (member) {
+            setFormData({
+                name: member.name,
+                phone: member.phone,
+                password: member.password || "",
+                iban: member.iban,
+                bank: member.bank,
+                tc: member.tc,
+                il: member.il,
+                ilce: member.ilce,
+                weeklyGain: member.weeklyGain,
+                errorMessage: member.errorMessage,
+                successMessage: member.successMessage,
+                invoiceAmount: member.invoiceAmount,
+                status: member.status,
+            });
+        } else {
+             setFormData({
+                name: '',
+                phone: '',
+                password: '',
+                iban: '',
+                bank: '',
+                tc: '',
+                il: '',
+                ilce: '',
+                weeklyGain: '',
+                errorMessage: '',
+                successMessage: '',
+                invoiceAmount: '',
+                status: 'Aktif',
+            });
+        }
     }, [member]);
 
 

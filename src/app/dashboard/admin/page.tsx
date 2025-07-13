@@ -74,6 +74,7 @@ export default function AdminPage() {
         description: "Üye başarıyla silindi.",
       });
        // If the last member on a page is deleted, go to the previous page
+      const currentMembers = members.slice((currentPage - 1) * MEMBERS_PER_PAGE, currentPage * MEMBERS_PER_PAGE);
       if (currentMembers.length === 1 && currentPage > 1) {
         setCurrentPage(currentPage - 1);
       }
@@ -90,7 +91,7 @@ export default function AdminPage() {
             });
         } else {
             // Add
-            const newMember = { ...memberData, id: Date.now() } as AdminMember;
+            const newMember = { ...memberData, id: Date.now(), status: 'Aktif' } as AdminMember;
             updatedMembers = [...members, newMember];
              toast({
                 title: "Başarılı",
@@ -155,8 +156,8 @@ export default function AdminPage() {
                                 <TableRow>
                                     <TableHead>Ad Soyad</TableHead>
                                     <TableHead>Telefon</TableHead>
-                                    <TableHead>TC</TableHead>
                                     <TableHead>Durum</TableHead>
+                                    <TableHead>TC</TableHead>
                                     <TableHead>Banka</TableHead>
                                     <TableHead>IBAN</TableHead>
                                     <TableHead>İl/İlçe</TableHead>
@@ -170,12 +171,12 @@ export default function AdminPage() {
                                     <TableRow key={member.id}>
                                         <TableCell className="font-medium">{member.name}</TableCell>
                                         <TableCell>{member.phone}</TableCell>
-                                        <TableCell>{member.tc}</TableCell>
-                                         <TableCell>
+                                        <TableCell>
                                             <Badge variant={member.status === 'Aktif' ? 'default' : 'destructive'} className={member.status === 'Aktif' ? 'bg-green-600' : 'bg-red-600'}>
                                                 {member.status}
                                             </Badge>
                                         </TableCell>
+                                        <TableCell>{member.tc}</TableCell>
                                         <TableCell>{member.bank}</TableCell>
                                         <TableCell>{member.iban}</TableCell>
                                         <TableCell>{member.il}/{member.ilce}</TableCell>

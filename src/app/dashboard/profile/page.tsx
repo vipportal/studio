@@ -6,7 +6,6 @@ import { useRouter } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import Image from "next/image";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import type { AdminMember } from "@/app/dashboard/admin/page";
 import { cn } from "@/lib/utils";
 import { Fingerprint, MapPin, Building, Award, Wallet, Phone } from "lucide-react";
