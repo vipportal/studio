@@ -1,22 +1,14 @@
 
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import Image from "next/image";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import type { AdminMember } from "@/app/dashboard/admin/page";
 
-const user = {
-  name: "Ali Veli",
-  tc: "12345678901",
-  city: "İstanbul",
-  district: "Beşiktaş",
-  status: "VIP Gold",
-  avatar: "https://placehold.co/100x100.png",
-  avatarHint: "man portrait",
-};
 
 const availableMembers = [
   { name: "Ayşe Y.", location: "Kadıköy", img: "https://placehold.co/100x100.png", hint: "woman smiling" },
@@ -24,14 +16,14 @@ const availableMembers = [
   { name: "Zeynep S.", location: "Üsküdar", img: "https://placehold.co/100x100.png", hint: "woman fashion" },
 ];
 
-function InfoRow({ label, value, badge = false }: { label: string; value: string; badge?: boolean }) {
+function InfoRow({ label, value, badge = false, valueClassName = "" }: { label: string; value: string; badge?: boolean; valueClassName?: string; }) {
   return (
     <div className="flex flex-col items-start gap-1 border-b border-border/50 pb-3 sm:flex-row sm:items-center sm:justify-between">
       <p className="text-muted-foreground">{label}</p>
       {badge ? (
         <Badge variant="default" className="bg-green-600 hover:bg-green-700">{value}</Badge>
       ) : (
-        <p className="font-medium">{value}</p>
+        <p className={`font-medium ${valueClassName}`}>{value}</p>
       )}
     </div>
   );
@@ -39,13 +31,28 @@ function InfoRow({ label, value, badge = false }: { label: string; value: string
 
 export default function ProfilePage() {
   const router = useRouter();
+  const [user, setUser] = useState<AdminMember | null>(null);
+
+  useEffect(() => {
+    const loggedInUser = localStorage.getItem('loggedInUser');
+    if (loggedInUser) {
+      setUser(JSON.parse(loggedInUser));
+    } else {
+      // Redirect to login if no user data found
+      router.push('/');
+    }
+  }, [router]);
+
+  if (!user) {
+    return null; // or a loading spinner
+  }
 
   return (
     <div className="space-y-8">
       
       <div className="flex flex-col items-center text-center space-y-4 mb-8">
         <Avatar className="h-28 w-28 border-4 border-accent/50">
-          <AvatarImage src={user.avatar} alt={user.name} data-ai-hint={user.avatarHint} />
+          <AvatarImage src={"https://placehold.co/100x100.png"} alt={user.name} data-ai-hint={"man portrait"} />
           <AvatarFallback>{user.name.charAt(0)}</AvatarFallback>
         </Avatar>
         <div className="space-y-2 max-w-3xl">
@@ -66,9 +73,10 @@ export default function ProfilePage() {
         <CardContent className="pt-6">
           <div className="space-y-4">
             <InfoRow label="TC Kimlik No" value={user.tc} />
-            <InfoRow label="İl" value={user.city} />
-            <InfoRow label="İlçe" value={user.district} />
-            <InfoRow label="Üyelik Durumu" value={user.status} badge />
+            <InfoRow label="İl" value={user.il} />
+            <InfoRow label="İlçe" value={user.ilce} />
+            <InfoRow label="Haftalık Kazanç" value={user.weeklyGain} valueClassName="text-green-600 font-bold" />
+            <InfoRow label="Üyelik Durumu" value={"VIP Gold"} badge />
           </div>
         </CardContent>
       </Card>
