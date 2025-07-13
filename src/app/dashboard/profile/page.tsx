@@ -1,6 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import Image from "next/image";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 const user = {
   name: "Ali Veli",
@@ -8,6 +9,8 @@ const user = {
   city: "İstanbul",
   district: "Beşiktaş",
   status: "VIP Gold",
+  avatar: "https://placehold.co/100x100.png",
+  avatarHint: "man portrait",
 };
 
 const availableMembers = [
@@ -21,7 +24,7 @@ function InfoRow({ label, value, badge = false }: { label: string; value: string
     <div className="flex flex-col items-start gap-1 border-b border-border/50 pb-3 sm:flex-row sm:items-center sm:justify-between">
       <p className="text-muted-foreground">{label}</p>
       {badge ? (
-        <Badge variant="default" className="bg-primary/80">{value}</Badge>
+        <Badge variant="default" className="bg-green-600 hover:bg-green-700">{value}</Badge>
       ) : (
         <p className="font-medium">{value}</p>
       )}
@@ -32,9 +35,15 @@ function InfoRow({ label, value, badge = false }: { label: string; value: string
 export default function ProfilePage() {
   return (
     <div className="space-y-8">
-       <div className="mb-6">
-        <h1 className="text-3xl font-headline font-bold">Hoşgeldiniz, {user.name}</h1>
-        <p className="text-muted-foreground">VIP Portalınıza genel bir bakış.</p>
+      <div className="flex items-center justify-between mb-8">
+        <div className="space-y-1">
+          <h1 className="text-4xl font-headline font-bold">Hoşgeldiniz, {user.name}</h1>
+          <p className="text-muted-foreground">VIP Portalınıza genel bir bakış.</p>
+        </div>
+        <Avatar className="h-24 w-24 border-4 border-accent/50">
+            <AvatarImage src={user.avatar} alt={user.name} data-ai-hint={user.avatarHint} />
+            <AvatarFallback>{user.name.charAt(0)}</AvatarFallback>
+        </Avatar>
       </div>
 
       <Card>
@@ -42,7 +51,7 @@ export default function ProfilePage() {
           <CardTitle className="font-headline text-2xl">Profil Bilgileri</CardTitle>
           <CardDescription>Kişisel bilgileriniz ve üyelik durumunuz.</CardDescription>
         </CardHeader>
-        <CardContent>
+        <CardContent className="pt-6">
           <div className="space-y-4">
             <InfoRow label="Ad Soyad" value={user.name} />
             <InfoRow label="TC Kimlik No" value={user.tc} />
@@ -58,10 +67,13 @@ export default function ProfilePage() {
           <CardTitle className="font-headline text-2xl">Aynı Bölgede Müsait Olan Üyelerimiz</CardTitle>
           <CardDescription>Yakınınızdaki diğer üyeleri keşfedin.</CardDescription>
         </CardHeader>
-        <CardContent className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3">
+        <CardContent className="grid grid-cols-1 gap-4 pt-6 sm:grid-cols-2 md:grid-cols-3">
           {availableMembers.map(member => (
             <Card key={member.name} className="flex flex-col items-center p-4 text-center transition-colors hover:bg-card/60">
-              <Image src={member.img} alt={member.name} data-ai-hint={member.hint} width={80} height={80} className="mb-4 rounded-full border-2 border-accent" />
+              <Avatar className="h-20 w-20 mb-4 border-2 border-accent">
+                <AvatarImage src={member.img} alt={member.name} data-ai-hint={member.hint} />
+                <AvatarFallback>{member.name.charAt(0)}</AvatarFallback>
+              </Avatar>
               <p className="font-semibold">{member.name}</p>
               <p className="text-sm text-muted-foreground">{member.location}</p>
             </Card>

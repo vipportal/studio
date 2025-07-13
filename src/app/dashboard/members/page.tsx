@@ -33,11 +33,11 @@ export default function MembersPage() {
                                 height={400} 
                                 className="h-auto w-full object-cover transition-transform duration-300 group-hover:scale-105"
                             />
-                            <Badge variant={member.status === 'Müsait' ? 'default' : 'destructive'} className="absolute right-2 top-2 bg-primary/80 backdrop-blur-sm">
+                            <Badge variant={member.status === 'Müsait' ? 'default' : 'destructive'} className="absolute right-2 top-2 bg-green-600/80 backdrop-blur-sm text-primary-foreground">
                                 {member.status}
                             </Badge>
                         </div>
-                        <CardContent className="p-4">
+                        <CardContent className="p-4 pt-4">
                             <h3 className="font-headline text-lg font-bold">{member.name}</h3>
                             <p className="text-sm text-muted-foreground">{member.location}</p>
                             <Button className="mt-4 w-full" variant="outline">Profili Görüntüle</Button>
