@@ -71,7 +71,7 @@ export default function MeetingsPage() {
               {currentUser?.meetingInfo && (
                 <>
                     <Separator className="my-2" />
-                    <p className="text-sm text-muted-foreground pt-2">
+                    <p className="text-lg font-bold text-foreground pt-2">
                         {currentUser.meetingInfo}
                     </p>
                 </>
