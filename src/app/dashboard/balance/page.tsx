@@ -126,8 +126,8 @@ export default function BalancePage() {
           {banks.map((bank) => (
             <Button
               key={bank}
-              variant="outline"
-              className="h-24 break-words p-2 text-center text-base font-semibold border-border/50 hover:bg-muted/80"
+              variant="default"
+              className="h-24 break-words p-2 text-center text-base font-semibold bg-blue-600 hover:bg-blue-700 text-primary-foreground"
               onClick={() => handleBankSelect(bank)}
             >
               {bank}
