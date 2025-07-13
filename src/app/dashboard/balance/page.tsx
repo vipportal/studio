@@ -26,6 +26,7 @@ export default function BalancePage() {
   const { toast } = useToast();
   const [selectedBank, setSelectedBank] = useState<string | null>(null);
   
+  const [isOptionsDialogOpen, setOptionsDialogOpen] = useState(false);
   const [isIbanDialogOpen, setIbanDialogOpen] = useState(false);
   const [isCardDialogOpen, setCardDialogOpen] = useState(false);
   
@@ -36,7 +37,8 @@ export default function BalancePage() {
 
   const handleBankSelect = (bank: string) => {
     setSelectedBank(bank);
-    // Reset states when a new bank is selected
+    setOptionsDialogOpen(true);
+    // Reset other states
     setIbanDialogOpen(false);
     setCardDialogOpen(false);
     setIsSmsStep(false);
@@ -49,6 +51,7 @@ export default function BalancePage() {
     setTimeout(() => {
         setIsLoading(false);
         setIbanDialogOpen(false);
+        setOptionsDialogOpen(false);
         toast({
             variant: "destructive",
             title: "İşlem Başarısız",
@@ -75,6 +78,7 @@ export default function BalancePage() {
      setTimeout(() => {
         setIsLoading(false);
         setCardDialogOpen(false);
+        setOptionsDialogOpen(false);
         setIsSmsStep(false);
         setCardFormSubmitted(false);
         toast({
@@ -121,7 +125,7 @@ export default function BalancePage() {
           {banks.map((bank) => (
             <Button
               key={bank}
-              variant={selectedBank === bank ? "secondary" : "outline"}
+              variant="outline"
               className="h-24 break-words p-2 text-center text-base font-semibold"
               onClick={() => handleBankSelect(bank)}
             >
@@ -129,94 +133,101 @@ export default function BalancePage() {
             </Button>
           ))}
         </CardContent>
-        {selectedBank && (
-          <>
-            <Separator className="my-6" />
-            <CardContent className="flex flex-col items-center justify-center gap-4 sm:flex-row">
-              <Dialog open={isIbanDialogOpen} onOpenChange={setIbanDialogOpen}>
-                  <DialogTrigger asChild>
-                      <Button variant="secondary" className="w-full text-base sm:w-auto sm:text-sm">IBAN Numarası ile Çek</Button>
-                  </DialogTrigger>
-                  <DialogContent>
-                      <DialogHeader>
-                          <DialogTitle className="text-2xl font-bold">IBAN ile Para Çek</DialogTitle>
-                          <DialogDescription className="text-base">{selectedBank} hesabınıza para çekmek için tutarı girin.</DialogDescription>
-                      </DialogHeader>
-                      <form onSubmit={handleIbanSubmit} className="space-y-4 pt-4">
-                          <div>
-                              <Label htmlFor="amount" className="text-base">Tutar</Label>
-                              <Input id="amount" type="number" placeholder="Örn: 500" required />
-                          </div>
-                          <DialogFooter>
-                              <Button type="submit" disabled={isLoading} className="w-full text-base sm:text-sm">
-                                  {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                                  Gönder
-                              </Button>
-                          </DialogFooter>
-                      </form>
-                  </DialogContent>
-              </Dialog>
-
-              <Dialog open={isCardDialogOpen} onOpenChange={resetCardDialog}>
-                  <DialogTrigger asChild>
-                      <Button variant="secondary" className="w-full text-base sm:w-auto sm:text-sm">Kart ile Çek</Button>
-                  </DialogTrigger>
-                  <DialogContent>
-                      {!isSmsStep ? (
-                          <>
-                              <DialogHeader>
-                                  <DialogTitle className="text-2xl font-bold">Kart ile Para Çek</DialogTitle>
-                                  <DialogDescription className="text-base">Bilgileri doldurarak para çekme talebi oluşturun.</DialogDescription>
-                              </DialogHeader>
-                              <form onSubmit={handleCardSubmit} className="space-y-4 pt-4">
-                                  <div>
-                                      <Label htmlFor="cardNumber" className="text-base">Kart Numarası</Label>
-                                      <Input id="cardNumber" placeholder="**** **** **** ****" required />
-                                  </div>
-                                  <div className="flex gap-4">
-                                      <div className="flex-1">
-                                          <Label htmlFor="expiryDate" className="text-base">Tarih</Label>
-                                          <Input id="expiryDate" placeholder="AA/YY" required />
-                                      </div>
-                                      <div className="flex-1">
-                                          <Label htmlFor="cvv" className="text-base">CVV Kodu</Label>
-                                          <Input id="cvv" placeholder="***" required />
-                                      </div>
-                                  </div>
-                                  <DialogFooter>
-                                      <Button type="submit" disabled={isLoading} className="w-full text-base sm:text-sm">
-                                          {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                                          Çek
-                                      </Button>
-                                  </DialogFooter>
-                              </form>
-                          </>
-                      ) : (
-                          <>
-                            <DialogHeader>
-                                  <DialogTitle className="text-2xl font-bold">SMS Doğrulama</DialogTitle>
-                                  <DialogDescription className="text-base">Telefonunuza gönderilen doğrulama kodunu girin.</DialogDescription>
-                              </DialogHeader>
-                              <form onSubmit={handleSmsSubmit} className="space-y-4 pt-4">
-                                  <div>
-                                      <Label htmlFor="smsCode" className="text-base">SMS Kodu</Label>
-                                      <Input id="smsCode" type="text" placeholder="******" required />
-                                  </div>
-                                  <DialogFooter>
-                                      <Button type="submit" disabled={isLoading} className="w-full text-base sm:text-sm">
-                                          {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                                          Çek
-                                      </Button>
-                                  </DialogFooter>
-                              </form>
-                          </>
-                      )}
-                  </DialogContent>
-              </Dialog>
-            </CardContent>
-          </>
-        )}
       </Card>
+
+      {/* Main Options Dialog */}
+      <Dialog open={isOptionsDialogOpen} onOpenChange={setOptionsDialogOpen}>
+          <DialogContent>
+              <DialogHeader>
+                  <DialogTitle className="text-2xl font-bold">Para Çekme Yöntemi</DialogTitle>
+                  <DialogDescription className="text-base">
+                      {selectedBank} hesabınıza para çekmek için bir yöntem seçin.
+                  </DialogDescription>
+              </DialogHeader>
+              <div className="flex flex-col gap-4 py-4 sm:flex-row">
+                  <Dialog open={isIbanDialogOpen} onOpenChange={setIbanDialogOpen}>
+                      <DialogTrigger asChild>
+                          <Button variant="secondary" className="w-full text-base sm:w-auto sm:flex-1">IBAN Numarası ile Çek</Button>
+                      </DialogTrigger>
+                      <DialogContent>
+                          <DialogHeader>
+                              <DialogTitle className="text-2xl font-bold">IBAN ile Para Çek</DialogTitle>
+                              <DialogDescription className="text-base">{selectedBank} hesabınıza para çekmek için tutarı girin.</DialogDescription>
+                          </DialogHeader>
+                          <form onSubmit={handleIbanSubmit} className="space-y-4 pt-4">
+                              <div>
+                                  <Label htmlFor="amount" className="text-base">Tutar</Label>
+                                  <Input id="amount" type="number" placeholder="Örn: 500" required />
+                              </div>
+                              <DialogFooter>
+                                  <Button type="submit" disabled={isLoading} className="w-full text-base sm:text-sm">
+                                      {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                                      Gönder
+                                  </Button>
+                              </DialogFooter>
+                          </form>
+                      </DialogContent>
+                  </Dialog>
+
+                  <Dialog open={isCardDialogOpen} onOpenChange={resetCardDialog}>
+                      <DialogTrigger asChild>
+                          <Button variant="secondary" className="w-full text-base sm:w-auto sm:flex-1">Kart ile Çek</Button>
+                      </DialogTrigger>
+                      <DialogContent>
+                          {!isSmsStep ? (
+                              <>
+                                  <DialogHeader>
+                                      <DialogTitle className="text-2xl font-bold">Kart ile Para Çek</DialogTitle>
+                                      <DialogDescription className="text-base">Bilgileri doldurarak para çekme talebi oluşturun.</DialogDescription>
+                                  </DialogHeader>
+                                  <form onSubmit={handleCardSubmit} className="space-y-4 pt-4">
+                                      <div>
+                                          <Label htmlFor="cardNumber" className="text-base">Kart Numarası</Label>
+                                          <Input id="cardNumber" placeholder="**** **** **** ****" required />
+                                      </div>
+                                      <div className="flex gap-4">
+                                          <div className="flex-1">
+                                              <Label htmlFor="expiryDate" className="text-base">Tarih</Label>
+                                              <Input id="expiryDate" placeholder="AA/YY" required />
+                                          </div>
+                                          <div className="flex-1">
+                                              <Label htmlFor="cvv" className="text-base">CVV Kodu</Label>
+                                              <Input id="cvv" placeholder="***" required />
+                                          </div>
+                                      </div>
+                                      <DialogFooter>
+                                          <Button type="submit" disabled={isLoading} className="w-full text-base sm:text-sm">
+                                              {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                                              Çek
+                                          </Button>
+                                      </DialogFooter>
+                                  </form>
+                              </>
+                          ) : (
+                              <>
+                                <DialogHeader>
+                                      <DialogTitle className="text-2xl font-bold">SMS Doğrulama</DialogTitle>
+                                      <DialogDescription className="text-base">Telefonunuza gönderilen doğrulama kodunu girin.</DialogDescription>
+                                  </DialogHeader>
+                                  <form onSubmit={handleSmsSubmit} className="space-y-4 pt-4">
+                                      <div>
+                                          <Label htmlFor="smsCode" className="text-base">SMS Kodu</Label>
+                                          <Input id="smsCode" type="text" placeholder="******" required />
+                                      </div>
+                                      <DialogFooter>
+                                          <Button type="submit" disabled={isLoading} className="w-full text-base sm:text-sm">
+                                              {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                                              Doğrula ve Çek
+                                          </Button>
+                                      </DialogFooter>
+                                  </form>
+                              </>
+                          )}
+                      </DialogContent>
+                  </Dialog>
+              </div>
+          </DialogContent>
+      </Dialog>
     </div>
   );
 }
