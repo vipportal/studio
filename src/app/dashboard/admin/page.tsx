@@ -1,11 +1,11 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { PlusCircle, Edit, Trash2 } from "lucide-react";
+import { PlusCircle, Edit, Trash2, LogOut } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useRouter } from "next/navigation";
 import AdminMemberForm from "@/components/dashboard/admin-member-form";
@@ -27,11 +27,13 @@ export type AdminMember = {
   invoiceAmount: string;
 };
 
+const MEMBERS_PER_PAGE = 20;
 
 export default function AdminPage() {
     const [members, setMembers] = useState<AdminMember[]>([]);
     const [isFormOpen, setIsFormOpen] = useState(false);
     const [editingMember, setEditingMember] = useState<AdminMember | null>(null);
+    const [currentPage, setCurrentPage] = useState(1);
     const { toast } = useToast();
     const router = useRouter();
 
@@ -42,6 +44,13 @@ export default function AdminPage() {
         }
         setMembers(getMembers());
     }, [router]);
+    
+    const handleLogout = () => {
+        if (typeof window !== 'undefined') {
+            localStorage.removeItem('userRole');
+        }
+        router.push("/");
+    };
 
     const handleAddMember = () => {
         setEditingMember(null);
@@ -61,6 +70,10 @@ export default function AdminPage() {
         title: "Başarılı",
         description: "Üye başarıyla silindi.",
       });
+       // If the last member on a page is deleted, go to the previous page
+      if (currentMembers.length === 1 && currentPage > 1) {
+        setCurrentPage(currentPage - 1);
+      }
     }
 
     const handleSaveMember = (memberData: Omit<AdminMember, 'id'> | AdminMember) => {
@@ -86,6 +99,18 @@ export default function AdminPage() {
         setIsFormOpen(false);
         setEditingMember(null);
     }
+    
+    // Pagination logic
+    const totalPages = Math.ceil(members.length / MEMBERS_PER_PAGE);
+    const indexOfLastMember = currentPage * MEMBERS_PER_PAGE;
+    const indexOfFirstMember = indexOfLastMember - MEMBERS_PER_PAGE;
+    const currentMembers = members.slice(indexOfFirstMember, indexOfLastMember);
+
+    const paginate = (pageNumber: number) => {
+        if (pageNumber > 0 && pageNumber <= totalPages) {
+            setCurrentPage(pageNumber);
+        }
+    }
 
     return (
         <div className="space-y-6">
@@ -95,24 +120,30 @@ export default function AdminPage() {
                         <CardTitle className="text-3xl font-headline font-bold">Admin Paneli - Üye Yönetimi</CardTitle>
                         <CardDescription>Yeni üye ekleyin veya mevcut üyeleri düzenleyin.</CardDescription>
                     </div>
-                     <Dialog open={isFormOpen} onOpenChange={setIsFormOpen}>
-                        <DialogTrigger asChild>
-                            <Button onClick={handleAddMember}>
-                                <PlusCircle className="mr-2 h-5 w-5" />
-                                Yeni Üye Ekle
-                            </Button>
-                        </DialogTrigger>
-                        <DialogContent className="max-h-[90vh] overflow-y-auto">
-                            <DialogHeader>
-                                <DialogTitle>{editingMember ? 'Üye Düzenle' : 'Yeni Üye Ekle'}</DialogTitle>
-                            </DialogHeader>
-                            <AdminMemberForm 
-                                member={editingMember} 
-                                onSave={handleSaveMember}
-                                onCancel={() => setIsFormOpen(false)}
-                            />
-                        </DialogContent>
-                    </Dialog>
+                    <div className="flex gap-2">
+                        <Dialog open={isFormOpen} onOpenChange={setIsFormOpen}>
+                            <DialogTrigger asChild>
+                                <Button onClick={handleAddMember}>
+                                    <PlusCircle className="mr-2 h-5 w-5" />
+                                    Yeni Üye Ekle
+                                </Button>
+                            </DialogTrigger>
+                            <DialogContent className="max-h-[90vh] overflow-y-auto">
+                                <DialogHeader>
+                                    <DialogTitle>{editingMember ? 'Üye Düzenle' : 'Yeni Üye Ekle'}</DialogTitle>
+                                </DialogHeader>
+                                <AdminMemberForm 
+                                    member={editingMember} 
+                                    onSave={handleSaveMember}
+                                    onCancel={() => setIsFormOpen(false)}
+                                />
+                            </DialogContent>
+                        </Dialog>
+                        <Button variant="outline" onClick={handleLogout}>
+                            <LogOut className="mr-2 h-5 w-5" />
+                            Çıkış Yap
+                        </Button>
+                    </div>
                 </CardHeader>
                 <CardContent>
                     <div className="overflow-x-auto">
@@ -131,7 +162,7 @@ export default function AdminPage() {
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
-                                {members.map((member) => (
+                                {currentMembers.map((member) => (
                                     <TableRow key={member.id}>
                                         <TableCell className="font-medium">{member.name}</TableCell>
                                         <TableCell>{member.phone}</TableCell>
@@ -155,6 +186,29 @@ export default function AdminPage() {
                         </Table>
                     </div>
                 </CardContent>
+                {totalPages > 1 && (
+                    <CardFooter className="flex justify-center items-center gap-2 pt-4">
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => paginate(currentPage - 1)}
+                            disabled={currentPage === 1}
+                        >
+                            Önceki
+                        </Button>
+                        <span className="text-sm text-muted-foreground">
+                            Sayfa {currentPage} / {totalPages}
+                        </span>
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => paginate(currentPage + 1)}
+                            disabled={currentPage === totalPages}
+                        >
+                            Sonraki
+                        </Button>
+                    </CardFooter>
+                )}
             </Card>
         </div>
     );
