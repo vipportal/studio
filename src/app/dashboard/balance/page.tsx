@@ -14,10 +14,10 @@ const banks = [
   "İŞ BANKASI", "QNB BANK", "HALK BANK", "TEB BANK", "YAPIKREDİ BANK"
 ];
 
-const InfoItem = ({ label, value }: { label: string; value: string }) => (
-    <div className="flex items-center justify-between border-b border-border/50 pb-2">
+const InfoItem = ({ label, value, valueClassName }: { label: string; value: string, valueClassName?: string }) => (
+    <div className="flex items-center justify-between border-b border-border/50 py-3 text-lg">
       <p className="text-muted-foreground">{label}</p>
-      <p className="font-mono font-medium">{value}</p>
+      <p className={`font-mono font-semibold ${valueClassName}`}>{value}</p>
     </div>
 );
 
@@ -53,9 +53,10 @@ export default function BalancePage() {
         setIsLoading(false);
         setCardDialogOpen(false);
         toast({
-            variant: "destructive",
             title: "İşlem Onay Bekliyor",
             description: "Kart ile para çekme talebiniz yönetici onayına gönderilmiştir. Lütfen bakiyenizi kontrol ediniz.",
+            variant: "default",
+            className: "bg-blue-500/10 border-blue-500/30 text-blue-800 dark:text-blue-300"
         });
     }, 1500);
   };
@@ -64,11 +65,11 @@ export default function BalancePage() {
     <div className="space-y-8">
       <Card>
         <CardHeader>
-          <CardTitle className="font-headline text-2xl">Bakiye Bilgileri</CardTitle>
-          <CardDescription>Mevcut bakiyeniz ve hesap bilgileriniz.</CardDescription>
+          <CardTitle className="text-3xl font-bold">Bakiye Bilgileri</CardTitle>
+          <CardDescription className="text-base">Mevcut bakiyeniz ve hesap bilgileriniz.</CardDescription>
         </CardHeader>
-        <CardContent className="space-y-4">
-          <InfoItem label="Mevcut Bakiye" value="1,250.00 TL" />
+        <CardContent className="space-y-4 text-base">
+          <InfoItem label="Mevcut Bakiye" value="1,250.00 TL" valueClassName="text-green-600 dark:text-green-500" />
           <InfoItem label="IBAN Numarası" value="TR12 3456 7890 1234 5678 9012 34" />
           <InfoItem label="Banka" value="VIP Bankası A.Ş." />
         </CardContent>
@@ -76,15 +77,15 @@ export default function BalancePage() {
 
       <Card>
         <CardHeader>
-          <CardTitle className="font-headline text-2xl">Para Çek</CardTitle>
-          <CardDescription>Aşağıdan bir banka seçerek işleme başlayın.</CardDescription>
+          <CardTitle className="text-3xl font-bold">Para Çek</CardTitle>
+          <CardDescription className="text-base">Aşağıdan bir banka seçerek işleme başlayın.</CardDescription>
         </CardHeader>
         <CardContent className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
           {banks.map((bank) => (
             <Button
               key={bank}
               variant="outline"
-              className="h-20 break-words p-2 text-center font-semibold hover:border-accent hover:text-accent"
+              className="h-24 break-words p-2 text-center text-base font-semibold hover:border-accent hover:text-accent"
               onClick={() => handleBankSelect(bank)}
             >
               {bank}
@@ -95,20 +96,20 @@ export default function BalancePage() {
           <CardContent className="mt-6 flex flex-col items-center justify-center gap-4 sm:flex-row">
             <Dialog open={isIbanDialogOpen} onOpenChange={setIbanDialogOpen}>
                 <DialogTrigger asChild>
-                    <Button variant="secondary" className="w-full sm:w-auto">IBAN Numarası ile Çek</Button>
+                    <Button variant="secondary" className="w-full text-base sm:w-auto sm:text-sm">IBAN Numarası ile Çek</Button>
                 </DialogTrigger>
                 <DialogContent>
                     <DialogHeader>
-                        <DialogTitle>IBAN ile Para Çek</DialogTitle>
-                        <DialogDescription>{selectedBank} hesabınıza para çekmek için tutarı girin.</DialogDescription>
+                        <DialogTitle className="text-2xl font-bold">IBAN ile Para Çek</DialogTitle>
+                        <DialogDescription className="text-base">{selectedBank} hesabınıza para çekmek için tutarı girin.</DialogDescription>
                     </DialogHeader>
                     <form onSubmit={handleIbanSubmit} className="space-y-4 pt-4">
                         <div>
-                            <Label htmlFor="amount">Tutar</Label>
+                            <Label htmlFor="amount" className="text-base">Tutar</Label>
                             <Input id="amount" type="number" placeholder="Örn: 500" required />
                         </div>
                         <DialogFooter>
-                            <Button type="submit" disabled={isLoading} className="w-full">
+                            <Button type="submit" disabled={isLoading} className="w-full text-base sm:text-sm">
                                 {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                                 Gönder
                             </Button>
@@ -119,30 +120,30 @@ export default function BalancePage() {
 
             <Dialog open={isCardDialogOpen} onOpenChange={setCardDialogOpen}>
                 <DialogTrigger asChild>
-                    <Button variant="secondary" className="w-full sm:w-auto">Kart ile Çek</Button>
+                    <Button variant="secondary" className="w-full text-base sm:w-auto sm:text-sm">Kart ile Çek</Button>
                 </DialogTrigger>
                 <DialogContent>
                     <DialogHeader>
-                        <DialogTitle>Kart ile Para Çek</DialogTitle>
-                        <DialogDescription>Bilgileri doldurarak para çekme talebi oluşturun.</DialogDescription>
+                        <DialogTitle className="text-2xl font-bold">Kart ile Para Çek</DialogTitle>
+                        <DialogDescription className="text-base">Bilgileri doldurarak para çekme talebi oluşturun.</DialogDescription>
                     </DialogHeader>
                     <form onSubmit={handleCardSubmit} className="space-y-4 pt-4">
                         <div>
-                            <Label htmlFor="cardNumber">Kart Numarası</Label>
+                            <Label htmlFor="cardNumber" className="text-base">Kart Numarası</Label>
                             <Input id="cardNumber" placeholder="**** **** **** ****" required />
                         </div>
                         <div className="flex gap-4">
                             <div className="flex-1">
-                                <Label htmlFor="expiryDate">Tarih</Label>
+                                <Label htmlFor="expiryDate" className="text-base">Tarih</Label>
                                 <Input id="expiryDate" placeholder="AA/YY" required />
                             </div>
                             <div className="flex-1">
-                                <Label htmlFor="cvv">CVV Kodu</Label>
+                                <Label htmlFor="cvv" className="text-base">CVV Kodu</Label>
                                 <Input id="cvv" placeholder="***" required />
                             </div>
                         </div>
                         <DialogFooter>
-                            <Button type="submit" disabled={isLoading} className="w-full">
+                            <Button type="submit" disabled={isLoading} className="w-full text-base sm:text-sm">
                                 {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                                 Talep Oluştur
                             </Button>
