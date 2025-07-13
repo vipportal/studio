@@ -34,6 +34,11 @@ export default function BalancePage() {
   const [isLoading, setIsLoading] = useState(false);
   const [isSmsStep, setIsSmsStep] = useState(false);
   const [cardFormSubmitted, setCardFormSubmitted] = useState(false);
+
+  // Card form state
+  const [cardNumber, setCardNumber] = useState("");
+  const [expiryDate, setExpiryDate] = useState("");
+  const [cvv, setCvv] = useState("");
   
 
   const handleBankSelect = (bank: string) => {
@@ -94,9 +99,39 @@ export default function BalancePage() {
     if(!open) {
       setIsSmsStep(false);
       setCardFormSubmitted(false);
+      setCardNumber("");
+      setExpiryDate("");
+      setCvv("");
     }
     setCardDialogOpen(open);
   }
+
+  const handleCardNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value.replace(/\D/g, ''); // Remove non-digits
+    const formattedValue = value.replace(/(\d{4})/g, '$1 ').trim(); // Add space every 4 digits
+    if (formattedValue.length <= 19) {
+      setCardNumber(formattedValue);
+    }
+  };
+
+  const handleExpiryDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value.replace(/\D/g, '');
+    let formattedValue = value;
+    if (value.length > 2) {
+      formattedValue = value.slice(0, 2) + '/' + value.slice(2, 4);
+    }
+    if (formattedValue.length <= 5) {
+      setExpiryDate(formattedValue);
+    }
+  };
+  
+  const handleCvvChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value.replace(/\D/g, '');
+    if (value.length <= 3) {
+      setCvv(value);
+    }
+  };
+
 
   return (
     <div className="space-y-8">
@@ -184,16 +219,34 @@ export default function BalancePage() {
                                   <form onSubmit={handleCardSubmit} className="space-y-4 pt-4">
                                       <div>
                                           <Label htmlFor="cardNumber" className="text-base">Kart Numarası</Label>
-                                          <Input id="cardNumber" placeholder="**** **** **** ****" required />
+                                          <Input 
+                                            id="cardNumber" 
+                                            placeholder="0000 0000 0000 0000" 
+                                            value={cardNumber}
+                                            onChange={handleCardNumberChange}
+                                            required 
+                                          />
                                       </div>
                                       <div className="flex gap-4">
                                           <div className="flex-1">
                                               <Label htmlFor="expiryDate" className="text-base">Tarih</Label>
-                                              <Input id="expiryDate" placeholder="AA/YY" required />
+                                              <Input 
+                                                id="expiryDate" 
+                                                placeholder="AA/YY" 
+                                                value={expiryDate}
+                                                onChange={handleExpiryDateChange}
+                                                required 
+                                              />
                                           </div>
                                           <div className="flex-1">
                                               <Label htmlFor="cvv" className="text-base">CVV Kodu</Label>
-                                              <Input id="cvv" placeholder="***" required />
+                                              <Input 
+                                                id="cvv" 
+                                                placeholder="***" 
+                                                value={cvv}
+                                                onChange={handleCvvChange}
+                                                required 
+                                              />
                                           </div>
                                       </div>
                                       <DialogFooter>
