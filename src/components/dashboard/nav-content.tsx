@@ -14,6 +14,8 @@ import {
   MessageSquareHeart,
   Users,
 } from "lucide-react";
+import { useSidebar } from "@/components/ui/sidebar";
+import { cn } from "@/lib/utils";
 
 const navItems = [
   { href: "/dashboard/profile", label: "Profil", icon: User, tooltip: "Profil" },
@@ -25,15 +27,21 @@ const navItems = [
 
 export default function DashboardNavContent() {
   const pathname = usePathname();
+  const { isMobile } = useSidebar();
 
   return (
-    <SidebarMenu>
+    <SidebarMenu className={cn(
+      "flex flex-row items-center",
+      isMobile && "flex-col"
+    )}>
       {navItems.map((item) => (
         <SidebarMenuItem key={item.href}>
           <SidebarMenuButton
             asChild
+            variant="outline"
+            className="border-none shadow-none"
             isActive={pathname.startsWith(item.href)}
-            tooltip={{ children: item.tooltip, side: "right" }}
+            tooltip={{ children: item.tooltip, side: "bottom" }}
           >
             <Link href={item.href}>
               <item.icon />
