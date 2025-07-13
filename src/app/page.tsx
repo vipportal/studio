@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState } from "react";
@@ -59,19 +60,22 @@ export default function LoginPage() {
       <div className="w-full max-w-md">
         <Card className="border-primary/20 shadow-lg shadow-primary/10">
           <CardHeader className="text-center">
-            <h1 className="font-headline text-5xl font-bold text-primary animate-text-glow py-4">
+            <h1 className="bg-gradient-to-r from-black to-blue-500 bg-clip-text font-headline text-5xl font-bold text-transparent">
               HOŞ GELDİNİZ
             </h1>
             <CardDescription>Lütfen giriş yapmak için bilgilerinizi girin.</CardDescription>
           </CardHeader>
           <form onSubmit={handleLogin}>
             <CardContent className="space-y-6">
+               <div className="space-y-2">
+                 <Label htmlFor="phone" className="text-center block font-bold">ÜYE GİRİŞİ</Label>
+               </div>
               <div className="space-y-2">
                 <Label htmlFor="phone">Telefon Numaranız</Label>
                 <Input
                   id="phone"
                   type="text"
-                  placeholder="admin veya 555 555 55 55"
+                  placeholder="Telefon Numaranız"
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
                   required
