@@ -63,16 +63,22 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
       <footer className="mt-auto border-t bg-background/50">
         <div className="container flex flex-col items-center justify-center gap-4 py-6">
             <div className="flex flex-col items-center gap-2">
-                <p className="text-sm font-medium text-muted-foreground">Bizi Takip Edin:</p>
+                <p className="text-lg font-semibold text-blue-600 dark:text-blue-400">Bizi Takip Edin:</p>
                 <div className="flex gap-4 text-2xl">
                     <a href="#" target="_blank" rel="noopener noreferrer" className="transition-transform hover:scale-110">
                         <span role="img" aria-label="Instagram">📸</span>
                     </a>
                     <a href="#" target="_blank" rel="noopener noreferrer" className="transition-transform hover:scale-110">
-                       <span role="img" aria-label="Twitter">🐦</span>
+                       <span role="img" aria-label="X (Twitter)">🐦</span>
                     </a>
                     <a href="#" target="_blank" rel="noopener noreferrer" className="transition-transform hover:scale-110">
                        <span role="img" aria-label="Facebook">📘</span>
+                    </a>
+                     <a href="#" target="_blank" rel="noopener noreferrer" className="transition-transform hover:scale-110">
+                       <span role="img" aria-label="WhatsApp">📞</span>
+                    </a>
+                     <a href="#" target="_blank" rel="noopener noreferrer" className="transition-transform hover:scale-110">
+                       <span role="img" aria-label="YouTube">📺</span>
                     </a>
                 </div>
             </div>
