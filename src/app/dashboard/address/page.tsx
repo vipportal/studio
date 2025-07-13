@@ -49,6 +49,19 @@ export default function AddressPage() {
                     destek@incivip.com
                  </ContactInfo>
             </div>
+            
+            <div className="mt-6 rounded-lg border shadow-md overflow-hidden">
+                <iframe
+                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3059.742385153213!2d32.8573932153808!3d39.9234839794255!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x14d34e1c8b7b1b3d%3A0x4d6b1b7b7b7b1b3d!2sAtat%C3%BCrk%20Blv.%2C%20%C3%87ankaya%2FAnkara!5e0!3m2!1str!2str!4v1689258600000"
+                    width="100%"
+                    height="300"
+                    style={{ border: 0 }}
+                    allowFullScreen={true}
+                    loading="lazy"
+                    referrerPolicy="no-referrer-when-downgrade"
+                    title="Merkez Ofis Konumu"
+                ></iframe>
+            </div>
 
              <p className="text-center text-sm text-muted-foreground p-4 bg-yellow-100/50 dark:bg-yellow-900/20 rounded-md border border-yellow-300/50">
                ⚠️ Güvenliğiniz ve gizliliğiniz önceliğimizdir. Bu nedenle fiziki ziyaretler yerine platformumuz üzerinden ve dijital kanallar aracılığıyla 7/24 hizmet vermekteyiz. Her türlü sorunuz için bizimle iletişime geçmekten çekinmeyin.
