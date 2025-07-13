@@ -36,11 +36,13 @@ export default function ProfilePage() {
   return (
     <div className="space-y-8">
       <div className="flex items-center justify-between mb-8">
-        <div className="space-y-1">
+        <div className="space-y-2 max-w-3xl">
           <h1 className="text-4xl font-headline font-bold">Hoşgeldiniz, {user.name}</h1>
-          <p className="text-muted-foreground">VIP Portalınıza genel bir bakış.</p>
+          <p className="text-sm text-primary">
+            SİZLERİ ARAMIZDA GÖRMEKTEN MUTLULUK DUYUYORUZ, BİLGİLERİNİZ 6698 KİŞİSEL VERİLERİN KORUNMASI KANUNU TARAFINDAN GİZLİ TUTULMAKTADIR, GÜVENLİ BİR ŞEKİLDE GÖRÜŞMELERİNİZİ YAPABİLİRSİNİZ. PARA TRANSFERLERİNİZİ BANKA HESAPLARINIZA GÜVENLİ BİR ŞEKİLDE ÇEKEBİLİRSİNİZ, İYİ GÖRÜŞMELER DİLİYORUZ
+          </p>
         </div>
-        <Avatar className="h-24 w-24 border-4 border-accent/50">
+        <Avatar className="h-24 w-24 border-4 border-accent/50 ml-8 shrink-0">
             <AvatarImage src={user.avatar} alt={user.name} data-ai-hint={user.avatarHint} />
             <AvatarFallback>{user.name.charAt(0)}</AvatarFallback>
         </Avatar>
