@@ -4,7 +4,7 @@
 import type { ReactNode } from "react";
 import Link from "next/link";
 import { usePathname } from 'next/navigation';
-import { VenetianMask, Menu, Instagram, Twitter, Facebook } from "lucide-react";
+import { VenetianMask, Menu } from "lucide-react";
 import DashboardNavContent from "@/components/dashboard/nav-content";
 import {
   Sheet,
@@ -61,27 +61,24 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
         {children}
       </main>
       <footer className="mt-auto border-t bg-background/50">
-        <div className="container flex flex-col items-center justify-center gap-4 py-6 md:flex-row md:justify-between">
-            <p className="text-sm text-muted-foreground">
-                &copy; {new Date().getFullYear()} İnci VIP Portal. Tüm hakları saklıdır.
-            </p>
-            <div className="flex items-center gap-4">
+        <div className="container flex flex-col items-center justify-center gap-4 py-6">
+            <div className="flex flex-col items-center gap-2">
                 <p className="text-sm font-medium text-muted-foreground">Bizi Takip Edin:</p>
-                <div className="flex gap-4">
-                    <a href="#" target="_blank" rel="noopener noreferrer" className="text-muted-foreground transition-colors hover:text-foreground">
-                        <Instagram className="h-5 w-5" />
-                        <span className="sr-only">Instagram</span>
+                <div className="flex gap-4 text-2xl">
+                    <a href="#" target="_blank" rel="noopener noreferrer" className="transition-transform hover:scale-110">
+                        <span role="img" aria-label="Instagram">📸</span>
                     </a>
-                    <a href="#" target="_blank" rel="noopener noreferrer" className="text-muted-foreground transition-colors hover:text-foreground">
-                        <Twitter className="h-5 w-5" />
-                        <span className="sr-only">Twitter</span>
+                    <a href="#" target="_blank" rel="noopener noreferrer" className="transition-transform hover:scale-110">
+                       <span role="img" aria-label="Twitter">🐦</span>
                     </a>
-                    <a href="#" target="_blank" rel="noopener noreferrer" className="text-muted-foreground transition-colors hover:text-foreground">
-                        <Facebook className="h-5 w-5" />
-                        <span className="sr-only">Facebook</span>
+                    <a href="#" target="_blank" rel="noopener noreferrer" className="transition-transform hover:scale-110">
+                       <span role="img" aria-label="Facebook">📘</span>
                     </a>
                 </div>
             </div>
+             <p className="text-center text-sm text-muted-foreground">
+                &copy; {new Date().getFullYear()} İnci VIP Portal. Tüm hakları saklıdır.
+            </p>
         </div>
       </footer>
     </div>

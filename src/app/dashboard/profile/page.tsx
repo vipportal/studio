@@ -69,10 +69,16 @@ export default function ProfilePage() {
     <div className="space-y-8">
       
       <div className="flex flex-col items-center text-center space-y-4 mb-8">
-        <Avatar className="h-28 w-28 border-4 border-accent/50">
-          <AvatarImage src={"https://placehold.co/100x100.png"} alt={user.name} data-ai-hint={"man portrait"} />
-          <AvatarFallback>{user.name.charAt(0)}</AvatarFallback>
-        </Avatar>
+        <div className="relative h-28 w-28 rounded-full overflow-hidden border-4 border-accent/50">
+            <Image 
+                src={"https://placehold.co/100x100.png"} 
+                alt={user.name}
+                data-ai-hint={"man portrait"}
+                width={112} 
+                height={112} 
+                className="h-full w-full object-cover filter blur-md brightness-50 sepia saturate-200 hue-rotate-[200deg]"
+            />
+        </div>
         <div className="space-y-2 max-w-3xl">
           <h1 className="text-4xl font-headline font-bold">Hoşgeldiniz, {user.name}</h1>
           <div className="border border-blue-500/30 rounded-md p-3 bg-blue-500/5">
@@ -113,10 +119,16 @@ export default function ProfilePage() {
         <CardContent className="grid grid-cols-1 gap-4 pt-6 sm:grid-cols-2 md:grid-cols-3">
           {availableMembers.map(member => (
             <Card key={member.name} className="flex flex-col items-center p-4 text-center transition-colors hover:bg-card/60">
-              <Avatar className="h-20 w-20 mb-4 border-2 border-accent">
-                <AvatarImage src={member.img} alt={member.name} data-ai-hint={member.hint} />
-                <AvatarFallback>{member.name.charAt(0)}</AvatarFallback>
-              </Avatar>
+              <div className="relative h-20 w-20 mb-4 overflow-hidden rounded-full border-2 border-accent">
+                <Image 
+                    src={member.img} 
+                    alt={member.name}
+                    data-ai-hint={member.hint}
+                    width={80}
+                    height={80}
+                    className="h-full w-full object-cover filter blur-md brightness-50 sepia saturate-200 hue-rotate-[200deg]"
+                />
+              </div>
               <p className="font-semibold">{member.name}</p>
               <p className="text-sm text-muted-foreground">{member.location}</p>
             </Card>
