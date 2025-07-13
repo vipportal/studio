@@ -8,19 +8,23 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, Di
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, Landmark } from "lucide-react";
+import { Loader2, Landmark, CreditCard, Wallet } from "lucide-react";
 import { getMembers } from "@/lib/member-storage";
 import type { AdminMember } from "@/app/dashboard/admin/page";
+import { cn } from "@/lib/utils";
 
 const banks = [
   "ZİRAAT BANK", "AKBANK", "VAKIF BANK", "GARANTİ BANK", "DENİZ BANK",
   "İŞ BANKASI", "QNB BANK", "HALK BANK", "TEB BANK", "YAPIKREDİ BANK"
 ];
 
-const InfoItem = ({ label, value, valueClassName }: { label: string; value: string, valueClassName?: string }) => (
-    <div className="flex items-center justify-between border-b border-border/50 py-3 text-lg">
-      <p className="text-muted-foreground">{label}</p>
-      <p className={`font-mono font-semibold ${valueClassName}`}>{value}</p>
+const InfoItem = ({ label, value, valueClassName, icon: Icon }: { label: string; value: string, valueClassName?: string, icon: React.ElementType }) => (
+    <div className="flex items-center justify-between rounded-lg border border-border/50 bg-background/30 p-4 shadow-sm backdrop-blur-sm">
+      <div className="flex items-center gap-3">
+        <Icon className="h-6 w-6 text-muted-foreground" />
+        <p className="text-lg text-muted-foreground">{label}</p>
+      </div>
+      <p className={cn(`font-mono text-lg font-semibold text-foreground`, valueClassName)}>{value}</p>
     </div>
 );
 
@@ -181,9 +185,9 @@ export default function BalancePage() {
           </div>
         </CardHeader>
         <CardContent className="space-y-4 text-base">
-          <InfoItem label="Mevcut Bakiye" value="1,250.00 TL" valueClassName="text-green-600 dark:text-green-500" />
-          <InfoItem label="IBAN Numarası" value={currentUser?.iban || "TRXX XXXX XXXX XXXX XXXX XXXX XX"} />
-          <InfoItem label="Banka" value={currentUser?.bank || "Banka Bilgisi Yok"} />
+          <InfoItem label="Mevcut Bakiye" value="1,250.00 TL" valueClassName="text-3xl font-bold text-green-600 dark:text-green-500" icon={Wallet} />
+          <InfoItem label="IBAN Numarası" value={currentUser?.iban || "TRXX XXXX XXXX XXXX XXXX XXXX XX"} icon={CreditCard} />
+          <InfoItem label="Banka" value={currentUser?.bank || "Banka Bilgisi Yok"} icon={Landmark} />
         </CardContent>
       </Card>
 
