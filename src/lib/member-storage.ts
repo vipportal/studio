@@ -2,48 +2,85 @@
 import type { AdminMember } from "@/app/dashboard/admin/page";
 
 const MEMBER_STORAGE_KEY = 'vip_portal_members';
+const FIREBASE_USERS_CACHE_KEY = 'firebaseUsersCache';
+const CACHE_EXPIRATION_MS = 5 * 60 * 1000; // 5 minutes
 
-const initialMembers: AdminMember[] = [
-  { id: 1, name: "Ali Veli", phone: "5551112233", password: "password1", iban: "TR123456789", bank: "Garanti", tc: "11111111111", il: "İstanbul", ilce: "Beşiktaş", weeklyGain: "1500 TL", errorMessage: "Lütfen destek ekibiyle iletişime geçin, ödemeniz askıya alındı.", onayMesaji: "Para çekme talebiniz onaylanmıştır.", invoiceAmount: "1250 TL", accountActivity: "Gelen Transfer: +1.250,00 TL (VIP Üyelik)", meetingInfo: "Randevu oluşturmadan önce lütfen uygunluk durumunu kontrol ediniz.", currentBalance: "2500 TL", status: "Aktif", transactionStatus: 'blocked' },
-  { id: 2, name: "Ayşe Fatma", phone: "5554445566", password: "password2", iban: "TR987654321", bank: "Akbank", tc: "22222222222", il: "Ankara", ilce: "Çankaya", weeklyGain: "2000 TL", errorMessage: "Hata", onayMesaji: "İşlem başarılı.", invoiceAmount: "1800 TL", accountActivity: "", meetingInfo: "", currentBalance: "500 TL", status: "Pasif", transactionStatus: 'allowed' },
-];
-
-export function getMembers(): AdminMember[] {
-    if (typeof window === 'undefined') {
-        return initialMembers;
-    }
-    try {
-        const storedMembers = localStorage.getItem(MEMBER_STORAGE_KEY);
-        if (storedMembers) {
-            const members = JSON.parse(storedMembers) as AdminMember[];
-            // Ensure all members have the new optional fields to avoid issues
-            return members.map(member => ({
-                status: 'Aktif',
-                transactionStatus: 'allowed',
-                onayMesaji: "İşleminiz başarıyla alındı.",
-                errorMessage: 'İşlem sırasında bir hata oluştu. Lütfen destek ekibiyle iletişime geçin.',
-                accountActivity: "",
-                meetingInfo: "",
-                currentBalance: "0 TL",
-                ...member, // Existing data from storage overwrites defaults
-            }));
-        } else {
-            // Initialize with default members if none are stored
-            localStorage.setItem(MEMBER_STORAGE_KEY, JSON.stringify(initialMembers));
-            return initialMembers;
+// A placeholder for a server-side call to fetch Firebase users.
+// In a real app, this would be an API endpoint calling the Firebase Admin SDK.
+// For this project, we'll simulate it and use a cache.
+export async function fetchFirebaseUsers(): Promise<{ id: string; email: string }[]> {
+    // This is a placeholder. In a real-world scenario, you can't get a user list on the client.
+    // This requires the Admin SDK on a secure backend.
+    // We will return an empty array to avoid breaking the app, and the admin will manage users they know.
+    console.warn("fetchFirebaseUsers is a client-side placeholder. For a real app, use a secure backend with Firebase Admin SDK to list users.");
+    
+    // Attempt to get from cache first
+     if (typeof window !== 'undefined') {
+        const cachedData = localStorage.getItem(FIREBASE_USERS_CACHE_KEY);
+        if (cachedData) {
+            const { timestamp, users } = JSON.parse(cachedData);
+            if (Date.now() - timestamp < CACHE_EXPIRATION_MS) {
+                return users;
+            }
         }
+    }
+    
+    // In a real app, here you would make a fetch call to your backend API
+    // e.g., const response = await fetch('/api/firebase-users');
+    // const users = await response.json();
+    
+    // For now, we return empty and the logic will rely on existing member data.
+    const users: { id: string; email: string }[] = [];
+    
+    if (typeof window !== 'undefined') {
+        localStorage.setItem(FIREBASE_USERS_CACHE_KEY, JSON.stringify({ timestamp: Date.now(), users }));
+    }
+    
+    return [];
+}
+
+
+export async function getMembers(): Promise<AdminMember[]> {
+    if (typeof window === 'undefined') {
+        return [];
+    }
+    
+    try {
+        // In a real app, you'd fetch from a database (e.g., Firestore).
+        // Here, we're using localStorage as a mock database.
+        const storedDetailsJSON = localStorage.getItem(MEMBER_STORAGE_KEY);
+        const storedDetails: AdminMember[] = storedDetailsJSON ? JSON.parse(storedDetailsJSON) : [];
+        
+        // As we cannot fetch all Firebase users on the client, we will rely on the stored details.
+        // The Admin Panel will now be responsible for showing users from Firebase
+        // and merging them with these details.
+        // For client-side operations, we return the details we have.
+        return storedDetails.map(member => ({
+            status: 'Aktif',
+            transactionStatus: 'allowed',
+            onayMesaji: "İşleminiz başarıyla alındı.",
+            errorMessage: 'İşlem sırasında bir hata oluştu. Lütfen destek ekibiyle iletişime geçin.',
+            accountActivity: "",
+            meetingInfo: "",
+            currentBalance: "0 TL",
+            ...member,
+        }));
+
     } catch (error) {
-        console.error("Failed to retrieve members from localStorage", error);
-        return initialMembers;
+        console.error("Failed to process members", error);
+        return [];
     }
 }
+
 
 export function setMembers(members: AdminMember[]): void {
      if (typeof window === 'undefined') {
         return;
     }
     try {
-        localStorage.setItem(MEMBER_STORAGE_KEY, JSON.stringify(members));
+        // We only store members that have actual details, not just the Firebase Auth shell.
+        const membersWithDetails = members.filter(m => m.name && m.tc);
+        localStorage.setItem(MEMBER_STORAGE_KEY, JSON.stringify(membersWithDetails));
     } catch (error) {
         console.error("Failed to save members to localStorage", error);
     }

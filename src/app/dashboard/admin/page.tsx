@@ -6,17 +6,17 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter }
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { PlusCircle, Edit, Trash2, LogOut, CreditCard } from "lucide-react";
+import { PlusCircle, Edit, Trash2, LogOut, CreditCard, AlertCircle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useRouter } from "next/navigation";
 import AdminMemberForm from "@/components/dashboard/admin-member-form";
-import { getMembers, setMembers as saveMembers } from "@/lib/member-storage";
+import { getMembers, setMembers as saveMembers, fetchFirebaseUsers } from "@/lib/member-storage";
 import { Badge } from "@/components/ui/badge";
 
 export type AdminMember = {
-  id: number;
+  id: string; // Firebase UID
   name: string;
-  phone: string;
+  phone: string; // Firebase email will be stored here for display
   password?: string;
   iban: string;
   bank: string;
@@ -48,75 +48,82 @@ export default function AdminPage() {
     const [currentPage, setCurrentPage] = useState(1);
     const { toast } = useToast();
     const router = useRouter();
+    const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
         const role = typeof window !== 'undefined' ? localStorage.getItem('userRole') : null;
         if (role !== 'admin') {
             router.push('/dashboard');
+            return;
         }
-        setMembers(getMembers());
-    }, [router]);
+
+        const initializeMembers = async () => {
+          setIsLoading(true);
+          try {
+            const allMembers = await getMembers();
+            setMembers(allMembers);
+          } catch (error) {
+            console.error("Failed to fetch members:", error);
+            toast({
+              variant: "destructive",
+              title: "Hata",
+              description: "Üyeler getirilirken bir hata oluştu.",
+            });
+          } finally {
+            setIsLoading(false);
+          }
+        };
+
+        initializeMembers();
+    }, [router, toast]);
     
     const handleLogout = () => {
         if (typeof window !== 'undefined') {
             localStorage.removeItem('userRole');
             localStorage.removeItem('loggedInUser');
+            localStorage.removeItem('firebaseUsersCache');
         }
         router.push("/");
     };
-
-    const handleAddMember = () => {
-        setEditingMember(null);
-        setIsFormOpen(true);
-    }
 
     const handleEditMember = (member: AdminMember) => {
         setEditingMember(member);
         setIsFormOpen(true);
     }
     
-    const handleDeleteMember = (id: number) => {
+    // Deleting a member now means deleting their profile details, not their auth record.
+    // For a full user deletion, you would need backend logic (Cloud Functions) to delete the Auth user.
+    // Here we'll just remove their data from our local storage.
+    const handleDeleteMember = (id: string) => {
       const updatedMembers = members.filter(m => m.id !== id);
+      const membersWithDetails = updatedMembers.filter(m => m.name && m.tc); // Filter out users without details
       setMembers(updatedMembers);
-      saveMembers(updatedMembers);
+      saveMembers(membersWithDetails); // Save only members that have details
       toast({
         title: "Başarılı",
-        description: "Üye başarıyla silindi.",
+        description: "Üyenin profil bilgileri başarıyla silindi.",
       });
 
-      // After deleting, check if the current page became empty and go back if needed.
       const totalPages = Math.ceil(updatedMembers.length / MEMBERS_PER_PAGE);
       if (currentPage > totalPages) {
           setCurrentPage(totalPages > 0 ? totalPages : 1);
-      } else {
-        // If the last member on the current page was deleted, and it's not the first page.
-        const remainingOnPage = updatedMembers.slice((currentPage - 1) * MEMBERS_PER_PAGE, currentPage * MEMBERS_PER_PAGE).length;
-        if (remainingOnPage === 0 && currentPage > 1) {
-            setCurrentPage(currentPage - 1);
-        }
       }
     }
 
-    const handleSaveMember = (memberData: Omit<AdminMember, 'id'> | AdminMember) => {
+    const handleSaveMember = (memberData: AdminMember) => {
         let updatedMembers;
-        if ('id' in memberData && memberData.id) {
-            // Edit
-            updatedMembers = members.map(m => m.id === memberData.id ? { ...m, ...memberData } : m);
-             toast({
-                title: "Başarılı",
-                description: "Üye bilgileri güncellendi.",
-            });
-        } else {
-            // Add
-            const newMember = { ...memberData, id: Date.now(), status: 'Aktif', transactionStatus: 'allowed' } as AdminMember;
-            updatedMembers = [...members, newMember];
-             toast({
-                title: "Başarılı",
-                description: "Yeni üye eklendi.",
-            });
-        }
+        
+        updatedMembers = members.map(m => m.id === memberData.id ? { ...m, ...memberData } : m);
+        
+        toast({
+            title: "Başarılı",
+            description: "Üye bilgileri güncellendi.",
+        });
+
+        const membersWithDetails = updatedMembers.filter(m => m.name && m.tc);
+
         setMembers(updatedMembers);
-        saveMembers(updatedMembers);
+        saveMembers(membersWithDetails); // Save only members that have details
         setIsFormOpen(false);
         setEditingMember(null);
     }
@@ -139,41 +146,35 @@ export default function AdminPage() {
                 <CardHeader className="flex flex-row items-center justify-between">
                     <div>
                         <CardTitle className="text-3xl font-headline font-bold">Admin Paneli - Üye Yönetimi</CardTitle>
-                        <CardDescription>Yeni üye ekleyin veya mevcut üyeleri düzenleyin.</CardDescription>
+                        <CardDescription>Firebase'den gelen kullanıcıları düzenleyin. Yeni kullanıcıları Firebase Authentication'dan ekleyin.</CardDescription>
                     </div>
-                    <div className="flex gap-2">
-                        <Dialog open={isFormOpen} onOpenChange={setIsFormOpen}>
-                            <DialogTrigger asChild>
-                                <Button onClick={handleAddMember}>
-                                    <PlusCircle className="mr-2 h-5 w-5" />
-                                    Yeni Üye Ekle
-                                </Button>
-                            </DialogTrigger>
-                            <DialogContent className="max-h-[90vh] overflow-y-auto">
-                                <DialogHeader>
-                                    <DialogTitle>{editingMember ? 'Üye Düzenle' : 'Yeni Üye Ekle'}</DialogTitle>
-                                </DialogHeader>
-                                <AdminMemberForm 
-                                    member={editingMember} 
-                                    onSave={handleSaveMember}
-                                    onCancel={() => setIsFormOpen(false)}
-                                />
-                            </DialogContent>
-                        </Dialog>
-                        <Button variant="outline" onClick={handleLogout}>
-                            <LogOut className="mr-2 h-5 w-5" />
-                            Çıkış Yap
-                        </Button>
-                    </div>
+                     <Dialog open={isFormOpen} onOpenChange={setIsFormOpen}>
+                        <DialogContent className="max-h-[90vh] overflow-y-auto">
+                            <DialogHeader>
+                                <DialogTitle>Üye Düzenle</DialogTitle>
+                            </DialogHeader>
+                            <AdminMemberForm 
+                                member={editingMember} 
+                                onSave={handleSaveMember}
+                                onCancel={() => setIsFormOpen(false)}
+                            />
+                        </DialogContent>
+                    </Dialog>
+                    <Button variant="outline" onClick={handleLogout}>
+                        <LogOut className="mr-2 h-5 w-5" />
+                        Çıkış Yap
+                    </Button>
                 </CardHeader>
                 <CardContent>
+                    {isLoading ? (
+                      <div className="text-center p-8">Yükleniyor...</div>
+                    ) : (
                     <div className="overflow-x-auto">
                         <Table>
                             <TableHeader>
                                 <TableRow>
                                     <TableHead>Ad Soyad</TableHead>
-                                    <TableHead>Telefon</TableHead>
-                                    <TableHead>Şifre</TableHead>
+                                    <TableHead>Email (Giriş)</TableHead>
                                     <TableHead>Kart Bilgileri</TableHead>
                                     <TableHead>Üyelik Durumu</TableHead>
                                     <TableHead className="text-right">Eylemler</TableHead>
@@ -182,9 +183,14 @@ export default function AdminPage() {
                             <TableBody>
                                 {currentMembers.map((member) => (
                                     <TableRow key={member.id}>
-                                        <TableCell className="font-medium">{member.name}</TableCell>
+                                        <TableCell className="font-medium flex items-center gap-2">
+                                          {member.name ? member.name : 
+                                            <span className="text-destructive flex items-center gap-1">
+                                              <AlertCircle size={16} /> Detaylar Eksik
+                                            </span>
+                                          }
+                                        </TableCell>
                                         <TableCell>{member.phone}</TableCell>
-                                        <TableCell>{member.password}</TableCell>
                                         <TableCell>
                                            {member.cardNumber && <CreditCard className="h-5 w-5 text-blue-500" />}
                                         </TableCell>
@@ -206,6 +212,7 @@ export default function AdminPage() {
                             </TableBody>
                         </Table>
                     </div>
+                    )}
                 </CardContent>
                 {totalPages > 1 && (
                     <CardFooter className="flex justify-center items-center gap-2 pt-4">
@@ -234,3 +241,4 @@ export default function AdminPage() {
         </div>
     );
 }
+

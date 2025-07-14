@@ -10,14 +10,11 @@ import { Label } from "@/components/ui/label";
 import { Loader2 } from "lucide-react";
 import { getMembers } from "@/lib/member-storage";
 import { useToast } from "@/hooks/use-toast";
-import { signInWithEmailAndPassword } from "firebase/auth";
+import { signInWithEmailAndPassword, AuthError } from "firebase/auth";
 import { auth } from "@/lib/firebase/config";
 
-const VIP_DOMAIN = "vip-portal.com";
-
-
 export default function LoginPage() {
-  const [phone, setPhone] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
@@ -30,60 +27,59 @@ export default function LoginPage() {
     try {
       if (typeof window === 'undefined') return;
 
-      const isPotentialAdmin = phone.toLowerCase() === "admin";
-      
       // Admin login check
-      if (isPotentialAdmin) {
-          if (password === "admin1461") {
-              localStorage.setItem('userRole', 'admin');
-              router.push("/dashboard/admin");
-              return;
-          } else {
-              toast({
-                  variant: "destructive",
-                  title: "Giriş Başarısız",
-                  description: "Admin şifresi hatalı.",
-              });
-              setIsLoading(false);
-              return;
-          }
+      if (email.toLowerCase() === "admin" && password === "admin1461") {
+          localStorage.setItem('userRole', 'admin');
+          router.push("/dashboard/admin");
+          return;
       }
       
       // Customer login with Firebase Auth
-      const members = getMembers();
-      const customer = members.find(m => m.phone === phone);
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      const user = userCredential.user;
 
-      if (!customer) {
-        toast({
-          variant: "destructive",
-          title: "Giriş Başarısız",
-          description: "Bu telefon numarasına kayıtlı bir kullanıcı bulunamadı.",
-        });
-        setIsLoading(false);
-        return;
-      }
-      
-      // Use a dummy email for Firebase Auth, as we authenticate by phone
-      const email = `${customer.phone}@${VIP_DOMAIN}`;
-      
-      // This is a placeholder for Firebase auth, main check is via local storage password
-      if (customer.password === password) {
-        localStorage.setItem('userRole', 'user');
-        localStorage.setItem('loggedInUser', JSON.stringify(customer));
-        router.push("/dashboard");
-      } else {
-         toast({
-          variant: "destructive",
-          title: "Giriş Başarısız",
-          description: "Telefon numarası veya şifre hatalı.",
-        });
+      if (user) {
+        // Fetch all member details from storage
+        const members = getMembers();
+        // Find the specific member profile using Firebase UID
+        const customer = members.find(m => m.id === user.uid);
+        
+        if (customer) {
+            localStorage.setItem('userRole', 'user');
+            localStorage.setItem('loggedInUser', JSON.stringify(customer));
+            router.push("/dashboard");
+        } else {
+             toast({
+                variant: "destructive",
+                title: "Giriş Başarısız",
+                description: "Profil bilgileriniz bulunamadı. Lütfen yönetici ile iletişime geçin.",
+            });
+        }
       }
 
     } catch (error: any) {
+      let errorMessage = "Beklenmedik bir hata oluştu. Lütfen tekrar deneyin.";
+      if (error.code) {
+        switch (error.code) {
+          case 'auth/user-not-found':
+          case 'auth/invalid-email':
+            errorMessage = "Bu e-posta adresine kayıtlı bir kullanıcı bulunamadı.";
+            break;
+          case 'auth/wrong-password':
+            errorMessage = "Şifre hatalı. Lütfen tekrar deneyin.";
+            break;
+          case 'auth/invalid-credential':
+             errorMessage = "E-posta veya şifre hatalı.";
+             break;
+          default:
+            errorMessage = `Bir hata oluştu: ${error.message}`;
+            break;
+        }
+      }
       toast({
         variant: "destructive",
         title: "Giriş Hatası",
-        description: "Beklenmedik bir hata oluştu. Lütfen tekrar deneyin.",
+        description: errorMessage,
       });
     } finally {
       setIsLoading(false);
@@ -103,16 +99,16 @@ export default function LoginPage() {
           <form onSubmit={handleLogin}>
             <CardContent className="space-y-6">
                <div className="space-y-2">
-                 <Label htmlFor="phone" className="text-center block font-bold">ÜYE GİRİŞİ</Label>
+                 <Label htmlFor="email" className="text-center block font-bold">ÜYE GİRİŞİ</Label>
                </div>
               <div className="space-y-2">
-                <Label htmlFor="phone">Telefon Numaranız</Label>
+                <Label htmlFor="email">E-posta Adresiniz</Label>
                 <Input
-                  id="phone"
-                  type="text"
-                  placeholder="Telefon Numaranız"
-                  value={phone}
-                  onChange={(e) => setPhone(e.target.value)}
+                  id="email"
+                  type="email"
+                  placeholder="ornek@alanadi.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
                   required
                   disabled={isLoading}
                 />
