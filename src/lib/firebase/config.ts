@@ -8,8 +8,8 @@ import { getAuth, Auth, setPersistence, browserSessionPersistence, createUserWit
 // Firebase projenizin yapılandırma bilgilerini buraya girin.
 // Bu bilgileri Firebase konsolunda, Proje Ayarları > Genel sekmesinde bulabilirsiniz.
 const firebaseConfig = {
-  apiKey: "YAPIŞTIRIN: Buraya kendi FIREBASE_API_KEY değerinizi yapıştırın",
-  authDomain: "YAPIŞTIRIN: Buraya kendi FIREBASE_AUTH_DOMAIN değerinizi yapıştırın",
+  apiKey: "AIzaSyCexoCpkkZaTI1OAHcJ743syavAYGImEqU",
+  authDomain:"vip-portal-5c0bh.firebaseapp.com",
   projectId: "YAPIŞTIRIN: Buraya kendi FIREBASE_PROJECT_ID değerinizi yapıştırın",
   storageBucket: "YAPIŞTIRIN: Buraya kendi FIREBASE_STORAGE_BUCKET değerinizi yapıştırın",
   messagingSenderId: "YAPIŞTIRIN: Buraya kendi FIREBASE_MESSAGING_SENDER_ID değerinizi yapıştırın",
