@@ -20,21 +20,21 @@ const firebaseConfig = {
 let app: FirebaseApp | null = null;
 let auth: Auth | null = null;
 
-const areEnvsDefined = 
+export const areEnvsDefined = 
     !!firebaseConfig.apiKey &&
     !firebaseConfig.apiKey.startsWith("YAPIŞTIRIN:") &&
     !!firebaseConfig.authDomain &&
     !!firebaseConfig.projectId;
 
-// Initialize Firebase only on the client side and if config is valid
+// Initialize Firebase only on the client side
 if (typeof window !== 'undefined') {
-  if (areEnvsDefined) {
+  try {
     app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
     auth = getAuth(app);
     // This ensures the user's session is persisted across browser sessions.
     setPersistence(auth, browserSessionPersistence);
-  } else {
-    console.error("Firebase yapılandırma bilgileri eksik. Lütfen `src/lib/firebase/config.ts` dosyasını kontrol edin.");
+  } catch (error) {
+     console.error("Firebase başlatma hatası. Lütfen `src/lib/firebase/config.ts` dosyasındaki yapılandırma bilgilerinizi kontrol edin.", error);
   }
 }
 
@@ -77,4 +77,4 @@ export const createUserInTempApp = async (email: string, password: string): Prom
 };
 
 
-export { app, auth, areEnvsDefined };
+export { app, auth };
