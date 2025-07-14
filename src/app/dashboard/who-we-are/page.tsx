@@ -2,6 +2,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Users, BrainCircuit, Rocket, HeartHandshake, Quote } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
+import InciLogo from "@/components/inci-logo";
 
 const TeamValue = ({ icon, title, children }: { icon: React.ReactNode; title: string; children: React.ReactNode }) => (
   <div className="flex flex-col items-center text-center gap-3 rounded-lg border border-border/60 p-6 bg-card transition-transform hover:scale-105 hover:shadow-xl h-full">
@@ -11,26 +12,11 @@ const TeamValue = ({ icon, title, children }: { icon: React.ReactNode; title: st
   </div>
 );
 
-const ProfileLogo = () => (
-    <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" className="h-full w-full object-cover">
-        <defs>
-            <filter id="blurry-glow" x="-50%" y="-50%" width="200%" height="200%">
-                <feGaussianBlur in="SourceGraphic" stdDeviation="5" result="blur" />
-                <feMerge>
-                    <feMergeNode in="blur" />
-                    <feMergeNode in="SourceGraphic" />
-                </feMerge>
-            </filter>
-        </defs>
-        <circle cx="50" cy="50" r="40" fill="#4B0082" stroke="#32CD32" strokeWidth="4" filter="url(#blurry-glow)" />
-    </svg>
-);
-
 const TeamMemberCard = ({ name, title, bio }: { name: string; title: string; bio: string; }) => (
     <Card className="text-center overflow-hidden transition-all hover:shadow-lg hover:border-primary/30 group">
         <CardContent className="p-6 flex flex-col items-center">
              <div className="relative h-24 w-24 mb-4 overflow-hidden rounded-full border-2 border-primary/50 transition-transform group-hover:scale-110">
-                <ProfileLogo />
+                <InciLogo />
             </div>
             <h4 className="text-lg font-semibold text-foreground">{name}</h4>
             <p className="text-sm font-medium text-primary">{title}</p>

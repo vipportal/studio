@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
+import InciLogo from "@/components/inci-logo";
 
 type Member = {
   id: number;
@@ -27,22 +28,6 @@ const initialMembers: Member[] = [
   { id: 7, name: "Gizem Ö.", status: "Müsait" },
   { id: 8, name: "Hande Ç.", status: "Müsait" },
 ];
-
-const ProfileLogo = () => (
-    <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" className="h-full w-full object-cover">
-        <defs>
-            <filter id="blurry-glow" x="-50%" y="-50%" width="200%" height="200%">
-                <feGaussianBlur in="SourceGraphic" stdDeviation="5" result="blur" />
-                <feMerge>
-                    <feMergeNode in="blur" />
-                    <feMergeNode in="SourceGraphic" />
-                </feMerge>
-            </filter>
-        </defs>
-        <circle cx="50" cy="50" r="40" fill="#4B0082" stroke="#32CD32" strokeWidth="4" filter="url(#blurry-glow)" />
-    </svg>
-);
-
 
 export default function MembersPage() {
     const [selectedMember, setSelectedMember] = useState<Member | null>(null);
@@ -91,7 +76,7 @@ export default function MembersPage() {
                                 <TableRow key={member.id} onClick={() => handleRowClick(member)} className="cursor-pointer">
                                     <TableCell>
                                         <div className="relative h-12 w-12 overflow-hidden rounded-full">
-                                            <ProfileLogo />
+                                            <InciLogo />
                                         </div>
                                     </TableCell>
                                     <TableCell className="font-medium">{member.name}</TableCell>

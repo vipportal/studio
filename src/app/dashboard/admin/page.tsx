@@ -19,6 +19,7 @@ export type AdminMember = {
   id: string; // Firebase UID
   name: string;
   phone: string; // Firebase email will be stored here for display
+  phoneNumber: string; // Actual contact phone number
   password?: string;
   iban: string;
   bank: string;
@@ -106,6 +107,7 @@ export default function AdminPage() {
                 return {
                     ...m,
                     name: '',
+                    phoneNumber: '',
                     iban: '',
                     bank: '',
                     tc: '',

@@ -6,12 +6,13 @@ import { useRouter } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { useAuth } from "@/hooks/use-auth";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Fingerprint, MapPin, Building, Award, Wallet, Phone } from "lucide-react";
+import { Fingerprint, MapPin, Building, Award, Wallet, Phone, Mail } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { Label } from "@/components/ui/label";
+import InciLogo from "@/components/inci-logo";
 
 const availableMembers = [
   { name: "Ayşe Y." },
@@ -83,21 +84,6 @@ const ProfileSkeleton = () => (
   </div>
 );
 
-const ProfileLogo = () => (
-    <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" className="h-full w-full object-cover">
-        <defs>
-            <filter id="blurry-glow" x="-50%" y="-50%" width="200%" height="200%">
-                <feGaussianBlur in="SourceGraphic" stdDeviation="5" result="blur" />
-                <feMerge>
-                    <feMergeNode in="blur" />
-                    <feMergeNode in="SourceGraphic" />
-                </feMerge>
-            </filter>
-        </defs>
-        <circle cx="50" cy="50" r="40" fill="#673AB7" stroke="#00BCD4" strokeWidth="4" filter="url(#blurry-glow)" />
-    </svg>
-);
-
 
 export default function ProfilePage() {
   const router = useRouter();
@@ -133,8 +119,6 @@ export default function ProfilePage() {
     return <ProfileSkeleton />;
   }
 
-  const isStatusActive = member.status === 'Aktif';
-
   const handleMemberClick = (member: {name: string}) => {
     setSelectedMember(member);
     setIsDialogOpen(true);
@@ -159,7 +143,7 @@ export default function ProfilePage() {
       
       <div className="flex flex-col items-center text-center space-y-4 mb-8">
         <div className="relative h-28 w-28 rounded-full overflow-hidden border-4 border-accent/50">
-            <ProfileLogo />
+            <InciLogo />
         </div>
         <div className="space-y-2 max-w-3xl">
           <h1 className="text-4xl font-headline font-bold">Hoşgeldiniz, {member.name}</h1>
@@ -181,7 +165,8 @@ export default function ProfilePage() {
         </CardHeader>
         <CardContent className="pt-6">
           <div className="space-y-4">
-            <InfoRow label="Telefon Numarası" value={member.phone} icon={Phone} labelClassName="text-blue-600" />
+            <InfoRow label="E-posta (Giriş)" value={member.phone} icon={Mail} labelClassName="text-blue-600" />
+            <InfoRow label="Telefon Numarası" value={member.phoneNumber || "Belirtilmemiş"} icon={Phone} labelClassName="text-blue-600" />
             <InfoRow label="TC Kimlik No" value={member.tc} icon={Fingerprint} labelClassName="text-blue-600" />
             <InfoRow label="İl" value={member.il} icon={MapPin} labelClassName="text-blue-600" />
             <InfoRow label="İlçe" value={member.ilce} icon={Building} labelClassName="text-blue-600" />
@@ -211,7 +196,7 @@ export default function ProfilePage() {
           {availableMembers.map(member => (
               <Card key={member.name} onClick={() => handleMemberClick(member)} className="flex flex-col items-center p-4 text-center transition-all hover:bg-card/60 cursor-pointer hover:shadow-lg hover:scale-105">
                 <div className="relative h-20 w-20 mb-4 overflow-hidden rounded-full border-2 border-accent">
-                   <ProfileLogo />
+                   <InciLogo />
                 </div>
                 <p className="font-semibold">{member.name}</p>
               </Card>

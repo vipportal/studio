@@ -34,6 +34,7 @@ export async function getMembers(): Promise<AdminMember[]> {
         const allMembersWithDefaults = storedMembers.map(member => ({
             id: member.id || '',
             phone: member.phone || '', // email is stored in phone field
+            phoneNumber: member.phoneNumber || '',
             name: member.name || '',
             iban: member.iban || '',
             bank: member.bank || '',

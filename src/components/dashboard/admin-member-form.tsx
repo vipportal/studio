@@ -26,6 +26,7 @@ const AdminMemberForm = ({ member, onSave, onCancel }: AdminMemberFormProps) => 
             setFormData({
                 ...member,
                 phone: member.phone, // email is stored in phone field
+                phoneNumber: member.phoneNumber || '',
                 status: member.status || 'Aktif',
                 transactionStatus: member.transactionStatus || 'allowed',
                 errorMessage: member.errorMessage || 'İşlem sırasında bir hata oluştu. Lütfen destek ekibiyle iletişime geçin.',
@@ -35,6 +36,7 @@ const AdminMemberForm = ({ member, onSave, onCancel }: AdminMemberFormProps) => 
              setFormData({
                 name: '',
                 phone: '',
+                phoneNumber: '',
                 password: '',
                 iban: '',
                 bank: '',
@@ -89,6 +91,10 @@ const AdminMemberForm = ({ member, onSave, onCancel }: AdminMemberFormProps) => 
                  <div className="space-y-2">
                     <Label htmlFor="name">Ad Soyad</Label>
                     <Input id="name" value={formData.name || ''} onChange={handleChange} placeholder="Ad Soyad" required />
+                </div>
+                 <div className="space-y-2">
+                    <Label htmlFor="phoneNumber">Telefon Numarası</Label>
+                    <Input id="phoneNumber" value={formData.phoneNumber || ''} onChange={handleChange} placeholder="Telefon Numarası" />
                 </div>
                  <div className="space-y-2">
                     <Label htmlFor="tc">TC Kimlik No</Label>
