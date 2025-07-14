@@ -77,7 +77,7 @@ export default function LoginPage() {
       <div className="w-full max-w-md">
         <Card className="border-primary/20 shadow-lg shadow-primary/10">
           <CardHeader className="text-center">
-            <h1 className="font-headline text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-background to-primary animate-text-glow">
+            <h1 className="font-headline text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-black to-blue-600">
               HOŞ GELDİNİZ
             </h1>
             <CardDescription>Lütfen giriş yapmak için bilgilerinizi girin.</CardDescription>
