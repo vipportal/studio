@@ -30,7 +30,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const pathname = usePathname();
 
   useEffect(() => {
-    // Return if auth is not initialized
     if (!auth) {
         console.error("Firebase Auth is not initialized.");
         setLoading(false);
@@ -46,20 +45,18 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         setIsAdmin(isAdminUser);
 
         try {
-          // Admin does not have a member profile, so we can skip fetching.
           if (!isAdminUser) {
             const allMembers = await getMembers();
             const memberDetails = allMembers.find(m => m.id === currentUser.uid);
             setMember(memberDetails || null);
           } else {
-            setMember(null); // Ensure member is null for admin
+            setMember(null);
           }
         } catch (error) {
            console.error("Error fetching member details:", error);
            setMember(null);
         }
       } else {
-        // User is signed out. Reset all auth state.
         setUser(null);
         setMember(null);
         setIsAdmin(false);
@@ -68,37 +65,27 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       setLoading(false);
     });
 
-    // Cleanup subscription on unmount
     return () => unsubscribe();
-  }, []); // Removed router and pathname dependencies to prevent re-running on navigation
+  }, []);
 
-  // This effect handles redirection logic based on auth state.
-  // It runs when loading is finished or when the user navigates to a new page.
   useEffect(() => {
     if (loading) {
-      return; // Don't do anything while auth state is being determined
+      return; 
     }
 
     const isAuthenticated = !!user;
     const isAuthPage = pathname === '/';
-    const isAdminPage = pathname.startsWith('/dashboard/admin');
+    const isDashboardPage = pathname.startsWith('/dashboard');
 
-    if (isAuthPage) {
-      if (isAuthenticated) {
-        // If user is logged in and on the login page, redirect to their dashboard
-        router.push('/dashboard');
-      }
-    } else {
-      // For all other pages (dashboard, etc.)
-      if (!isAuthenticated) {
-        // If user is not logged in, redirect to login page
-        router.push('/');
-      } else if (isAdminPage && !isAdmin) {
-        // If user is trying to access admin page but is not admin, redirect
+    if (!isAuthenticated && isDashboardPage) {
+      router.push('/');
+    } else if (isAuthenticated && isAuthPage) {
+      if (isAdmin) {
+        router.push('/dashboard/admin');
+      } else {
         router.push('/dashboard');
       }
     }
-
   }, [user, isAdmin, loading, pathname, router]);
 
 

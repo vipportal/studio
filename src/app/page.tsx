@@ -12,8 +12,8 @@ import { useToast } from "@/hooks/use-toast";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth, areEnvsDefined } from "@/lib/firebase/config";
 import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
-import { getMembers } from "@/lib/member-storage";
 
+const ADMIN_EMAIL = "admin@vip-portal.com";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -37,23 +37,17 @@ export default function LoginPage() {
     }
 
     try {
-      if (typeof window === 'undefined') return;
-
-      // Special case for admin login
-      if (email.toLowerCase() === "admin@vip-portal.com" && password === "admin1461") {
-          localStorage.setItem('userRole', 'admin');
-          router.push("/dashboard/admin");
-          return;
-      }
-      
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
 
       if (user) {
-        // Successful login, let the AuthProvider handle the rest
-        router.push("/dashboard");
+        // Successful login, redirect based on email
+        if (user.email === ADMIN_EMAIL) {
+          router.push("/dashboard/admin");
+        } else {
+          router.push("/dashboard");
+        }
       } else {
-         // This case should ideally not be reached if signInWithEmailAndPassword throws an error on failure
          toast({
             variant: "destructive",
             title: "Giriş Başarısız",
