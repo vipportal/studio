@@ -22,18 +22,20 @@ const availableMembers = [
 function InfoRow({ 
   label, 
   value, 
+  labelClassName = "", 
   valueClassName = "", 
   icon: Icon
 }: { 
   label: string; 
   value: string; 
+  labelClassName?: string;
   valueClassName?: string;
   icon?: React.ComponentType<{ className?: string }>; 
 }) {
   return (
     <div className="flex flex-col items-start gap-1 border-b border-border/50 pb-3 sm:flex-row sm:items-center sm:justify-between">
-      <p className="flex items-center gap-2 font-medium text-muted-foreground">
-        {Icon && <Icon className="h-5 w-5" />}
+      <p className={`flex items-center gap-2 font-medium text-muted-foreground ${labelClassName}`}>
+        {Icon && <Icon className={`h-5 w-5 ${labelClassName}`} />}
         <span>{label}</span>
       </p>
       <p className={`font-medium ${valueClassName}`}>{value}</p>
@@ -179,16 +181,17 @@ export default function ProfilePage() {
         </CardHeader>
         <CardContent className="pt-6">
           <div className="space-y-4">
-            <InfoRow label="Telefon Numarası" value={member.phone} icon={Phone} />
-            <InfoRow label="TC Kimlik No" value={member.tc} icon={Fingerprint} />
-            <InfoRow label="İl" value={member.il} icon={MapPin} />
-            <InfoRow label="İlçe" value={member.ilce} icon={Building} />
-            <InfoRow label="Haftalık Kazanç" value={member.weeklyGain} icon={Wallet} valueClassName="text-green-600 font-bold" />
+            <InfoRow label="Telefon Numarası" value={member.phone} icon={Phone} labelClassName="text-blue-600" />
+            <InfoRow label="TC Kimlik No" value={member.tc} icon={Fingerprint} labelClassName="text-blue-600" />
+            <InfoRow label="İl" value={member.il} icon={MapPin} labelClassName="text-blue-600" />
+            <InfoRow label="İlçe" value={member.ilce} icon={Building} labelClassName="text-blue-600" />
+            <InfoRow label="Haftalık Kazanç" value={member.weeklyGain} icon={Wallet} labelClassName="text-green-600" valueClassName="text-green-600 font-bold" />
             <InfoRow 
               label="Üyelik Durumu" 
               value={member.status} 
               icon={Award} 
-              valueClassName={isStatusActive ? 'text-green-600 font-bold' : 'text-red-600 font-bold'}
+              labelClassName="text-blue-600"
+              valueClassName="text-blue-600 font-bold"
             />
           </div>
         </CardContent>
