@@ -33,7 +33,7 @@ export default function LoginPage() {
       const isPotentialAdmin = phone.toLowerCase() === "admin";
       
       // Admin login check with Firebase
-      if (isPotentialAdmin && password === "146161") {
+      if (isPotentialAdmin && password === "admin1461") {
           localStorage.setItem('userRole', 'admin');
           router.push("/dashboard/admin");
           return;
