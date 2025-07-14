@@ -43,7 +43,6 @@ export default function InvoicesPage() {
   const vatAmount = invoiceAmountNumber - subtotal;
   
   const creationDate = new Date(currentUser.id);
-  const dueDate = format(addDays(creationDate, 15), "dd.MM.yyyy");
 
   return (
     <Card className="max-w-4xl mx-auto my-8 font-sans shadow-lg">
@@ -66,7 +65,6 @@ export default function InvoicesPage() {
             <div className="space-y-2">
                 <h2 className="font-semibold text-gray-700">Fatura Bilgileri</h2>
                 <p className="text-sm"><span className="font-medium text-gray-600">e-Arşiv No:</span> VIP20240000{currentUser.id.toString().slice(-6)}</p>
-                <p className="text-sm"><span className="font-medium text-gray-600">Son Ödeme Tarihi:</span> {dueDate}</p>
             </div>
             <div className="space-y-2 text-left md:text-right">
                 <h2 className="font-semibold text-gray-700">Üye Bilgileri</h2>
