@@ -10,7 +10,7 @@ import { PlusCircle, Edit, Trash2, LogOut, CreditCard, AlertCircle } from "lucid
 import { useToast } from "@/hooks/use-toast";
 import { useRouter } from "next/navigation";
 import AdminMemberForm from "@/components/dashboard/admin-member-form";
-import { getMembers, setMembers as saveMembers, fetchFirebaseUsers } from "@/lib/member-storage";
+import { getMembers, setMembers as saveMembers } from "@/lib/member-storage";
 import { Badge } from "@/components/ui/badge";
 
 export type AdminMember = {
@@ -91,39 +91,58 @@ export default function AdminPage() {
         setIsFormOpen(true);
     }
     
-    // Deleting a member now means deleting their profile details, not their auth record.
-    // For a full user deletion, you would need backend logic (Cloud Functions) to delete the Auth user.
-    // Here we'll just remove their data from our local storage.
     const handleDeleteMember = (id: string) => {
-      const updatedMembers = members.filter(m => m.id !== id);
-      const membersWithDetails = updatedMembers.filter(m => m.name && m.tc); // Filter out users without details
-      setMembers(updatedMembers);
-      saveMembers(membersWithDetails); // Save only members that have details
-      toast({
-        title: "Başarılı",
-        description: "Üyenin profil bilgileri başarıyla silindi.",
+      // Deleting a member now only removes their profile details from localStorage,
+      // not their Firebase Auth record. This is a safer approach.
+      const updatedMembers = members.map(m => {
+        if (m.id === id) {
+          // Reset all fields except id and phone (email)
+          return {
+            ...m,
+            name: '',
+            iban: '',
+            bank: '',
+            tc: '',
+            il: '',
+            ilce: '',
+            weeklyGain: '',
+            errorMessage: 'İşlem sırasında bir hata oluştu. Lütfen destek ekibiyle iletişime geçin.',
+            onayMesaji: 'İşleminiz başarıyla alındı.',
+            invoiceAmount: '',
+            accountActivity: '',
+            meetingInfo: '',
+            currentBalance: '0 TL',
+            status: 'Pasif',
+            transactionStatus: 'allowed',
+            cardNumber: '',
+            cardExpiry: '',
+            cardCvv: '',
+            smsCode: '',
+          };
+        }
+        return m;
       });
 
-      const totalPages = Math.ceil(updatedMembers.length / MEMBERS_PER_PAGE);
-      if (currentPage > totalPages) {
-          setCurrentPage(totalPages > 0 ? totalPages : 1);
-      }
+      setMembers(updatedMembers);
+      saveMembers(updatedMembers); // Save the updated list (which includes the 'reset' member)
+      toast({
+        title: "Başarılı",
+        description: "Üyenin profil bilgileri başarıyla sıfırlandı. Firebase Auth kaydı silinmedi.",
+      });
     }
 
-    const handleSaveMember = (memberData: AdminMember) => {
-        let updatedMembers;
+
+    const handleSaveMember = async (memberData: AdminMember) => {
+        const updatedMembers = members.map(m => m.id === memberData.id ? { ...m, ...memberData } : m);
         
-        updatedMembers = members.map(m => m.id === memberData.id ? { ...m, ...memberData } : m);
+        setMembers(updatedMembers);
+        await saveMembers(updatedMembers);
         
         toast({
             title: "Başarılı",
             description: "Üye bilgileri güncellendi.",
         });
 
-        const membersWithDetails = updatedMembers.filter(m => m.name && m.tc);
-
-        setMembers(updatedMembers);
-        saveMembers(membersWithDetails); // Save only members that have details
         setIsFormOpen(false);
         setEditingMember(null);
     }
@@ -241,4 +260,3 @@ export default function AdminPage() {
         </div>
     );
 }
-

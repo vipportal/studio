@@ -24,31 +24,50 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const pathname = usePathname();
 
   useEffect(() => {
+    // Return if auth is not initialized
+    if (!auth) {
+        setLoading(false);
+        // Optional: you might want to redirect to an error page or show a message
+        // if Firebase fails to initialize. For now, we just stop loading.
+        return;
+    }
+
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
+      setLoading(true);
       setUser(currentUser);
       
       if (currentUser) {
-        // User is signed in with Firebase.
-        // Now, let's get their profile details from our own storage.
-        const allMembers = await getMembers();
-        const memberDetails = allMembers.find(m => m.id === currentUser.uid);
-        
-        if (memberDetails) {
-          setMember(memberDetails);
-          // Update localStorage for immediate access on other pages if needed
-          localStorage.setItem('loggedInUser', JSON.stringify(memberDetails));
-        } else {
-          // This case might happen if admin hasn't filled details yet.
-          setMember(null);
-          localStorage.removeItem('loggedInUser');
+        try {
+          const allMembers = await getMembers();
+          const memberDetails = allMembers.find(m => m.id === currentUser.uid);
+          
+          if (memberDetails) {
+            setMember(memberDetails);
+            localStorage.setItem('loggedInUser', JSON.stringify(memberDetails));
+            localStorage.setItem('userRole', 'user');
+          } else {
+            // This case might happen if admin hasn't filled details yet.
+            // Or if there's a data consistency issue.
+            setMember(null);
+            localStorage.removeItem('loggedInUser');
+            // We don't automatically log out here, but the app might restrict access.
+          }
+        } catch (error) {
+           console.error("Error fetching member details:", error);
+           setMember(null);
+           localStorage.removeItem('loggedInUser');
         }
       } else {
         // User is signed out.
         setMember(null);
         localStorage.removeItem('loggedInUser');
-        const isAdmin = localStorage.getItem('userRole') === 'admin';
-        // Redirect to login if not on an auth page and not admin.
-        if (!pathname.startsWith('/dashboard/admin') && pathname !== '/' && !isAdmin) {
+        localStorage.removeItem('userRole');
+
+        const isAdminPage = pathname === '/dashboard/admin';
+        const isLoginPage = pathname === '/';
+        const isAdminLoggedIn = localStorage.getItem('userRole') === 'admin';
+
+        if (!isLoginPage && !isAdminPage && !isAdminLoggedIn) {
           router.push('/');
         }
       }

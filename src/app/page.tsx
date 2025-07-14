@@ -49,7 +49,7 @@ export default function LoginPage() {
       const user = userCredential.user;
 
       if (user) {
-        const members = getMembers();
+        const members = await getMembers();
         const customer = members.find(m => m.id === user.uid);
         
         if (customer) {
