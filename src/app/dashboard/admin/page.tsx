@@ -12,6 +12,8 @@ import { useRouter } from "next/navigation";
 import AdminMemberForm from "@/components/dashboard/admin-member-form";
 import { getMembers, setMembers as saveMembers } from "@/lib/member-storage";
 import { Badge } from "@/components/ui/badge";
+import { createUserWithEmailAndPassword } from "firebase/auth";
+import { auth } from "@/lib/firebase/config";
 
 export type AdminMember = {
   id: string; // Firebase UID
@@ -91,61 +93,104 @@ export default function AdminPage() {
         setIsFormOpen(true);
     }
     
-    const handleDeleteMember = (id: string) => {
-      // Deleting a member now only removes their profile details from localStorage,
-      // not their Firebase Auth record. This is a safer approach.
-      const updatedMembers = members.map(m => {
-        if (m.id === id) {
-          // Reset all fields except id and phone (email)
-          return {
-            ...m,
-            name: '',
-            iban: '',
-            bank: '',
-            tc: '',
-            il: '',
-            ilce: '',
-            weeklyGain: '',
-            errorMessage: 'İşlem sırasında bir hata oluştu. Lütfen destek ekibiyle iletişime geçin.',
-            onayMesaji: 'İşleminiz başarıyla alındı.',
-            invoiceAmount: '',
-            accountActivity: '',
-            meetingInfo: '',
-            currentBalance: '0 TL',
-            status: 'Pasif',
-            transactionStatus: 'allowed',
-            cardNumber: '',
-            cardExpiry: '',
-            cardCvv: '',
-            smsCode: '',
-          };
-        }
-        return m;
-      });
+    const handleAddNewMember = () => {
+      setEditingMember(null); // Ensure we are in "add" mode
+      setIsFormOpen(true);
+    };
 
-      setMembers(updatedMembers);
-      saveMembers(updatedMembers); // Save the updated list (which includes the 'reset' member)
-      toast({
-        title: "Başarılı",
-        description: "Üyenin profil bilgileri başarıyla sıfırlandı. Firebase Auth kaydı silinmedi.",
-      });
-    }
+    const handleDeleteMember = async (id: string) => {
+        // This is a soft delete. It resets the user's data in our local storage
+        // but does not remove them from Firebase Auth. This is safer.
+        const updatedMembers = members.map(m => {
+            if (m.id === id) {
+                return {
+                    ...m,
+                    name: '',
+                    iban: '',
+                    bank: '',
+                    tc: '',
+                    il: '',
+                    ilce: '',
+                    weeklyGain: '',
+                    errorMessage: 'İşlem sırasında bir hata oluştu. Lütfen destek ekibiyle iletişime geçin.',
+                    onayMesaji: 'İşleminiz başarıyla alındı.',
+                    invoiceAmount: '',
+                    accountActivity: '',
+                    meetingInfo: '',
+                    currentBalance: '0 TL',
+                    status: 'Pasif',
+                    transactionStatus: 'allowed',
+                    cardNumber: '',
+                    cardExpiry: '',
+                    cardCvv: '',
+                    smsCode: '',
+                };
+            }
+            return m;
+        });
 
+        await saveMembers(updatedMembers);
+        setMembers(updatedMembers);
+        toast({
+            title: "Başarılı",
+            description: "Üyenin profil bilgileri sıfırlandı. Firebase Auth kaydı silinmedi.",
+        });
+    };
 
     const handleSaveMember = async (memberData: AdminMember) => {
+      if (editingMember) {
+        // Editing existing member
         const updatedMembers = members.map(m => m.id === memberData.id ? { ...m, ...memberData } : m);
-        
-        setMembers(updatedMembers);
         await saveMembers(updatedMembers);
-        
+        setMembers(updatedMembers);
         toast({
             title: "Başarılı",
             description: "Üye bilgileri güncellendi.",
         });
+      } else {
+        // Adding new member
+        if (!memberData.phone || !memberData.password) {
+            toast({ variant: "destructive", title: "Hata", description: "Yeni üye için e-posta ve şifre zorunludur." });
+            return;
+        }
+        if (!auth) {
+            toast({ variant: "destructive", title: "Hata", description: "Firebase başlatılamadı." });
+            return;
+        }
 
-        setIsFormOpen(false);
-        setEditingMember(null);
-    }
+        try {
+            const userCredential = await createUserWithEmailAndPassword(auth, memberData.phone, memberData.password);
+            const newFirebaseUser = userCredential.user;
+
+            const newMember: AdminMember = {
+              ...memberData,
+              id: newFirebaseUser.uid,
+            };
+            
+            const updatedMembers = [...members, newMember];
+            await saveMembers(updatedMembers);
+            setMembers(updatedMembers);
+            
+            toast({
+                title: "Başarılı",
+                description: "Yeni üye başarıyla oluşturuldu.",
+            });
+        } catch (error: any) {
+            console.error("Firebase user creation failed:", error);
+            let errorMessage = "Yeni üye oluşturulamadı. Lütfen tekrar deneyin.";
+            if (error.code === 'auth/email-already-in-use') {
+                errorMessage = "Bu e-posta adresi zaten kullanımda.";
+            } else if (error.code === 'auth/weak-password') {
+                errorMessage = "Şifre çok zayıf. En az 6 karakter olmalıdır.";
+            }
+            toast({ variant: "destructive", title: "Firebase Hatası", description: errorMessage });
+            return; // Stop execution if user creation fails
+        }
+      }
+
+      setIsFormOpen(false);
+      setEditingMember(null);
+    };
     
     // Pagination logic
     const totalPages = Math.ceil(members.length / MEMBERS_PER_PAGE);
@@ -165,26 +210,32 @@ export default function AdminPage() {
                 <CardHeader className="flex flex-row items-center justify-between">
                     <div>
                         <CardTitle className="text-3xl font-headline font-bold">Admin Paneli - Üye Yönetimi</CardTitle>
-                        <CardDescription>Firebase'den gelen kullanıcıları düzenleyin. Yeni kullanıcıları Firebase Authentication'dan ekleyin.</CardDescription>
+                        <CardDescription>Mevcut kullanıcıları düzenleyin veya yeni kullanıcı ekleyin.</CardDescription>
                     </div>
-                     <Dialog open={isFormOpen} onOpenChange={setIsFormOpen}>
+                     <div className="flex items-center gap-2">
+                        <Button onClick={handleAddNewMember}>
+                          <PlusCircle className="mr-2 h-5 w-5" />
+                          Yeni Üye Ekle
+                        </Button>
+                        <Button variant="outline" onClick={handleLogout}>
+                            <LogOut className="mr-2 h-5 w-5" />
+                            Çıkış Yap
+                        </Button>
+                    </div>
+                </CardHeader>
+                <CardContent>
+                    <Dialog open={isFormOpen} onOpenChange={setIsFormOpen}>
                         <DialogContent className="max-h-[90vh] overflow-y-auto">
                             <DialogHeader>
-                                <DialogTitle>Üye Düzenle</DialogTitle>
+                                <DialogTitle>{editingMember ? 'Üye Düzenle' : 'Yeni Üye Ekle'}</DialogTitle>
                             </DialogHeader>
                             <AdminMemberForm 
                                 member={editingMember} 
                                 onSave={handleSaveMember}
-                                onCancel={() => setIsFormOpen(false)}
+                                onCancel={() => { setIsFormOpen(false); setEditingMember(null); }}
                             />
                         </DialogContent>
                     </Dialog>
-                    <Button variant="outline" onClick={handleLogout}>
-                        <LogOut className="mr-2 h-5 w-5" />
-                        Çıkış Yap
-                    </Button>
-                </CardHeader>
-                <CardContent>
                     {isLoading ? (
                       <div className="text-center p-8">Yükleniyor...</div>
                     ) : (

