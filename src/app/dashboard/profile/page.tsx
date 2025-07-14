@@ -125,7 +125,7 @@ export default function ProfilePage() {
                 data-ai-hint={"man portrait"}
                 width={112} 
                 height={112} 
-                className="h-full w-full object-cover filter blur-md brightness-50 sepia saturate-200 hue-rotate-[200deg]"
+                className="h-full w-full object-cover"
             />
         </div>
         <div className="space-y-2 max-w-3xl">
@@ -185,11 +185,10 @@ export default function ProfilePage() {
                       data-ai-hint={member.hint}
                       width={80}
                       height={80}
-                      className="h-full w-full object-cover filter blur-md brightness-50 sepia saturate-200 hue-rotate-[200deg]"
+                      className="h-full w-full object-cover"
                   />
                 </div>
                 <p className="font-semibold">{member.name}</p>
-                <p className="text-sm text-muted-foreground">{member.location}</p>
               </Card>
           ))}
         </CardContent>
