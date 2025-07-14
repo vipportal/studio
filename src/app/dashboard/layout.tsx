@@ -3,33 +3,17 @@
 
 import type { ReactNode } from "react";
 import Link from "next/link";
-import { usePathname, useRouter } from 'next/navigation';
+import { usePathname } from 'next/navigation';
 import { VenetianMask, Instagram, Twitter, Facebook, Youtube, MessageCircle } from "lucide-react";
 import DashboardNavContent from "@/components/dashboard/nav-content";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { useEffect, useState } from "react";
 import { AuthProvider, useAuth } from "@/hooks/use-auth";
 
 
 function DashboardLayoutContent({ children }: { children: ReactNode }) {
   const pathname = usePathname();
-  const router = useRouter();
+  const { loading, isAuthenticated, isAdmin } = useAuth();
   const isAdminPage = pathname === '/dashboard/admin';
-  const { user, loading } = useAuth(); // Use the central auth hook
-
-  useEffect(() => {
-    // Let the AuthProvider handle auth state and redirects
-    // This effect now mainly handles admin-specific logic
-    if (!loading) {
-      const userRole = localStorage.getItem('userRole');
-      if (isAdminPage && userRole !== 'admin') {
-        router.push('/dashboard');
-      } else if (!isAdminPage && !user) {
-        // This case is now handled by the AuthProvider, but as a fallback
-        router.push('/');
-      }
-    }
-  }, [loading, user, isAdminPage, router]);
 
   if (loading) {
     return (
@@ -39,17 +23,9 @@ function DashboardLayoutContent({ children }: { children: ReactNode }) {
     );
   }
   
-  // Also check for admin role from localStorage for the admin page
-  if (isAdminPage && localStorage.getItem('userRole') !== 'admin') {
-      return (
-        <div className="flex justify-center items-center h-screen bg-background">
-            <p className="text-foreground">Yönlendiriliyor...</p>
-        </div>
-      )
-  }
-
-  // If not an admin page, but there's no user, show loading while redirecting
-  if (!isAdminPage && !user) {
+  if (!isAuthenticated) {
+     // The AuthProvider will handle the redirect, so we can just show a loading state
+     // while the redirect is in progress.
      return (
         <div className="flex justify-center items-center h-screen bg-background">
             <p className="text-foreground">Yönlendiriliyor...</p>
@@ -57,9 +33,19 @@ function DashboardLayoutContent({ children }: { children: ReactNode }) {
       )
   }
 
+  // If this is the admin page, but the user is not an admin, show a loading state
+  // while the AuthProvider redirects them.
+  if (isAdminPage && !isAdmin) {
+    return (
+      <div className="flex justify-center items-center h-screen bg-background">
+          <p className="text-foreground">Yetkiniz yok, yönlendiriliyorsunuz...</p>
+      </div>
+    )
+  }
+
   return (
     <div className="flex min-h-screen w-full flex-col bg-background text-foreground">
-      {!isAdminPage && (
+      {(!isAdminPage || isAdmin) && (
         <header className="sticky top-0 z-40 w-full border-b bg-background/95 backdrop-blur-sm">
           <div className="container flex h-auto flex-col items-start gap-4 py-2 md:h-16 md:flex-row md:items-center">
             <Link href="/dashboard" className="mr-6 flex items-center space-x-2">

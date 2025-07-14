@@ -17,10 +17,11 @@ import {
   Menu,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 import { auth } from "@/lib/firebase/config";
+import { useAuth } from "@/hooks/use-auth";
 
 const baseNavItems = [
   { href: "/dashboard/profile", label: "Profil", icon: User },
@@ -41,25 +42,17 @@ const adminNavItem = { href: "/dashboard/admin", label: "Admin Paneli", icon: Sh
 export default function DashboardNavContent() {
   const pathname = usePathname();
   const router = useRouter();
-  const [userRole, setUserRole] = useState<string | null>(null);
+  const { isAdmin } = useAuth();
 
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      setUserRole(localStorage.getItem('userRole'));
-    }
-  }, []);
 
   const handleLogout = () => {
-    if (typeof window !== 'undefined') {
-      localStorage.removeItem('userRole');
-      if (auth) {
-        auth.signOut();
-      }
+    if (auth) {
+      auth.signOut();
     }
-    router.push("/");
+    // The AuthProvider will handle the redirect.
   };
   
-  const navItems = userRole === 'admin' ? [...baseNavItems] : baseNavItems;
+  const navItems = baseNavItems;
   
   const allNavLinks = [...navItems, 
     {
@@ -95,7 +88,7 @@ export default function DashboardNavContent() {
                           </DropdownMenuItem>
                       ))}
                       <DropdownMenuSeparator />
-                      {userRole === 'admin' && (
+                      {isAdmin && (
                          <DropdownMenuItem asChild className="cursor-pointer">
                            <Link href={adminNavItem.href}>
                              <adminNavItem.icon className="mr-2 h-4 w-4" />

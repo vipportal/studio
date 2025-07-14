@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter }
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { PlusCircle, Edit, Trash2, LogOut, CreditCard, AlertCircle } from "lucide-react";
+import { PlusCircle, Edit, Trash2, CreditCard, AlertCircle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useRouter } from "next/navigation";
 import AdminMemberForm from "@/components/dashboard/admin-member-form";
@@ -14,6 +14,7 @@ import { getMembers, setMembers as saveMembers } from "@/lib/member-storage";
 import { Badge } from "@/components/ui/badge";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { auth } from "@/lib/firebase/config";
+import { useAuth } from "@/hooks/use-auth";
 
 export type AdminMember = {
   id: string; // Firebase UID
@@ -52,10 +53,10 @@ export default function AdminPage() {
     const { toast } = useToast();
     const router = useRouter();
     const [isLoading, setIsLoading] = useState(true);
+    const { isAdmin } = useAuth();
 
     useEffect(() => {
-        const role = typeof window !== 'undefined' ? localStorage.getItem('userRole') : null;
-        if (role !== 'admin') {
+        if (!isAdmin) {
             router.push('/dashboard');
             return;
         }
@@ -78,15 +79,8 @@ export default function AdminPage() {
         };
 
         initializeMembers();
-    }, [router, toast]);
+    }, [router, toast, isAdmin]);
     
-    const handleLogout = () => {
-        if (typeof window !== 'undefined') {
-            localStorage.removeItem('userRole');
-            // No need to remove other items, as the AuthProvider will handle it
-        }
-        router.push("/");
-    };
 
     const handleEditMember = (member: AdminMember) => {
         setEditingMember(member);
@@ -205,6 +199,10 @@ export default function AdminPage() {
         }
     }
 
+    if (!isAdmin) {
+      return null; // or a loading/access denied component
+    }
+
     return (
         <div className="space-y-6">
             <Card>
@@ -217,10 +215,6 @@ export default function AdminPage() {
                         <Button onClick={handleAddNewMember}>
                           <PlusCircle className="mr-2 h-5 w-5" />
                           Yeni Üye Ekle
-                        </Button>
-                        <Button variant="outline" onClick={handleLogout}>
-                            <LogOut className="mr-2 h-5 w-5" />
-                            Çıkış Yap
                         </Button>
                     </div>
                 </CardHeader>
