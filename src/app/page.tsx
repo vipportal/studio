@@ -8,11 +8,11 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Loader2, AlertCircle } from "lucide-react";
-import { getMembers } from "@/lib/member-storage";
 import { useToast } from "@/hooks/use-toast";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth, areEnvsDefined } from "@/lib/firebase/config";
 import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
+import { getMembers } from "@/lib/member-storage";
 
 
 export default function LoginPage() {
@@ -39,6 +39,7 @@ export default function LoginPage() {
     try {
       if (typeof window === 'undefined') return;
 
+      // Special case for admin login
       if (email.toLowerCase() === "admin@vip-portal.com" && password === "admin1461") {
           localStorage.setItem('userRole', 'admin');
           router.push("/dashboard/admin");
@@ -49,20 +50,15 @@ export default function LoginPage() {
       const user = userCredential.user;
 
       if (user) {
-        const members = await getMembers();
-        const customer = members.find(m => m.id === user.uid);
-        
-        if (customer && customer.name) { // Check if details are filled
-            localStorage.setItem('userRole', 'user');
-            localStorage.setItem('loggedInUser', JSON.stringify(customer));
-            router.push("/dashboard");
-        } else {
-             toast({
-                variant: "destructive",
-                title: "Giriş Başarısız",
-                description: "Profil bilgileriniz bulunamadı veya eksik. Lütfen yönetici ile iletişime geçin.",
-            });
-        }
+        // Successful login, let the AuthProvider handle the rest
+        router.push("/dashboard");
+      } else {
+         // This case should ideally not be reached if signInWithEmailAndPassword throws an error on failure
+         toast({
+            variant: "destructive",
+            title: "Giriş Başarısız",
+            description: "Kullanıcı kimliği doğrulanamadı.",
+        });
       }
 
     } catch (error: any) {
@@ -74,8 +70,6 @@ export default function LoginPage() {
             errorMessage = "Bu e-posta adresine kayıtlı bir kullanıcı bulunamadı.";
             break;
           case 'auth/wrong-password':
-            errorMessage = "Şifre hatalı. Lütfen tekrar deneyin.";
-            break;
           case 'auth/invalid-credential':
              errorMessage = "E-posta veya şifre hatalı.";
              break;

@@ -43,31 +43,29 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           
           if (memberDetails) {
             setMember(memberDetails);
-            localStorage.setItem('loggedInUser', JSON.stringify(memberDetails));
-            localStorage.setItem('userRole', 'user');
+            // We no longer need to store the user in localStorage for auth purposes
           } else {
-            // This case might happen if admin hasn't filled details yet.
-            // Or if there's a data consistency issue.
+            // This case happens if a user exists in Firebase Auth but has no profile details yet.
+            // This is a valid state; the user is authenticated but may have limited access to features
+            // until their profile is completed by an admin.
             setMember(null);
-            localStorage.removeItem('loggedInUser');
-            // We don't automatically log out here, but the app might restrict access.
           }
         } catch (error) {
            console.error("Error fetching member details:", error);
            setMember(null);
-           localStorage.removeItem('loggedInUser');
         }
       } else {
         // User is signed out.
         setMember(null);
-        localStorage.removeItem('loggedInUser');
-        localStorage.removeItem('userRole');
-
-        const isAdminPage = pathname === '/dashboard/admin';
+        setUser(null);
+        
+        // Don't redirect if on the login page
+        // or if it's the admin page and an admin session is still locally stored.
+        const isAdminPage = pathname.startsWith('/dashboard/admin');
         const isLoginPage = pathname === '/';
         const isAdminLoggedIn = typeof window !== 'undefined' && localStorage.getItem('userRole') === 'admin';
 
-        if (!isLoginPage && !isAdminPage && !isAdminLoggedIn) {
+        if (!isLoginPage && (!isAdminPage || !isAdminLoggedIn)) {
           router.push('/');
         }
       }

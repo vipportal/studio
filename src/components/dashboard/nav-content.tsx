@@ -20,6 +20,7 @@ import { cn } from "@/lib/utils";
 import React, { useEffect, useState } from "react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
+import { auth } from "@/lib/firebase/config";
 
 const baseNavItems = [
   { href: "/dashboard/profile", label: "Profil", icon: User },
@@ -51,7 +52,9 @@ export default function DashboardNavContent() {
   const handleLogout = () => {
     if (typeof window !== 'undefined') {
       localStorage.removeItem('userRole');
-      localStorage.removeItem('loggedInUser');
+      if (auth) {
+        auth.signOut();
+      }
     }
     router.push("/");
   };

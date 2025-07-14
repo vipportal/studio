@@ -83,8 +83,7 @@ export default function AdminPage() {
     const handleLogout = () => {
         if (typeof window !== 'undefined') {
             localStorage.removeItem('userRole');
-            localStorage.removeItem('loggedInUser');
-            localStorage.removeItem('firebaseUsersCache');
+            // No need to remove other items, as the AuthProvider will handle it
         }
         router.push("/");
     };
