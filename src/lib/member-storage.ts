@@ -1,10 +1,12 @@
 
+"use client";
+
 import type { AdminMember } from "@/app/dashboard/admin/page";
 
 const MEMBER_STORAGE_KEY = 'vip_portal_members';
 
 // This function now only gets members from localStorage.
-// The synchronization logic is handled by the creation/update process in the admin panel.
+// It is designed to only run on the client side.
 function getMembersFromStorageOnly(): AdminMember[] {
     if (typeof window === 'undefined') {
         return [];
@@ -21,7 +23,8 @@ function getMembersFromStorageOnly(): AdminMember[] {
 }
 
 
-export async function getMembers(): Promise<AdminMember[]> {
+// This function is also client-side only.
+export function getMembers(): AdminMember[] {
     if (typeof window === 'undefined') {
         return [];
     }

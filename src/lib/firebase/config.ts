@@ -2,7 +2,7 @@
 "use client";
 
 import { initializeApp, getApps, getApp, FirebaseApp } from "firebase/app";
-import { getAuth, Auth } from "firebase/auth";
+import { getAuth, Auth, setPersistence, browserSessionPersistence } from "firebase/auth";
 
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -27,6 +27,8 @@ if (typeof window !== 'undefined') {
   if (areEnvsDefined) {
     app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
     auth = getAuth(app);
+    // This ensures the user's session is persisted across browser sessions.
+    setPersistence(auth, browserSessionPersistence);
   } else {
     console.error("Firebase config environment variables are not defined. Please create a .env.local file with your Firebase credentials.");
   }
