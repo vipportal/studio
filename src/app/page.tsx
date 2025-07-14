@@ -7,11 +7,13 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader } from "@/co
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Loader2 } from "lucide-react";
+import { Loader2, AlertCircle } from "lucide-react";
 import { getMembers } from "@/lib/member-storage";
 import { useToast } from "@/hooks/use-toast";
-import { signInWithEmailAndPassword, AuthError } from "firebase/auth";
-import { auth } from "@/lib/firebase/config";
+import { signInWithEmailAndPassword } from "firebase/auth";
+import { auth, areEnvsDefined } from "@/lib/firebase/config";
+import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
+
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -24,24 +26,30 @@ export default function LoginPage() {
     e.preventDefault();
     setIsLoading(true);
     
+    if (!auth) {
+        toast({
+            variant: "destructive",
+            title: "Yapılandırma Hatası",
+            description: "Firebase yapılandırması yüklenemedi. Lütfen yönetici ile iletişime geçin.",
+        });
+        setIsLoading(false);
+        return;
+    }
+
     try {
       if (typeof window === 'undefined') return;
 
-      // Admin login check
       if (email.toLowerCase() === "admin" && password === "admin1461") {
           localStorage.setItem('userRole', 'admin');
           router.push("/dashboard/admin");
           return;
       }
       
-      // Customer login with Firebase Auth
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
 
       if (user) {
-        // Fetch all member details from storage
         const members = getMembers();
-        // Find the specific member profile using Firebase UID
         const customer = members.find(m => m.id === user.uid);
         
         if (customer) {
@@ -85,6 +93,8 @@ export default function LoginPage() {
       setIsLoading(false);
     }
   };
+  
+  const isFirebaseConfigured = areEnvsDefined;
 
   return (
     <main className="flex min-h-screen w-full items-center justify-center bg-background p-4">
@@ -98,6 +108,15 @@ export default function LoginPage() {
           </CardHeader>
           <form onSubmit={handleLogin}>
             <CardContent className="space-y-6">
+              {!isFirebaseConfigured && (
+                  <Alert variant="destructive">
+                      <AlertCircle className="h-4 w-4" />
+                      <AlertTitle>Yapılandırma Hatası</AlertTitle>
+                      <AlertDescription>
+                          Firebase yapılandırma anahtarları eksik. Lütfen .env.local dosyasını kontrol edin. Uygulama düzgün çalışmayacaktır.
+                      </AlertDescription>
+                  </Alert>
+              )}
                <div className="space-y-2">
                  <Label htmlFor="email" className="text-center block font-bold">ÜYE GİRİŞİ</Label>
                </div>
@@ -110,7 +129,7 @@ export default function LoginPage() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
-                  disabled={isLoading}
+                  disabled={isLoading || !isFirebaseConfigured}
                 />
               </div>
               <div className="space-y-2">
@@ -122,12 +141,12 @@ export default function LoginPage() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
-                  disabled={isLoading}
+                  disabled={isLoading || !isFirebaseConfigured}
                 />
               </div>
             </CardContent>
             <CardFooter>
-              <Button type="submit" className="w-full" disabled={isLoading}>
+              <Button type="submit" className="w-full" disabled={isLoading || !isFirebaseConfigured}>
                 {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
                 Giriş Yap
               </Button>

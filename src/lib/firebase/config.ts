@@ -1,6 +1,8 @@
 
-import { initializeApp, getApps } from "firebase/app";
-import { getAuth } from "firebase/auth";
+"use client";
+
+import { initializeApp, getApps, getApp, FirebaseApp } from "firebase/app";
+import { getAuth, Auth } from "firebase/auth";
 
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -11,14 +13,19 @@ const firebaseConfig = {
   appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
 };
 
-// Initialize Firebase
-let app;
-if (!getApps().length) {
-  app = initializeApp(firebaseConfig);
-} else {
-  app = getApps()[0];
+let app: FirebaseApp | null = null;
+let auth: Auth | null = null;
+
+const areEnvsDefined = Object.values(firebaseConfig).every(Boolean);
+
+// Initialize Firebase only on the client side and if config is valid
+if (typeof window !== 'undefined') {
+  if (areEnvsDefined) {
+    app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
+    auth = getAuth(app);
+  } else {
+    console.error("Firebase config environment variables are not defined. Please create a .env.local file with your Firebase credentials.");
+  }
 }
 
-const auth = getAuth(app);
-
-export { app, auth };
+export { app, auth, areEnvsDefined };
