@@ -65,7 +65,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
         const isAdminPage = pathname === '/dashboard/admin';
         const isLoginPage = pathname === '/';
-        const isAdminLoggedIn = localStorage.getItem('userRole') === 'admin';
+        const isAdminLoggedIn = typeof window !== 'undefined' && localStorage.getItem('userRole') === 'admin';
 
         if (!isLoginPage && !isAdminPage && !isAdminLoggedIn) {
           router.push('/');
