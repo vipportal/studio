@@ -54,8 +54,10 @@ export default function AdminPage() {
     const { isAdmin, loading } = useAuth();
 
     useEffect(() => {
+        // The useAuth hook now handles redirection, but we can add an
+        // extra layer of security here.
         if (!loading && !isAdmin) {
-            router.push('/dashboard');
+            router.push('/dashboard/profile'); // Redirect non-admins away
             return;
         }
 
@@ -181,11 +183,11 @@ export default function AdminPage() {
     }
 
     if (loading) {
-       return <div className="text-center p-8">Yükleniyor...</div>;
+       return <div className="text-center p-8 text-xl">Yükleniyor...</div>;
     }
 
     if (!isAdmin) {
-      return null; // or a loading/access denied component
+      return null; // The layout and hook will handle redirecting, so we can just return nothing.
     }
 
     return (
@@ -216,9 +218,7 @@ export default function AdminPage() {
                             />
                         </DialogContent>
                     </Dialog>
-                    {loading ? (
-                      <div className="text-center p-8">Yükleniyor...</div>
-                    ) : (
+                    
                     <div className="overflow-x-auto">
                         <Table>
                             <TableHeader>
@@ -262,7 +262,7 @@ export default function AdminPage() {
                             </TableBody>
                         </Table>
                     </div>
-                    )}
+                    
                 </CardContent>
                 {totalPages > 1 && (
                     <CardFooter className="flex justify-center items-center gap-2 pt-4">

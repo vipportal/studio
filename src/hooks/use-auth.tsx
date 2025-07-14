@@ -46,7 +46,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
         try {
           if (!isAdminUser) {
-            const allMembers = await getMembers();
+            const allMembers = getMembers(); // This is client-side safe
             const memberDetails = allMembers.find(m => m.id === currentUser.uid);
             setMember(memberDetails || null);
           } else {
@@ -69,6 +69,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   }, []);
 
   useEffect(() => {
+    // Wait until loading is false to prevent race conditions
     if (loading) {
       return; 
     }
@@ -78,14 +79,20 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const isDashboardPage = pathname.startsWith('/dashboard');
 
     if (!isAuthenticated && isDashboardPage) {
+      // If user is not authenticated and tries to access dashboard, redirect to login
       router.push('/');
     } else if (isAuthenticated && isAuthPage) {
+      // If user is authenticated and on the login page, redirect to their dashboard
       if (isAdmin) {
         router.push('/dashboard/admin');
       } else {
-        router.push('/dashboard');
+        router.push('/dashboard/profile');
       }
+    } else if (isAuthenticated && pathname === '/dashboard') {
+        // If user lands on the base dashboard, redirect to profile
+        router.push('/dashboard/profile');
     }
+
   }, [user, isAdmin, loading, pathname, router]);
 
 

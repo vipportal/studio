@@ -13,29 +13,31 @@ import { AuthProvider, useAuth } from "@/hooks/use-auth";
 function DashboardLayoutContent({ children }: { children: ReactNode }) {
   const pathname = usePathname();
   const { loading, isAuthenticated, isAdmin } = useAuth();
-  const isAdminPage = pathname === '/dashboard/admin';
 
+  // This is the crucial part. While the auth state is loading,
+  // we show a full-screen loading indicator. This prevents the
+  // "flicker" or the page showing content before redirecting.
   if (loading) {
     return (
       <div className="flex justify-center items-center h-screen bg-background">
-        <p className="text-foreground">Yükleniyor...</p>
+        <p className="text-foreground text-xl">Yükleniyor...</p>
       </div>
     );
   }
   
+  // After loading, if the user is not authenticated, the useAuth hook
+  // will handle the redirect. We can show a message while that happens.
   if (!isAuthenticated) {
-     // The AuthProvider will handle the redirect, so we can just show a loading state
-     // while the redirect is in progress.
      return (
         <div className="flex justify-center items-center h-screen bg-background">
-            <p className="text-foreground">Yönlendiriliyor...</p>
+            <p className="text-foreground text-xl">Yönlendiriliyor...</p>
         </div>
       )
   }
 
-  // If this is the admin page, but the user is not an admin, show a loading state
-  // while the AuthProvider redirects them.
-  if (isAdminPage && !isAdmin) {
+  // If this is the admin page, but the user is not an admin,
+  // the hook will also handle redirection.
+  if (pathname === '/dashboard/admin' && !isAdmin) {
     return (
       <div className="flex justify-center items-center h-screen bg-background">
           <p className="text-foreground">Yetkiniz yok, yönlendiriliyorsunuz...</p>
@@ -45,24 +47,22 @@ function DashboardLayoutContent({ children }: { children: ReactNode }) {
 
   return (
     <div className="flex min-h-screen w-full flex-col bg-background text-foreground">
-      {(!isAdminPage || isAdmin) && (
-        <header className="sticky top-0 z-40 w-full border-b bg-background/95 backdrop-blur-sm">
-          <div className="container flex h-auto flex-col items-start gap-4 py-2 md:h-16 md:flex-row md:items-center">
-            <Link href="/dashboard" className="mr-6 flex items-center space-x-2">
-              <VenetianMask className="h-8 w-8 text-primary" />
-              <span className="font-headline text-2xl font-bold">
-                VIP Portal
-              </span>
-            </Link>
+      <header className="sticky top-0 z-40 w-full border-b bg-background/95 backdrop-blur-sm">
+        <div className="container flex h-auto flex-col items-start gap-4 py-2 md:h-16 md:flex-row md:items-center">
+          <Link href="/dashboard" className="mr-6 flex items-center space-x-2">
+            <VenetianMask className="h-8 w-8 text-primary" />
+            <span className="font-headline text-2xl font-bold">
+              VIP Portal
+            </span>
+          </Link>
 
-            <div className="w-full flex-1 md:flex md:items-center md:justify-end">
-              <ScrollArea className="w-full whitespace-nowrap md:w-auto">
-                <DashboardNavContent />
-              </ScrollArea>
-            </div>
+          <div className="w-full flex-1 md:flex md:items-center md:justify-end">
+            <ScrollArea className="w-full whitespace-nowrap md:w-auto">
+              <DashboardNavContent />
+            </ScrollArea>
           </div>
-        </header>
-      )}
+        </div>
+      </header>
       <main className="flex-1 flex flex-col p-4 sm:p-6 lg:p-8">
         {children}
       </main>

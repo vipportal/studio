@@ -13,13 +13,11 @@ import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth, areEnvsDefined } from "@/lib/firebase/config";
 import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
 
-const ADMIN_EMAIL = "admin@vip-portal.com";
-
 export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const router = useRouter();
+  const router = useRouter(); // Keep router for potential future use, but logic is in useAuth
   const { toast } = useToast();
 
   const handleLogin = async (e: React.FormEvent) => {
@@ -37,24 +35,9 @@ export default function LoginPage() {
     }
 
     try {
-      const userCredential = await signInWithEmailAndPassword(auth, email, password);
-      const user = userCredential.user;
-
-      if (user) {
-        // Successful login, redirect based on email
-        if (user.email === ADMIN_EMAIL) {
-          router.push("/dashboard/admin");
-        } else {
-          router.push("/dashboard");
-        }
-      } else {
-         toast({
-            variant: "destructive",
-            title: "Giriş Başarısız",
-            description: "Kullanıcı kimliği doğrulanamadı.",
-        });
-      }
-
+      // The useAuth hook will handle the redirect upon successful sign-in
+      await signInWithEmailAndPassword(auth, email, password);
+      // No router.push here. Let the AuthProvider handle it.
     } catch (error: any) {
       let errorMessage = "Beklenmedik bir hata oluştu. Lütfen tekrar deneyin.";
       if (error.code) {
