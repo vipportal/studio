@@ -7,7 +7,7 @@ import { usePathname } from 'next/navigation';
 import { VenetianMask, Instagram, Twitter, Facebook, Youtube, MessageCircle } from "lucide-react";
 import DashboardNavContent from "@/components/dashboard/nav-content";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { AuthProvider, useAuth } from "@/hooks/use-auth";
+import { useAuth } from "@/hooks/use-auth";
 
 
 function DashboardLayoutContent({ children }: { children: ReactNode }) {
@@ -100,8 +100,6 @@ function DashboardLayoutContent({ children }: { children: ReactNode }) {
 
 export default function DashboardLayout({ children }: { children: ReactNode }) {
   return (
-    <AuthProvider>
       <DashboardLayoutContent>{children}</DashboardLayoutContent>
-    </AuthProvider>
   )
 }

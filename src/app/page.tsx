@@ -2,7 +2,6 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -12,13 +11,16 @@ import { useToast } from "@/hooks/use-toast";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth, areEnvsDefined } from "@/lib/firebase/config";
 import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
+import { useRouter } from "next/navigation";
+import { useAuth } from "@/hooks/use-auth";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const router = useRouter(); // Keep router for potential future use, but logic is in useAuth
   const { toast } = useToast();
+  const { isAdmin } = useAuth(); // We don't need the full hook, just for logic
+  const router = useRouter();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -35,9 +37,9 @@ export default function LoginPage() {
     }
 
     try {
-      // The useAuth hook will handle the redirect upon successful sign-in
       await signInWithEmailAndPassword(auth, email, password);
-      // No router.push here. Let the AuthProvider handle it.
+      // The useAuth hook will handle the redirect upon successful sign-in.
+      // We don't need to push the router here, the hook will detect the auth change.
     } catch (error: any) {
       let errorMessage = "Beklenmedik bir hata oluştu. Lütfen tekrar deneyin.";
       if (error.code) {
