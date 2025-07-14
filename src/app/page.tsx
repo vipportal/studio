@@ -9,9 +9,8 @@ import { Label } from "@/components/ui/label";
 import { Loader2, AlertCircle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { signInWithEmailAndPassword } from "firebase/auth";
-import { auth, areEnvsDefined } from "@/lib/firebase/config";
+import { auth } from "@/lib/firebase/config";
 import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
-import { useRouter } from "next/navigation";
 import { useAuth } from "@/hooks/use-auth";
 
 export default function LoginPage() {
@@ -19,8 +18,7 @@ export default function LoginPage() {
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
-  const { isAdmin } = useAuth(); // We don't need the full hook, just for logic
-  const router = useRouter();
+  const { loading: authLoading } = useAuth();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -39,15 +37,12 @@ export default function LoginPage() {
     try {
       await signInWithEmailAndPassword(auth, email, password);
       // The useAuth hook will handle the redirect upon successful sign-in.
-      // We don't need to push the router here, the hook will detect the auth change.
     } catch (error: any) {
       let errorMessage = "Beklenmedik bir hata oluştu. Lütfen tekrar deneyin.";
       if (error.code) {
         switch (error.code) {
           case 'auth/user-not-found':
           case 'auth/invalid-email':
-            errorMessage = "Bu e-posta adresine kayıtlı bir kullanıcı bulunamadı.";
-            break;
           case 'auth/wrong-password':
           case 'auth/invalid-credential':
              errorMessage = "E-posta veya şifre hatalı.";
@@ -67,8 +62,6 @@ export default function LoginPage() {
     }
   };
   
-  const isFirebaseConfigured = areEnvsDefined;
-
   return (
     <main className="flex min-h-screen w-full items-center justify-center bg-background p-4">
       <div className="w-full max-w-md">
@@ -81,15 +74,6 @@ export default function LoginPage() {
           </CardHeader>
           <form onSubmit={handleLogin}>
             <CardContent className="space-y-6">
-              {!isFirebaseConfigured && (
-                  <Alert variant="destructive">
-                      <AlertCircle className="h-4 w-4" />
-                      <AlertTitle>Yapılandırma Hatası</AlertTitle>
-                      <AlertDescription>
-                          Firebase yapılandırma anahtarları eksik. Lütfen .env.local dosyasını kontrol edin. Uygulama düzgün çalışmayacaktır.
-                      </AlertDescription>
-                  </Alert>
-              )}
                <div className="space-y-2">
                  <Label htmlFor="email" className="text-center block font-bold">ÜYE GİRİŞİ</Label>
                </div>
@@ -102,7 +86,7 @@ export default function LoginPage() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
-                  disabled={isLoading || !isFirebaseConfigured}
+                  disabled={isLoading || authLoading}
                 />
               </div>
               <div className="space-y-2">
@@ -114,13 +98,13 @@ export default function LoginPage() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
-                  disabled={isLoading || !isFirebaseConfigured}
+                  disabled={isLoading || authLoading}
                 />
               </div>
             </CardContent>
             <CardFooter>
-              <Button type="submit" className="w-full" disabled={isLoading || !isFirebaseConfigured}>
-                {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+              <Button type="submit" className="w-full" disabled={isLoading || authLoading}>
+                {isLoading || authLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
                 Giriş Yap
               </Button>
             </CardFooter>
