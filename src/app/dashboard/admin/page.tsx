@@ -12,8 +12,7 @@ import { useRouter } from "next/navigation";
 import AdminMemberForm from "@/components/dashboard/admin-member-form";
 import { getMembers, setMembers as saveMembers } from "@/lib/member-storage";
 import { Badge } from "@/components/ui/badge";
-import { createUserWithEmailAndPassword } from "firebase/auth";
-import { auth } from "@/lib/firebase/config";
+import { createUserInTempApp } from "@/lib/firebase/config";
 import { useAuth } from "@/hooks/use-auth";
 
 export type AdminMember = {
@@ -52,34 +51,19 @@ export default function AdminPage() {
     const [currentPage, setCurrentPage] = useState(1);
     const { toast } = useToast();
     const router = useRouter();
-    const [isLoading, setIsLoading] = useState(true);
-    const { isAdmin } = useAuth();
+    const { isAdmin, loading } = useAuth();
 
     useEffect(() => {
-        if (!isAdmin) {
+        if (!loading && !isAdmin) {
             router.push('/dashboard');
             return;
         }
 
-        const initializeMembers = async () => {
-          setIsLoading(true);
-          try {
-            const allMembers = await getMembers();
-            setMembers(allMembers);
-          } catch (error) {
-            console.error("Failed to fetch members:", error);
-            toast({
-              variant: "destructive",
-              title: "Hata",
-              description: "Üyeler getirilirken bir hata oluştu.",
-            });
-          } finally {
-            setIsLoading(false);
-          }
-        };
-
-        initializeMembers();
-    }, [router, toast, isAdmin]);
+        if(isAdmin) {
+          const allMembers = getMembers();
+          setMembers(allMembers);
+        }
+    }, [router, isAdmin, loading]);
     
 
     const handleEditMember = (member: AdminMember) => {
@@ -136,7 +120,7 @@ export default function AdminPage() {
       if (editingMember) {
         // Editing existing member
         const updatedMembers = members.map(m => m.id === memberData.id ? { ...m, ...memberData } : m);
-        await saveMembers(updatedMembers);
+        saveMembers(updatedMembers);
         setMembers(updatedMembers);
         toast({
             title: "Başarılı",
@@ -148,13 +132,10 @@ export default function AdminPage() {
             toast({ variant: "destructive", title: "Hata", description: "Yeni üye için e-posta ve şifre zorunludur." });
             return;
         }
-        if (!auth) {
-            toast({ variant: "destructive", title: "Hata", description: "Firebase başlatılamadı." });
-            return;
-        }
 
         try {
-            const userCredential = await createUserWithEmailAndPassword(auth, memberData.phone, memberData.password);
+            // Use the temporary app to create a user without affecting admin's session
+            const userCredential = await createUserInTempApp(memberData.phone, memberData.password);
             const newFirebaseUser = userCredential.user;
 
             const newMember: AdminMember = {
@@ -163,7 +144,7 @@ export default function AdminPage() {
             };
             
             const updatedMembers = [...members, newMember];
-            await saveMembers(updatedMembers);
+            saveMembers(updatedMembers);
             setMembers(updatedMembers);
             
             toast({
@@ -199,6 +180,10 @@ export default function AdminPage() {
         }
     }
 
+    if (loading) {
+       return <div className="text-center p-8">Yükleniyor...</div>;
+    }
+
     if (!isAdmin) {
       return null; // or a loading/access denied component
     }
@@ -231,7 +216,7 @@ export default function AdminPage() {
                             />
                         </DialogContent>
                     </Dialog>
-                    {isLoading ? (
+                    {loading ? (
                       <div className="text-center p-8">Yükleniyor...</div>
                     ) : (
                     <div className="overflow-x-auto">
