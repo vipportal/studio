@@ -6,11 +6,10 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader } from "@/co
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Loader2, AlertCircle } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "@/lib/firebase/config";
-import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
 import { useAuth } from "@/hooks/use-auth";
 
 export default function LoginPage() {
@@ -18,7 +17,7 @@ export default function LoginPage() {
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
-  const { loading: authLoading } = useAuth();
+  const { loading: authLoading } = useAuth(); // Use the loading state from the hook
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -35,8 +34,9 @@ export default function LoginPage() {
     }
 
     try {
+      // signInWithEmailAndPassword handles the auth state.
+      // The useAuth hook will detect the change and handle redirection automatically.
       await signInWithEmailAndPassword(auth, email, password);
-      // The useAuth hook will handle the redirect upon successful sign-in.
     } catch (error: any) {
       let errorMessage = "Beklenmedik bir hata oluştu. Lütfen tekrar deneyin.";
       if (error.code) {
@@ -62,6 +62,15 @@ export default function LoginPage() {
     }
   };
   
+  // Render a loading state or nothing while the hook is verifying the auth state
+  if (authLoading) {
+     return (
+        <main className="flex min-h-screen w-full items-center justify-center bg-background p-4">
+           <Loader2 className="h-8 w-8 animate-spin" />
+        </main>
+     )
+  }
+
   return (
     <main className="flex min-h-screen w-full items-center justify-center bg-background p-4">
       <div className="w-full max-w-md">
@@ -86,7 +95,7 @@ export default function LoginPage() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
-                  disabled={isLoading || authLoading}
+                  disabled={isLoading}
                 />
               </div>
               <div className="space-y-2">
@@ -98,13 +107,13 @@ export default function LoginPage() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
-                  disabled={isLoading || authLoading}
+                  disabled={isLoading}
                 />
               </div>
             </CardContent>
             <CardFooter>
-              <Button type="submit" className="w-full" disabled={isLoading || authLoading}>
-                {isLoading || authLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+              <Button type="submit" className="w-full" disabled={isLoading}>
+                {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
                 Giriş Yap
               </Button>
             </CardFooter>

@@ -4,7 +4,7 @@
 import type { ReactNode } from "react";
 import Link from "next/link";
 import { usePathname } from 'next/navigation';
-import { VenetianMask, Instagram, Twitter, Facebook, Youtube, MessageCircle } from "lucide-react";
+import { VenetianMask, Instagram, Twitter, Facebook, Youtube, MessageCircle, Loader2 } from "lucide-react";
 import DashboardNavContent from "@/components/dashboard/nav-content";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useAuth } from "@/hooks/use-auth";
@@ -14,13 +14,13 @@ function DashboardLayoutContent({ children }: { children: ReactNode }) {
   const pathname = usePathname();
   const { loading, isAuthenticated, isAdmin } = useAuth();
 
-  // This is the crucial part. While the auth state is loading,
-  // we show a full-screen loading indicator. This prevents the
-  // "flicker" or the page showing content before redirecting.
+  // While the auth state is loading, we show a full-screen loading indicator.
+  // This prevents the "flicker" or showing content before redirecting.
+  // This is the most critical fix for the redirect loop.
   if (loading) {
     return (
       <div className="flex justify-center items-center h-screen bg-background">
-        <p className="text-foreground text-xl">Yükleniyor...</p>
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
       </div>
     );
   }
@@ -99,6 +99,7 @@ function DashboardLayoutContent({ children }: { children: ReactNode }) {
 
 
 export default function DashboardLayout({ children }: { children: ReactNode }) {
+  // We no longer need to wrap this in AuthProvider, as it's now in the root layout.
   return (
       <DashboardLayoutContent>{children}</DashboardLayoutContent>
   )
