@@ -10,39 +10,70 @@ import { Badge } from "@/components/ui/badge";
 import { VenetianMask } from "lucide-react";
 import { format, addDays } from "date-fns";
 import type { AdminMember } from "@/app/dashboard/admin/page";
-import { getMembers } from "@/lib/member-storage";
+import { useAuth } from "@/hooks/use-auth";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const VAT_RATE = 0.20;
 
-export default function InvoicesPage() {
-  const [currentUser, setCurrentUser] = useState<AdminMember | null>(null);
-  const router = useRouter();
+const InvoiceSkeleton = () => (
+    <Card className="max-w-4xl mx-auto my-8">
+        <CardHeader className="p-6">
+            <div className="flex justify-between">
+                <div>
+                    <Skeleton className="h-8 w-48 mb-2" />
+                    <Skeleton className="h-4 w-32" />
+                </div>
+                <Skeleton className="h-10 w-32" />
+            </div>
+        </CardHeader>
+        <CardContent className="p-8 space-y-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div className="space-y-2">
+                    <Skeleton className="h-5 w-24 mb-2" />
+                    <Skeleton className="h-4 w-40" />
+                </div>
+                <div className="space-y-2 text-left md:text-right">
+                    <Skeleton className="h-5 w-24 mb-2" />
+                    <Skeleton className="h-4 w-32" />
+                    <Skeleton className="h-4 w-48" />
+                    <Skeleton className="h-4 w-36" />
+                </div>
+            </div>
+            <Separator />
+            <Skeleton className="h-32 w-full" />
+            <Separator />
+            <div className="flex justify-end">
+                <div className="w-full max-w-xs space-y-2">
+                    <Skeleton className="h-5 w-full" />
+                    <Skeleton className="h-5 w-full" />
+                    <Skeleton className="h-6 w-full mt-2" />
+                </div>
+            </div>
+        </CardContent>
+    </Card>
+);
 
+
+export default function InvoicesPage() {
+  const { member, loading } = useAuth();
+  const router = useRouter();
+  
   useEffect(() => {
-    const loggedInUserData = localStorage.getItem('loggedInUser');
-    if (loggedInUserData) {
-      const allMembers = getMembers();
-      const parsedUser = JSON.parse(loggedInUserData);
-      const freshUserData = allMembers.find(m => m.id === parsedUser.id);
-      setCurrentUser(freshUserData || null);
-    } else {
+    if (!loading && !member) {
       router.push('/');
     }
-  }, [router]);
+  }, [loading, member, router]);
 
-  if (!currentUser) {
-    return (
-      <div className="flex justify-center items-center h-full">
-        <p>Yükleniyor...</p>
-      </div>
-    );
+
+  if (loading || !member) {
+    return <InvoiceSkeleton />;
   }
 
-  const invoiceAmountNumber = parseFloat(currentUser.invoiceAmount) || 0;
+  const invoiceAmountNumber = parseFloat(member.invoiceAmount) || 0;
   const subtotal = invoiceAmountNumber / (1 + VAT_RATE);
   const vatAmount = invoiceAmountNumber - subtotal;
   
-  const creationDate = new Date(currentUser.id);
+  const creationDate = new Date(member.id);
 
   return (
     <Card className="max-w-4xl mx-auto my-8 font-sans shadow-lg">
@@ -50,7 +81,7 @@ export default function InvoicesPage() {
         <div className="flex items-center justify-between">
             <div>
                 <h1 className="text-3xl font-bold text-gray-800">E-Arşiv Fatura</h1>
-                <p className="text-muted-foreground">Fatura No: INV2024{currentUser.id.toString().slice(-6)}</p>
+                <p className="text-muted-foreground">Fatura No: INV2024{member.id.toString().slice(-6)}</p>
             </div>
             <div className="flex items-center gap-2 text-right">
                 <VenetianMask className="h-10 w-10 text-green-600" />
@@ -64,13 +95,13 @@ export default function InvoicesPage() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             <div className="space-y-2">
                 <h2 className="font-semibold text-gray-700">Fatura Bilgileri</h2>
-                <p className="text-sm"><span className="font-medium text-gray-600">e-Arşiv No:</span> VIP20240000{currentUser.id.toString().slice(-6)}</p>
+                <p className="text-sm"><span className="font-medium text-gray-600">e-Arşiv No:</span> VIP20240000{member.id.toString().slice(-6)}</p>
             </div>
             <div className="space-y-2 text-left md:text-right">
                 <h2 className="font-semibold text-gray-700">Üye Bilgileri</h2>
-                <p className="text-sm font-medium text-gray-800">{currentUser.name}</p>
-                <p className="text-sm text-gray-600">{currentUser.ilce}, {currentUser.il}</p>
-                <p className="text-sm text-gray-600">TCKN: {currentUser.tc}</p>
+                <p className="text-sm font-medium text-gray-800">{member.name}</p>
+                <p className="text-sm text-gray-600">{member.ilce}, {member.il}</p>
+                <p className="text-sm text-gray-600">TCKN: {member.tc}</p>
             </div>
         </div>
         
@@ -111,7 +142,7 @@ export default function InvoicesPage() {
                 </div>
                  <div className="flex justify-between font-bold text-lg text-green-700">
                     <span>Genel Toplam:</span>
-                    <span className="font-mono">{currentUser.invoiceAmount}</span>
+                    <span className="font-mono">{member.invoiceAmount}</span>
                 </div>
             </div>
         </div>

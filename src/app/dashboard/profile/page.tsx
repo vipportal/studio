@@ -23,13 +23,11 @@ function InfoRow({
   label, 
   value, 
   valueClassName = "", 
-  labelClassName = "",
   icon: Icon
 }: { 
   label: string; 
   value: string; 
   valueClassName?: string;
-  labelClassName?: string;
   icon?: React.ComponentType<{ className?: string }>; 
 }) {
   return (
@@ -83,7 +81,6 @@ const ProfileSkeleton = () => (
   </div>
 );
 
-
 const ProfileLogo = () => (
     <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" className="h-full w-full object-cover">
         <defs>
@@ -95,26 +92,26 @@ const ProfileLogo = () => (
                 </feMerge>
             </filter>
         </defs>
-        <circle cx="50" cy="50" r="40" fill="#4B0082" stroke="#32CD32" strokeWidth="4" filter="url(#blurry-glow)" />
+        <circle cx="50" cy="50" r="40" fill="#673AB7" stroke="#00BCD4" strokeWidth="4" filter="url(#blurry-glow)" />
     </svg>
 );
 
 
 export default function ProfilePage() {
   const router = useRouter();
-  const { user, member, loading } = useAuth();
+  const { member, loading } = useAuth();
   const [selectedMember, setSelectedMember] = useState<{name: string} | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const { toast } = useToast();
 
   useEffect(() => {
-    if (!loading && !user) {
-      router.push('/');
-    }
-  }, [user, loading, router]);
+     if (!loading && !member) {
+       router.push('/');
+     }
+  }, [loading, member, router]);
   
   useEffect(() => {
-     if (user) {
+     if (member) {
         const welcomeToastTimeout = setTimeout(() => {
             const { id, dismiss } = toast({
               title: `SEVDA KİŞİSİNDEN MESAJINIZ VAR ❤️`,
@@ -128,7 +125,7 @@ export default function ProfilePage() {
           }, 3000);
         return () => clearTimeout(welcomeToastTimeout);
      }
-  }, [user, toast]);
+  }, [member, toast]);
 
   if (loading || !member) {
     return <ProfileSkeleton />;
@@ -164,10 +161,10 @@ export default function ProfilePage() {
         </div>
         <div className="space-y-2 max-w-3xl">
           <h1 className="text-4xl font-headline font-bold">Hoşgeldiniz, {member.name}</h1>
-          <div className="border border-blue-500/40 rounded-lg p-4 bg-blue-500/10">
+          <div className="border border-primary/40 rounded-lg p-4 bg-primary/10">
             <div className="flex items-start gap-3">
-              <div className="mt-1.5 h-2 w-2 flex-shrink-0 rounded-full bg-blue-600 dark:bg-blue-400"></div>
-              <p className="text-xs text-blue-800 dark:text-blue-300 text-left">
+              <div className="mt-1.5 h-2 w-2 flex-shrink-0 rounded-full bg-primary/80"></div>
+              <p className="text-xs text-primary/90 text-left">
                 SİZLERİ ARAMIZDA GÖRMEKTEN MUTLULUK DUYUYORUZ, BİLGİLERİNİZ 6698 KİŞİSEL VERİLERİN KORUNMASI KANUNU TARAFINDAN GİZLİ TUTULMAKTADIR, GÜVENLİ BİR ŞEKİLDE GÖRÜŞMELERİNİZİ YAPABİLİRSİNİZ. PARA TRANSFERLERİNİZİ BANKA HESAPLARINIZA GÜVENLİ BİR ŞEKİLDE ÇEKEBİLİRSİNİZ, İYİ GÖRÜŞMELER DİLİYORUZ.
               </p>
             </div>
@@ -177,21 +174,20 @@ export default function ProfilePage() {
 
       <Card>
         <CardHeader>
-          <CardTitle className="font-headline text-2xl uppercase text-green-600">Profil Bilgileri</CardTitle>
+          <CardTitle className="font-headline text-2xl uppercase text-primary">Profil Bilgileri</CardTitle>
           <CardDescription>Kişisel bilgileriniz ve üyelik durumunuz.</CardDescription>
         </CardHeader>
         <CardContent className="pt-6">
           <div className="space-y-4">
-            <InfoRow label="Telefon Numarası" value={member.phone} icon={Phone} labelClassName="text-blue-600 dark:text-blue-400" />
-            <InfoRow label="TC Kimlik No" value={member.tc} icon={Fingerprint} labelClassName="text-blue-600 dark:text-blue-400" />
-            <InfoRow label="İl" value={member.il} icon={MapPin} labelClassName="text-blue-600 dark:text-blue-400" />
-            <InfoRow label="İlçe" value={member.ilce} icon={Building} labelClassName="text-blue-600 dark:text-blue-400" />
-            <InfoRow label="Haftalık Kazanç" value={member.weeklyGain} icon={Wallet} labelClassName="text-green-600" valueClassName="text-green-600 font-bold" />
+            <InfoRow label="Telefon Numarası" value={member.phone} icon={Phone} />
+            <InfoRow label="TC Kimlik No" value={member.tc} icon={Fingerprint} />
+            <InfoRow label="İl" value={member.il} icon={MapPin} />
+            <InfoRow label="İlçe" value={member.ilce} icon={Building} />
+            <InfoRow label="Haftalık Kazanç" value={member.weeklyGain} icon={Wallet} valueClassName="text-green-600 font-bold" />
             <InfoRow 
               label="Üyelik Durumu" 
               value={member.status} 
               icon={Award} 
-              labelClassName="text-blue-600 dark:text-blue-400"
               valueClassName={isStatusActive ? 'text-green-600 font-bold' : 'text-red-600 font-bold'}
             />
           </div>

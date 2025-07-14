@@ -10,24 +10,58 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { format } from "date-fns";
 import { Textarea } from "@/components/ui/textarea";
-import { getMembers } from "@/lib/member-storage";
 import type { AdminMember } from "@/app/dashboard/admin/page";
 import { Separator } from "@/components/ui/separator";
+import { useAuth } from "@/hooks/use-auth";
+import { Skeleton } from "@/components/ui/skeleton";
+
+const MeetingsPageSkeleton = () => (
+    <div className="space-y-8">
+        <div>
+            <Skeleton className="h-8 w-64 mb-2" />
+            <Skeleton className="h-5 w-96" />
+        </div>
+        <div className="grid grid-cols-1 gap-8 md:grid-cols-3">
+            <div className="md:col-span-2">
+                <Card>
+                    <CardContent className="p-2">
+                        <Skeleton className="w-full h-[350px]" />
+                    </CardContent>
+                </Card>
+            </div>
+            <div className="md:col-span-1">
+                <Card>
+                    <CardHeader>
+                        <Skeleton className="h-6 w-48 mb-2" />
+                        <Skeleton className="h-4 w-32" />
+                        <Separator className="my-2" />
+                        <Skeleton className="h-10 w-full" />
+                    </CardHeader>
+                    <CardContent className="space-y-6">
+                        <div className="space-y-2">
+                            <Skeleton className="h-4 w-16" />
+                            <Skeleton className="h-10 w-full" />
+                        </div>
+                        <div className="space-y-2">
+                             <Skeleton className="h-4 w-24" />
+                            <Skeleton className="h-10 w-full" />
+                        </div>
+                        <div className="space-y-2">
+                            <Skeleton className="h-4 w-12" />
+                            <Skeleton className="h-20 w-full" />
+                        </div>
+                        <Skeleton className="h-10 w-full" />
+                    </CardContent>
+                </Card>
+            </div>
+        </div>
+    </div>
+);
 
 export default function MeetingsPage() {
   const [date, setDate] = useState<Date | undefined>(new Date());
   const { toast } = useToast();
-  const [currentUser, setCurrentUser] = useState<AdminMember | null>(null);
-
-  useEffect(() => {
-    const loggedInUserData = localStorage.getItem('loggedInUser');
-    if (loggedInUserData) {
-        const loggedInUser = JSON.parse(loggedInUserData);
-        const allMembers = getMembers();
-        const freshUserData = allMembers.find(m => m.id === loggedInUser.id);
-        setCurrentUser(freshUserData || null);
-    }
-  }, []);
+  const { member, loading } = useAuth();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -35,6 +69,10 @@ export default function MeetingsPage() {
         title: "Planlama Başarılı",
         description: `Görüşmeniz ${date ? format(date, "PPP") : ""} için başarıyla oluşturuldu.`,
     })
+  }
+  
+  if (loading) {
+      return <MeetingsPageSkeleton />;
   }
 
   return (
@@ -68,11 +106,11 @@ export default function MeetingsPage() {
               <CardDescription>
                 {date ? format(date, "PPP") : "Lütfen bir tarih seçin"}
               </CardDescription>
-              {currentUser?.meetingInfo && (
+              {member?.meetingInfo && (
                 <>
                     <Separator className="my-2" />
                     <p className="text-lg font-bold text-foreground pt-2">
-                        {currentUser.meetingInfo}
+                        {member.meetingInfo}
                     </p>
                 </>
               )}

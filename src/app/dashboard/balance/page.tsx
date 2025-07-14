@@ -12,6 +12,8 @@ import { Loader2, Landmark, CreditCard, Wallet, TrendingUp, CircleAlert, CircleC
 import { getMembers, setMembers } from "@/lib/member-storage";
 import type { AdminMember } from "@/app/dashboard/admin/page";
 import { cn } from "@/lib/utils";
+import { useAuth } from "@/hooks/use-auth";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const banks = [
   "ZİRAAT BANK", "AKBANK", "VAKIF BANK", "GARANTİ BANK", "DENİZ BANK",
@@ -28,8 +30,38 @@ const InfoItem = ({ label, value, valueClassName, icon: Icon, labelClassName }: 
     </div>
 );
 
+const BalancePageSkeleton = () => (
+    <div className="space-y-8">
+        <Card>
+            <CardHeader>
+                <Skeleton className="h-8 w-48" />
+                <Skeleton className="h-5 w-64" />
+            </CardHeader>
+            <CardContent className="space-y-4">
+                <Skeleton className="h-16 w-full" />
+                <Skeleton className="h-16 w-full" />
+                <Skeleton className="h-16 w-full" />
+                <Skeleton className="h-16 w-full" />
+            </CardContent>
+        </Card>
+        <Card>
+            <CardHeader>
+                 <Skeleton className="h-8 w-32" />
+                 <Skeleton className="h-5 w-72" />
+            </CardHeader>
+            <CardContent className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
+                {[...Array(10)].map((_, i) => (
+                    <Skeleton key={i} className="h-24 w-full" />
+                ))}
+            </CardContent>
+        </Card>
+    </div>
+);
+
+
 export default function BalancePage() {
   const { toast } = useToast();
+  const { member, loading: authLoading } = useAuth();
   const [currentUser, setCurrentUser] = useState<AdminMember | null>(null);
   const [selectedBank, setSelectedBank] = useState<string | null>(null);
   
@@ -53,15 +85,10 @@ export default function BalancePage() {
   const [smsCode, setSmsCode] = useState("");
   
   useEffect(() => {
-    const loggedInUserData = localStorage.getItem('loggedInUser');
-    if (loggedInUserData) {
-        const loggedInUser = JSON.parse(loggedInUserData);
-        // We need to get the latest user data from the main source of truth
-        const allMembers = getMembers();
-        const freshUserData = allMembers.find(m => m.id === loggedInUser.id);
-        setCurrentUser(freshUserData || null);
+    if (member) {
+      setCurrentUser(member);
     }
-  }, []);
+  }, [member]);
 
   const updateUserInStorage = (dataToUpdate: Partial<AdminMember>) => {
      if (!currentUser) return;
@@ -184,6 +211,10 @@ export default function BalancePage() {
       setCvv(value);
     }
   };
+  
+  if (authLoading || !currentUser) {
+    return <BalancePageSkeleton />;
+  }
 
 
   return (

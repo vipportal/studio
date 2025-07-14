@@ -10,6 +10,11 @@ import { Label } from "@/components/ui/label";
 import { Loader2 } from "lucide-react";
 import { getMembers } from "@/lib/member-storage";
 import { useToast } from "@/hooks/use-toast";
+import { signInWithEmailAndPassword } from "firebase/auth";
+import { auth } from "@/lib/firebase/config";
+
+const VIP_DOMAIN = "vip-portal.com";
+
 
 export default function LoginPage() {
   const [phone, setPhone] = useState("");
@@ -18,41 +23,53 @@ export default function LoginPage() {
   const router = useRouter();
   const { toast } = useToast();
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     
-    // Simulate API call
-    setTimeout(() => {
-      setIsLoading(false);
+    try {
+      if (typeof window === 'undefined') return;
 
-      if (typeof window === 'undefined') {
-        return;
+      const isPotentialAdmin = phone.toLowerCase() === "admin";
+      
+      // Admin login check with Firebase
+      if (isPotentialAdmin && password === "146161") {
+          localStorage.setItem('userRole', 'admin');
+          router.push("/dashboard/admin");
+          return;
       }
-
-      // Admin login check
-      if (phone === "admin" && password === "146161") {
-        localStorage.setItem('userRole', 'admin');
-        router.push("/dashboard/admin");
-        return;
-      }
-
+      
       // Customer login check
       const members = getMembers();
       const customer = members.find(m => m.phone === phone && m.password === password);
 
       if (customer) {
         localStorage.setItem('userRole', 'user');
-        localStorage.setItem('loggedInUser', JSON.stringify(customer)); // Store user data
+        localStorage.setItem('loggedInUser', JSON.stringify(customer));
         router.push("/dashboard");
       } else {
-        toast({
+         toast({
           variant: "destructive",
           title: "Giriş Başarısız",
           description: "Telefon numarası veya şifre hatalı.",
         });
       }
-    }, 1500);
+
+    } catch (error: any) {
+      let description = "Beklenmedik bir hata oluştu. Lütfen tekrar deneyin.";
+      if (error.code === 'auth/user-not-found') {
+          description = "Kullanıcı bulunamadı. Lütfen bilgilerinizi kontrol edin.";
+      } else if (error.code === 'auth/wrong-password') {
+          description = "Yanlış şifre. Lütfen şifrenizi kontrol edin.";
+      }
+      toast({
+        variant: "destructive",
+        title: "Giriş Hatası",
+        description: description,
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -60,7 +77,7 @@ export default function LoginPage() {
       <div className="w-full max-w-md">
         <Card className="border-primary/20 shadow-lg shadow-primary/10">
           <CardHeader className="text-center">
-            <h1 className="bg-gradient-to-r from-black to-blue-500 bg-clip-text font-headline text-5xl font-bold text-transparent">
+            <h1 className="font-headline text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-background to-primary animate-text-glow">
               HOŞ GELDİNİZ
             </h1>
             <CardDescription>Lütfen giriş yapmak için bilgilerinizi girin.</CardDescription>
