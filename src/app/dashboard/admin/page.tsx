@@ -60,6 +60,7 @@ export default function AdminPage() {
     const handleLogout = () => {
         if (typeof window !== 'undefined') {
             localStorage.removeItem('userRole');
+            localStorage.removeItem('loggedInUser');
         }
         router.push("/");
     };
@@ -82,10 +83,17 @@ export default function AdminPage() {
         title: "Başarılı",
         description: "Üye başarıyla silindi.",
       });
-       // If the last member on a page is deleted, go to the previous page
-      const currentMembers = members.slice((currentPage - 1) * MEMBERS_PER_PAGE, currentPage * MEMBERS_PER_PAGE);
-      if (currentMembers.length === 1 && currentPage > 1) {
-        setCurrentPage(currentPage - 1);
+
+      // After deleting, check if the current page became empty and go back if needed.
+      const totalPages = Math.ceil(updatedMembers.length / MEMBERS_PER_PAGE);
+      if (currentPage > totalPages) {
+          setCurrentPage(totalPages > 0 ? totalPages : 1);
+      } else {
+        // If the last member on the current page was deleted, and it's not the first page.
+        const remainingOnPage = updatedMembers.slice((currentPage - 1) * MEMBERS_PER_PAGE, currentPage * MEMBERS_PER_PAGE).length;
+        if (remainingOnPage === 0 && currentPage > 1) {
+            setCurrentPage(currentPage - 1);
+        }
       }
     }
 

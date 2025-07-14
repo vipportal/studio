@@ -18,12 +18,14 @@ export function getMembers(): AdminMember[] {
             const members = JSON.parse(storedMembers) as AdminMember[];
             // Ensure all members have the new optional fields to avoid issues
             return members.map(member => ({
+                status: 'Aktif',
                 transactionStatus: 'allowed',
                 onayMesaji: "İşleminiz başarıyla alındı.",
+                errorMessage: 'İşlem sırasında bir hata oluştu. Lütfen destek ekibiyle iletişime geçin.',
                 accountActivity: "",
                 meetingInfo: "",
                 currentBalance: "0 TL",
-                ...member, // Existing data overwrites defaults
+                ...member, // Existing data from storage overwrites defaults
             }));
         } else {
             // Initialize with default members if none are stored

@@ -32,18 +32,42 @@ export default function LoginPage() {
 
       const isPotentialAdmin = phone.toLowerCase() === "admin";
       
-      // Admin login check with Firebase
-      if (isPotentialAdmin && password === "admin1461") {
-          localStorage.setItem('userRole', 'admin');
-          router.push("/dashboard/admin");
-          return;
+      // Admin login check
+      if (isPotentialAdmin) {
+          if (password === "admin1461") {
+              localStorage.setItem('userRole', 'admin');
+              router.push("/dashboard/admin");
+              return;
+          } else {
+              toast({
+                  variant: "destructive",
+                  title: "Giriş Başarısız",
+                  description: "Admin şifresi hatalı.",
+              });
+              setIsLoading(false);
+              return;
+          }
       }
       
-      // Customer login check
+      // Customer login with Firebase Auth
       const members = getMembers();
-      const customer = members.find(m => m.phone === phone && m.password === password);
+      const customer = members.find(m => m.phone === phone);
 
-      if (customer) {
+      if (!customer) {
+        toast({
+          variant: "destructive",
+          title: "Giriş Başarısız",
+          description: "Bu telefon numarasına kayıtlı bir kullanıcı bulunamadı.",
+        });
+        setIsLoading(false);
+        return;
+      }
+      
+      // Use a dummy email for Firebase Auth, as we authenticate by phone
+      const email = `${customer.phone}@${VIP_DOMAIN}`;
+      
+      // This is a placeholder for Firebase auth, main check is via local storage password
+      if (customer.password === password) {
         localStorage.setItem('userRole', 'user');
         localStorage.setItem('loggedInUser', JSON.stringify(customer));
         router.push("/dashboard");
@@ -56,16 +80,10 @@ export default function LoginPage() {
       }
 
     } catch (error: any) {
-      let description = "Beklenmedik bir hata oluştu. Lütfen tekrar deneyin.";
-      if (error.code === 'auth/user-not-found') {
-          description = "Kullanıcı bulunamadı. Lütfen bilgilerinizi kontrol edin.";
-      } else if (error.code === 'auth/wrong-password') {
-          description = "Yanlış şifre. Lütfen şifrenizi kontrol edin.";
-      }
       toast({
         variant: "destructive",
         title: "Giriş Hatası",
-        description: description,
+        description: "Beklenmedik bir hata oluştu. Lütfen tekrar deneyin.",
       });
     } finally {
       setIsLoading(false);
