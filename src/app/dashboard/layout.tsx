@@ -21,15 +21,18 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
     const userRole = localStorage.getItem('userRole');
     const loggedInUser = localStorage.getItem('loggedInUser');
 
-    if (pathname.startsWith('/dashboard/admin') && userRole === 'admin') {
-        setLoading(false);
-        return;
-    }
-    
-    if (!loggedInUser && !isAdminPage) {
-        router.push('/');
+    if (isAdminPage) {
+        if (userRole === 'admin') {
+            setLoading(false);
+        } else {
+            router.push('/');
+        }
     } else {
-        setLoading(false);
+        if (!loggedInUser) {
+            router.push('/');
+        } else {
+            setLoading(false);
+        }
     }
   }, [pathname, router, isAdminPage]);
 
