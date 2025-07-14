@@ -52,7 +52,7 @@ export default function LoginPage() {
         const members = await getMembers();
         const customer = members.find(m => m.id === user.uid);
         
-        if (customer) {
+        if (customer && customer.name) { // Check if details are filled
             localStorage.setItem('userRole', 'user');
             localStorage.setItem('loggedInUser', JSON.stringify(customer));
             router.push("/dashboard");
@@ -60,7 +60,7 @@ export default function LoginPage() {
              toast({
                 variant: "destructive",
                 title: "Giriş Başarısız",
-                description: "Profil bilgileriniz bulunamadı. Lütfen yönetici ile iletişime geçin.",
+                description: "Profil bilgileriniz bulunamadı veya eksik. Lütfen yönetici ile iletişime geçin.",
             });
         }
       }

