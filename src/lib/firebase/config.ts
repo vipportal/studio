@@ -8,14 +8,14 @@ import { getAuth, Auth, setPersistence, browserSessionPersistence, createUserWit
 // Firebase projenizin yapılandırma bilgilerini buraya girin.
 // Bu bilgileri Firebase konsolunda, Proje Ayarları > Genel sekmesinde bulabilirsiniz.
 const firebaseConfig = {
-  apiKey: "YAPIŞTIRIN: Buraya kendi FIREBASE_API_KEY değerinizi yapıştırın",
-  authDomain: "YAPIŞTIRIN: Buraya kendi FIREBASE_AUTH_DOMAIN değerinizi yapıştırın",
-  projectId: "YAPIŞTIRIN: Buraya kendi FIREBASE_PROJECT_ID değerinizi yapıştırın",
-  storageBucket: "YAPIŞTIRIN: Buraya kendi FIREBASE_STORAGE_BUCKET değerinizi yapıştırın",
-  messagingSenderId: "YAPIŞTIRIN: Buraya kendi FIREBASE_MESSAGING_SENDER_ID değerinizi yapıştırın",
-  appId: "YAPIŞTIRIN: Buraya kendi FIREBASE_APP_ID değerinizi yapıştırın",
-  measurementId: "YAPIŞTIRIN: Buraya kendi G- ile başlayan MEASUREMENT_ID değerinizi yapıştırın" // Google Analytics için
-};
+    apiKey: "AIzaSyCexoCpkkZaTI1OAHcJ743syavAYGImEqU",
+    authDomain: "vip-portal-5c0bh.firebaseapp.com",
+    projectId: "vip-portal-5c0bh",
+    storageBucket: "vip-portal-5c0bh.firebasestorage.app",
+    messagingSenderId: "343162938148",
+    appId: "1:343162938148:web:5f4cd212f10305e495c9b1",
+    measurementId: "G-DSGWBE1D50"
+  };
 
 let app: FirebaseApp | null = null;
 let auth: Auth | null = null;
@@ -27,7 +27,7 @@ export const areEnvsDefined =
     !!firebaseConfig.projectId;
 
 // Initialize Firebase only on the client side
-if (typeof window !== 'undefined' && areEnvsDefined) {
+if (typeof window !== 'undefined') {
   try {
     app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
     auth = getAuth(app);
