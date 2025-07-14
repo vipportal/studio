@@ -1,6 +1,6 @@
+
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Users, BrainCircuit, Rocket, HeartHandshake, Quote } from "lucide-react";
-import Image from "next/image";
 import { Separator } from "@/components/ui/separator";
 
 const TeamValue = ({ icon, title, children }: { icon: React.ReactNode; title: string; children: React.ReactNode }) => (
@@ -11,18 +11,26 @@ const TeamValue = ({ icon, title, children }: { icon: React.ReactNode; title: st
   </div>
 );
 
-const TeamMemberCard = ({ name, title, bio, imgSrc, imgHint }: { name: string; title: string; bio: string; imgSrc: string; imgHint: string }) => (
-    <Card className="text-center overflow-hidden transition-all hover:shadow-lg hover:border-primary/30">
+const ProfileLogo = () => (
+    <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" className="h-full w-full object-cover">
+        <defs>
+            <filter id="blurry-glow" x="-50%" y="-50%" width="200%" height="200%">
+                <feGaussianBlur in="SourceGraphic" stdDeviation="5" result="blur" />
+                <feMerge>
+                    <feMergeNode in="blur" />
+                    <feMergeNode in="SourceGraphic" />
+                </feMerge>
+            </filter>
+        </defs>
+        <circle cx="50" cy="50" r="40" fill="#4B0082" stroke="#32CD32" strokeWidth="4" filter="url(#blurry-glow)" />
+    </svg>
+);
+
+const TeamMemberCard = ({ name, title, bio }: { name: string; title: string; bio: string; }) => (
+    <Card className="text-center overflow-hidden transition-all hover:shadow-lg hover:border-primary/30 group">
         <CardContent className="p-6 flex flex-col items-center">
-             <div className="relative h-24 w-24 mb-4 overflow-hidden rounded-full border-2 border-primary/50">
-                <Image
-                    src={imgSrc}
-                    alt={name}
-                    data-ai-hint={imgHint}
-                    width={96}
-                    height={96}
-                    className="h-full w-full object-cover filter blur-sm brightness-75 sepia-[.2] saturate-150"
-                />
+             <div className="relative h-24 w-24 mb-4 overflow-hidden rounded-full border-2 border-primary/50 transition-transform group-hover:scale-110">
+                <ProfileLogo />
             </div>
             <h4 className="text-lg font-semibold text-foreground">{name}</h4>
             <p className="text-sm font-medium text-primary">{title}</p>
@@ -79,22 +87,16 @@ export default function WhoWeArePage() {
                     name="Sevda K."
                     title="Kurucu & CEO"
                     bio="İnsanları bir araya getirme tutkusuyla İnci'yi kurdu. Vizyonu, güven ve kalite üzerine kurulu seçkin bir topluluk yaratmak."
-                    imgSrc="https://placehold.co/100x100.png"
-                    imgHint="woman professional portrait"
                  />
                  <TeamMemberCard 
                     name="Ahmet Y."
                     title="Teknoloji Lideri (CTO)"
                     bio="Platformun güvenli ve kesintisiz çalışmasını sağlayan teknoloji dehası. Kullanıcı gizliliği ve veri güvenliği en büyük önceliği."
-                    imgSrc="https://placehold.co/100x100.png"
-                    imgHint="man tech office"
                  />
                  <TeamMemberCard 
                     name="Elif A."
                     title="Üye İlişkileri Direktörü"
                     bio="Üyelerimizin mutluluğu ve memnuniyeti için çalışan enerjik lider. Her üyenin özel ve değerli hissetmesini sağlamak için burada."
-                    imgSrc="https://placehold.co/100x100.png"
-                    imgHint="woman smiling friendly"
                  />
               </div>
             </div>
