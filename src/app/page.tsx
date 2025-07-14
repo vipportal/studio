@@ -39,7 +39,7 @@ export default function LoginPage() {
     try {
       if (typeof window === 'undefined') return;
 
-      if (email.toLowerCase() === "admin" && password === "admin1461") {
+      if (email.toLowerCase() === "admin@vip-portal.com" && password === "admin1461") {
           localStorage.setItem('userRole', 'admin');
           router.push("/dashboard/admin");
           return;
