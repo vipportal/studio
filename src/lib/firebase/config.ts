@@ -4,14 +4,17 @@
 import { initializeApp, getApps, getApp, FirebaseApp, deleteApp } from "firebase/app";
 import { getAuth, Auth, setPersistence, browserSessionPersistence, createUserWithEmailAndPassword, UserCredential } from "firebase/auth";
 
+// --- SDK KURULUMU VE YAPILANDIRMASI ---
+// Firebase projenizin yapılandırma bilgilerini buraya girin.
+// Bu bilgileri Firebase konsolunda, Proje Ayarları > Genel sekmesinde bulabilirsiniz.
 const firebaseConfig = {
-  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
-  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
-  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
-  storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
-  messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
-  appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
-  measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID,
+  apiKey: "YAPIŞTIRIN: Buraya kendi FIREBASE_API_KEY değerinizi yapıştırın",
+  authDomain: "YAPIŞTIRIN: Buraya kendi FIREBASE_AUTH_DOMAIN değerinizi yapıştırın",
+  projectId: "YAPIŞTIRIN: Buraya kendi FIREBASE_PROJECT_ID değerinizi yapıştırın",
+  storageBucket: "YAPIŞTIRIN: Buraya kendi FIREBASE_STORAGE_BUCKET değerinizi yapıştırın",
+  messagingSenderId: "YAPIŞTIRIN: Buraya kendi FIREBASE_MESSAGING_SENDER_ID değerinizi yapıştırın",
+  appId: "YAPIŞTIRIN: Buraya kendi FIREBASE_APP_ID değerinizi yapıştırın",
+  measurementId: "YAPIŞTIRIN: Buraya kendi G- ile başlayan MEASUREMENT_ID değerinizi yapıştırın" // Google Analytics için
 };
 
 let app: FirebaseApp | null = null;
@@ -19,6 +22,7 @@ let auth: Auth | null = null;
 
 const areEnvsDefined = 
     !!firebaseConfig.apiKey &&
+    !firebaseConfig.apiKey.startsWith("YAPIŞTIRIN:") &&
     !!firebaseConfig.authDomain &&
     !!firebaseConfig.projectId;
 
@@ -30,7 +34,7 @@ if (typeof window !== 'undefined') {
     // This ensures the user's session is persisted across browser sessions.
     setPersistence(auth, browserSessionPersistence);
   } else {
-    console.error("Firebase config environment variables are not defined. Please create a .env.local file with your Firebase credentials.");
+    console.error("Firebase yapılandırma bilgileri eksik. Lütfen `src/lib/firebase/config.ts` dosyasını kontrol edin.");
   }
 }
 
