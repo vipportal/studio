@@ -48,7 +48,7 @@ function DashboardLayoutContent({ children }: { children: ReactNode }) {
   return (
     <div className="flex min-h-screen w-full flex-col bg-background text-foreground">
       <header className="sticky top-0 z-40 w-full border-b bg-background/95 backdrop-blur-sm">
-        <div className="container flex h-auto flex-col items-start gap-4 py-2 md:h-16 md:flex-row md:items-center">
+        <div className="container flex h-auto flex-wrap items-start gap-4 py-2 md:h-16 md:flex-row md:items-center">
           <Link href="/dashboard" className="mr-6 flex items-center space-x-2">
             <VenetianMask className="h-8 w-8 text-primary" />
             <span className="font-headline text-2xl font-bold">
