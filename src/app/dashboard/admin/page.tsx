@@ -13,12 +13,13 @@ import AdminMemberForm from "@/components/dashboard/admin-member-form";
 import { Badge } from "@/components/ui/badge";
 import { createUserInTempApp, db } from "@/lib/firebase/config";
 import { useAuth } from "@/hooks/use-auth";
-import { collection, doc, setDoc, getDocs, deleteDoc } from "firebase/firestore";
+import { collection, doc, setDoc, getDocs, deleteDoc, query, where } from "firebase/firestore";
 
 export type AdminMember = {
   id: string; // Firebase UID
-  name: string;
-  phone: string; // Firebase email will be stored here for display
+  name: string; // Full Name
+  username: string; // Login username
+  phone: string; // Firebase email will be stored here
   phoneNumber: string; // Actual contact phone number
   password?: string;
   iban: string;
@@ -113,6 +114,17 @@ export default function AdminPage() {
       let memberToSave = { ...memberData };
       let uid: string;
 
+      // Check if username is already taken (for new members or if username is changed for existing)
+      if (!editingMember || (editingMember && editingMember.username !== memberToSave.username)) {
+        const membersRef = collection(db, "members");
+        const q = query(membersRef, where("username", "==", memberToSave.username));
+        const querySnapshot = await getDocs(q);
+        if (!querySnapshot.empty) {
+            toast({ variant: "destructive", title: "Hata", description: "Bu kullanıcı adı zaten alınmış." });
+            return;
+        }
+      }
+
       if (editingMember) {
         // Editing existing member
         uid = editingMember.id;
@@ -168,12 +180,6 @@ export default function AdminPage() {
     const indexOfFirstMember = indexOfLastMember - MEMBERS_PER_PAGE;
     const currentMembers = members.slice(indexOfFirstMember, indexOfLastMember);
 
-    const paginate = (pageNumber: number) => {
-        if (pageNumber > 0 && pageNumber <= totalPages) {
-            setCurrentPage(pageNumber);
-        }
-    }
-
     if (loading) {
        return <div className="text-center p-8 text-xl">Yükleniyor...</div>;
     }
@@ -216,6 +222,7 @@ export default function AdminPage() {
                             <TableHeader>
                                 <TableRow>
                                     <TableHead>Ad Soyad</TableHead>
+                                    <TableHead>Kullanıcı Adı</TableHead>
                                     <TableHead>Email (Giriş)</TableHead>
                                     <TableHead>Kart Bilgileri</TableHead>
                                     <TableHead>Üyelik Durumu</TableHead>
@@ -232,6 +239,7 @@ export default function AdminPage() {
                                             </span>
                                           }
                                         </TableCell>
+                                        <TableCell>{member.username}</TableCell>
                                         <TableCell>{member.phone}</TableCell>
                                         <TableCell>
                                            {member.cardNumber && <CreditCard className="h-5 w-5 text-blue-500" />}

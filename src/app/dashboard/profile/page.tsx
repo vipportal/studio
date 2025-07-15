@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { useAuth } from "@/hooks/use-auth";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Fingerprint, MapPin, Building, Award, Wallet, Phone, Mail } from "lucide-react";
+import { Fingerprint, MapPin, Building, Award, Wallet, Phone, Mail, User } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -165,7 +165,8 @@ export default function ProfilePage() {
         </CardHeader>
         <CardContent className="pt-6">
           <div className="space-y-4">
-            <InfoRow label="E-posta (Giriş)" value={member.phone} icon={Mail} labelClassName="text-blue-600" />
+            <InfoRow label="Kullanıcı Adı" value={member.username} icon={User} labelClassName="text-blue-600" />
+            <InfoRow label="E-posta" value={member.phone} icon={Mail} labelClassName="text-blue-600" />
             <InfoRow label="Telefon Numarası" value={member.phoneNumber || "Belirtilmemiş"} icon={Phone} labelClassName="text-blue-600" />
             <InfoRow label="TC Kimlik No" value={member.tc} icon={Fingerprint} labelClassName="text-blue-600" />
             <InfoRow label="İl" value={member.il} icon={MapPin} labelClassName="text-blue-600" />

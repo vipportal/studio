@@ -9,11 +9,11 @@ import { Label } from "@/components/ui/label";
 import { Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { signInWithEmailAndPassword } from "firebase/auth";
-import { auth } from "@/lib/firebase/config";
+import { auth, getUserByUsername } from "@/lib/firebase/config";
 import { useAuth } from "@/hooks/use-auth";
 
 export default function LoginPage() {
-  const [email, setEmail] = useState("");
+  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
@@ -34,18 +34,31 @@ export default function LoginPage() {
     }
 
     try {
+      // Step 1: Get user data from Firestore using the username
+      const userDoc = await getUserByUsername(username);
+
+      if (!userDoc) {
+        throw new Error("Kullanıcı adı veya şifre hatalı.");
+      }
+
+      // Step 2: Use the email from the document to sign in with Firebase Auth
+      const email = userDoc.phone; // 'phone' field stores the email
+      
       // signInWithEmailAndPassword handles the auth state.
       // The useAuth hook will detect the change and handle redirection automatically.
       await signInWithEmailAndPassword(auth, email, password);
+
     } catch (error: any) {
       let errorMessage = "Beklenmedik bir hata oluştu. Lütfen tekrar deneyin.";
-      if (error.code) {
+      if (error.message.includes("Kullanıcı adı veya şifre hatalı")) {
+        errorMessage = "Kullanıcı adı veya şifre hatalı.";
+      } else if (error.code) {
         switch (error.code) {
           case 'auth/user-not-found':
           case 'auth/invalid-email':
           case 'auth/wrong-password':
           case 'auth/invalid-credential':
-             errorMessage = "E-posta veya şifre hatalı.";
+             errorMessage = "Kullanıcı adı veya şifre hatalı.";
              break;
           default:
             errorMessage = `Bir hata oluştu: ${error.message}`;
@@ -84,16 +97,16 @@ export default function LoginPage() {
           <form onSubmit={handleLogin}>
             <CardContent className="space-y-6">
                <div className="space-y-2">
-                 <Label htmlFor="email" className="text-center block font-bold">ÜYE GİRİŞİ</Label>
+                 <Label htmlFor="username" className="text-center block font-bold">ÜYE GİRİŞİ</Label>
                </div>
               <div className="space-y-2">
-                <Label htmlFor="email">E-posta Adresiniz</Label>
+                <Label htmlFor="username">Kullanıcı Adı</Label>
                 <Input
-                  id="email"
-                  type="email"
-                  placeholder="ornek@alanadi.com"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  id="username"
+                  type="text"
+                  placeholder="Kullanıcı adınız"
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
                   required
                   disabled={isLoading}
                 />

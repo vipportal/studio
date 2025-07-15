@@ -25,6 +25,7 @@ const AdminMemberForm = ({ member, onSave, onCancel }: AdminMemberFormProps) => 
         if (member) {
             setFormData({
                 ...member,
+                username: member.username || '',
                 phone: member.phone, // email is stored in phone field
                 phoneNumber: member.phoneNumber || '',
                 status: member.status || 'Aktif',
@@ -35,6 +36,7 @@ const AdminMemberForm = ({ member, onSave, onCancel }: AdminMemberFormProps) => 
         } else {
              setFormData({
                 name: '',
+                username: '',
                 phone: '',
                 phoneNumber: '',
                 password: '',
@@ -88,6 +90,10 @@ const AdminMemberForm = ({ member, onSave, onCancel }: AdminMemberFormProps) => 
                       <Input id="password" value={formData.password || ''} onChange={handleChange} type="password" placeholder="En az 6 karakter" required />
                   </div>
                 )}
+                 <div className="space-y-2">
+                    <Label htmlFor="username">Kullanıcı Adı (Giriş için)</Label>
+                    <Input id="username" value={formData.username || ''} onChange={handleChange} placeholder="benzersiz_kullanici_adi" required />
+                </div>
                  <div className="space-y-2">
                     <Label htmlFor="name">Ad Soyad</Label>
                     <Input id="name" value={formData.name || ''} onChange={handleChange} placeholder="Ad Soyad" required />

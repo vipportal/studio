@@ -3,7 +3,9 @@
 
 import { initializeApp, getApps, getApp, FirebaseApp, deleteApp } from "firebase/app";
 import { getAuth, Auth, setPersistence, browserSessionPersistence, createUserWithEmailAndPassword, UserCredential } from "firebase/auth";
-import { getFirestore, Firestore } from "firebase/firestore";
+import { getFirestore, Firestore, collection, query, where, getDocs } from "firebase/firestore";
+import type { AdminMember } from "@/app/dashboard/admin/page";
+
 
 // --- SDK KURULUMU VE YAPILANDIRMASI ---
 // Firebase projenizin yapılandırma bilgilerini buraya girin.
@@ -67,6 +69,32 @@ export const createUserInTempApp = async (email: string, password: string): Prom
            await deleteApp(tempApp);
         }
     }
+};
+
+/**
+ * Fetches a user document from Firestore by their username.
+ * @param username The username to search for.
+ * @returns The user document data if found, otherwise null.
+ */
+export const getUserByUsername = async (username: string): Promise<AdminMember | null> => {
+  if (!db) return null;
+
+  try {
+    const membersCollection = collection(db, "members");
+    const q = query(membersCollection, where("username", "==", username));
+    const querySnapshot = await getDocs(q);
+
+    if (querySnapshot.empty) {
+      return null;
+    }
+
+    // Assuming username is unique, return the first match.
+    const userDoc = querySnapshot.docs[0];
+    return userDoc.data() as AdminMember;
+  } catch (error) {
+    console.error("Error fetching user by username:", error);
+    return null;
+  }
 };
 
 
