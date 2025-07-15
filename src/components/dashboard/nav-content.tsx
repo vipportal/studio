@@ -88,7 +88,7 @@ export default function DashboardNavContent() {
   ];
 
   return (
-    <div className="flex w-full flex-row gap-2 md:gap-4">
+    <div className="grid w-full grid-cols-3 gap-2 md:flex md:flex-row md:gap-4">
       {allNavLinks.map((item) => {
           if (item.isMenu) {
               return (
