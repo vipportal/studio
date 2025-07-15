@@ -41,20 +41,44 @@ const adminNavItem = { href: "/dashboard/admin", label: "Admin Paneli", icon: Sh
 
 export default function DashboardNavContent() {
   const pathname = usePathname();
-  const router = useRouter();
   const { isAdmin } = useAuth();
-
 
   const handleLogout = () => {
     if (auth) {
       auth.signOut();
     }
-    // The AuthProvider will handle the redirect.
   };
   
-  const navItems = baseNavItems;
-  
-  const allNavLinks = [...navItems, 
+  const buttonClasses = "inline-flex items-center justify-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition-colors text-primary-foreground bg-primary flex-shrink-0";
+  const activeClasses = "bg-accent text-accent-foreground";
+
+  if (isAdmin) {
+    return (
+       <div className="flex w-full flex-row gap-2 md:gap-4">
+          <Link
+              href={adminNavItem.href}
+              className={cn(
+                  buttonClasses,
+                  pathname.startsWith(adminNavItem.href) && activeClasses
+              )}
+          >
+              <adminNavItem.icon className="h-5 w-5" />
+              <span>{adminNavItem.label}</span>
+          </Link>
+          <Button
+            variant="destructive"
+            onClick={handleLogout}
+            className={cn(buttonClasses, "bg-destructive")}
+          >
+            <LogOut className="h-5 w-5" />
+            <span>Çıkış Yap</span>
+          </Button>
+      </div>
+    )
+  }
+
+  // Regular Member Navigation
+  const allNavLinks = [...baseNavItems, 
     {
       isMenu: true,
       label: "Menü",
@@ -63,12 +87,9 @@ export default function DashboardNavContent() {
     }
   ];
 
-  const buttonClasses = "inline-flex items-center justify-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition-colors text-primary-foreground bg-primary flex-shrink-0";
-  const activeClasses = "bg-accent text-accent-foreground";
-
   return (
     <div className="flex w-full flex-row gap-2 md:gap-4">
-      {allNavLinks.map((item, index) => {
+      {allNavLinks.map((item) => {
           if (item.isMenu) {
               return (
                    <DropdownMenu key={item.label}>
@@ -88,14 +109,6 @@ export default function DashboardNavContent() {
                           </DropdownMenuItem>
                       ))}
                       <DropdownMenuSeparator />
-                      {isAdmin && (
-                         <DropdownMenuItem asChild className="cursor-pointer">
-                           <Link href={adminNavItem.href}>
-                             <adminNavItem.icon className="mr-2 h-4 w-4" />
-                             <span>{adminNavItem.label}</span>
-                           </Link>
-                         </DropdownMenuItem>
-                      )}
                       <DropdownMenuItem onClick={handleLogout} className="text-destructive focus:text-destructive cursor-pointer">
                           <LogOut className="mr-2 h-4 w-4" />
                           <span>Çıkış Yap</span>
