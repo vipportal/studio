@@ -2,11 +2,11 @@
 "use client";
 
 import { useState, useEffect, createContext, useContext, ReactNode } from "react";
-import { getMembers } from "@/lib/member-storage";
 import type { AdminMember } from "@/app/dashboard/admin/page";
 import { useRouter, usePathname } from "next/navigation";
 import { onAuthStateChanged, User } from "firebase/auth";
-import { auth } from "@/lib/firebase/config";
+import { auth, db } from "@/lib/firebase/config";
+import { doc, getDoc } from "firebase/firestore";
 
 // The email for the admin user
 const ADMIN_EMAIL = "admin@vip-portal.com";
@@ -30,22 +30,29 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const pathname = usePathname();
 
   useEffect(() => {
-    if (!auth) {
-        console.error("Firebase Auth is not initialized.");
-        setLoading(false); // Stop loading if auth fails
+    if (!auth || !db) {
+        console.error("Firebase Auth or Firestore is not initialized.");
+        setLoading(false); // Stop loading if services fail
         return;
     }
 
-    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+    const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
       if (currentUser) {
         setUser(currentUser);
         const isAdminUser = currentUser.email === ADMIN_EMAIL;
         setIsAdmin(isAdminUser);
 
         if (!isAdminUser) {
-            const allMembers = getMembers(); // Get members from localStorage
-            const memberDetails = allMembers.find(m => m.id === currentUser.uid);
-            setMember(memberDetails || null);
+            // Fetch member details from Firestore
+            const memberDocRef = doc(db, "members", currentUser.uid);
+            const memberDocSnap = await getDoc(memberDocRef);
+
+            if (memberDocSnap.exists()) {
+                 setMember(memberDocSnap.data() as AdminMember);
+            } else {
+                 console.warn(`No member document found for UID: ${currentUser.uid}`);
+                 setMember(null);
+            }
         } else {
             setMember(null); // Admin is not a "member"
         }

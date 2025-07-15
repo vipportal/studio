@@ -3,6 +3,7 @@
 
 import { initializeApp, getApps, getApp, FirebaseApp, deleteApp } from "firebase/app";
 import { getAuth, Auth, setPersistence, browserSessionPersistence, createUserWithEmailAndPassword, UserCredential } from "firebase/auth";
+import { getFirestore, Firestore } from "firebase/firestore";
 
 // --- SDK KURULUMU VE YAPILANDIRMASI ---
 // Firebase projenizin yapılandırma bilgilerini buraya girin.
@@ -19,18 +20,14 @@ const firebaseConfig = {
 
 let app: FirebaseApp | null = null;
 let auth: Auth | null = null;
-
-export const areEnvsDefined = 
-    !!firebaseConfig.apiKey &&
-    !firebaseConfig.apiKey.startsWith("YAPIŞTIRIN:") &&
-    !!firebaseConfig.authDomain &&
-    !!firebaseConfig.projectId;
+let db: Firestore | null = null;
 
 // Initialize Firebase only on the client side
 if (typeof window !== 'undefined') {
   try {
     app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
     auth = getAuth(app);
+    db = getFirestore(app);
     // This ensures the user's session is persisted across browser sessions.
     setPersistence(auth, browserSessionPersistence);
   } catch (error) {
@@ -44,10 +41,6 @@ if (typeof window !== 'undefined') {
  * @returns A temporary FirebaseApp instance.
  */
 export const createTempApp = (): FirebaseApp | null => {
-    if (!areEnvsDefined) {
-        console.error("Firebase config not defined, cannot create temp app.");
-        return null;
-    }
     const tempAppName = `temp-app-${Date.now()}`;
     return initializeApp(firebaseConfig, tempAppName);
 };
@@ -77,4 +70,4 @@ export const createUserInTempApp = async (email: string, password: string): Prom
 };
 
 
-export { app, auth };
+export { app, auth, db };

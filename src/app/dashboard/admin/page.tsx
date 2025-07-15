@@ -10,10 +10,10 @@ import { PlusCircle, Edit, Trash2, CreditCard, AlertCircle } from "lucide-react"
 import { useToast } from "@/hooks/use-toast";
 import { useRouter } from "next/navigation";
 import AdminMemberForm from "@/components/dashboard/admin-member-form";
-import { getMembers, setMembers as saveMembers } from "@/lib/member-storage";
 import { Badge } from "@/components/ui/badge";
-import { createUserInTempApp } from "@/lib/firebase/config";
+import { createUserInTempApp, db } from "@/lib/firebase/config";
 import { useAuth } from "@/hooks/use-auth";
+import { collection, doc, setDoc, getDocs, deleteDoc } from "firebase/firestore";
 
 export type AdminMember = {
   id: string; // Firebase UID
@@ -53,17 +53,26 @@ export default function AdminPage() {
     const router = useRouter();
     const { isAdmin, loading } = useAuth();
 
+    const fetchMembers = async () => {
+        if (!db) {
+            console.error("Firestore is not initialized.");
+            toast({ variant: "destructive", title: "Hata", description: "Veritabanı bağlantısı kurulamadı." });
+            return;
+        }
+        const membersCollection = collection(db, "members");
+        const memberSnapshot = await getDocs(membersCollection);
+        const memberList = memberSnapshot.docs.map(doc => doc.data() as AdminMember);
+        setMembers(memberList);
+    };
+
     useEffect(() => {
-        // The useAuth hook now handles redirection, but we can add an
-        // extra layer of security here.
         if (!loading && !isAdmin) {
-            router.push('/dashboard/profile'); // Redirect non-admins away
+            router.push('/dashboard/profile');
             return;
         }
 
         if(isAdmin) {
-          const allMembers = getMembers();
-          setMembers(allMembers);
+          fetchMembers();
         }
     }, [router, isAdmin, loading]);
     
@@ -74,57 +83,52 @@ export default function AdminPage() {
     }
     
     const handleAddNewMember = () => {
-      setEditingMember(null); // Ensure we are in "add" mode
+      setEditingMember(null);
       setIsFormOpen(true);
     };
 
     const handleDeleteMember = async (idToDelete: string) => {
-        const updatedMembers = members.filter(member => member.id !== idToDelete);
+        if (!db) return;
         
-        saveMembers(updatedMembers);
-        setMembers(updatedMembers);
-        
-        toast({
-            title: "Başarılı",
-            description: "Üye başarıyla silindi. Firebase Auth kaydı etkilenmedi.",
-        });
+        try {
+            await deleteDoc(doc(db, "members", idToDelete));
+            
+            // Note: We are not deleting the Firebase Auth user for safety and recovery.
+            // If you want to delete the auth user, you'd need a backend function.
+
+            toast({
+                title: "Başarılı",
+                description: "Üye başarıyla silindi.",
+            });
+            fetchMembers(); // Refresh the list from Firestore
+        } catch (error) {
+             console.error("Error deleting member: ", error);
+             toast({ variant: "destructive", title: "Hata", description: "Üye silinirken bir hata oluştu." });
+        }
     };
 
     const handleSaveMember = async (memberData: AdminMember) => {
+      if (!db) return;
+      
+      let memberToSave = { ...memberData };
+      let uid: string;
+
       if (editingMember) {
         // Editing existing member
-        const updatedMembers = members.map(m => m.id === memberData.id ? { ...m, ...memberData } : m);
-        saveMembers(updatedMembers);
-        setMembers(updatedMembers);
-        toast({
-            title: "Başarılı",
-            description: "Üye bilgileri güncellendi.",
-        });
+        uid = editingMember.id;
+        memberToSave.id = uid;
       } else {
         // Adding new member
-        if (!memberData.phone || !memberData.password) {
+        if (!memberToSave.phone || !memberToSave.password) {
             toast({ variant: "destructive", title: "Hata", description: "Yeni üye için e-posta ve şifre zorunludur." });
             return;
         }
 
         try {
-            // Use the temporary app to create a user without affecting admin's session
-            const userCredential = await createUserInTempApp(memberData.phone, memberData.password);
-            const newFirebaseUser = userCredential.user;
-
-            const newMember: AdminMember = {
-              ...memberData,
-              id: newFirebaseUser.uid,
-            };
+            const userCredential = await createUserInTempApp(memberToSave.phone, memberToSave.password);
+            uid = userCredential.user.uid;
+            memberToSave.id = uid;
             
-            const updatedMembers = [...members, newMember];
-            saveMembers(updatedMembers);
-            setMembers(updatedMembers);
-            
-            toast({
-                title: "Başarılı",
-                description: "Yeni üye başarıyla oluşturuldu.",
-            });
         } catch (error: any) {
             console.error("Firebase user creation failed:", error);
             let errorMessage = "Yeni üye oluşturulamadı. Lütfen tekrar deneyin.";
@@ -134,8 +138,24 @@ export default function AdminPage() {
                 errorMessage = "Şifre çok zayıf. En az 6 karakter olmalıdır.";
             }
             toast({ variant: "destructive", title: "Firebase Hatası", description: errorMessage });
-            return; // Stop execution if user creation fails
+            return;
         }
+      }
+
+      try {
+          // Remove password before saving to Firestore for security
+          const { password, ...firestoreData } = memberToSave;
+          const memberDocRef = doc(db, "members", uid);
+          await setDoc(memberDocRef, firestoreData, { merge: true });
+
+          toast({
+              title: "Başarılı",
+              description: editingMember ? "Üye bilgileri güncellendi." : "Yeni üye başarıyla oluşturuldu.",
+          });
+          fetchMembers(); // Refresh list from firestore
+      } catch (error) {
+          console.error("Error saving member to Firestore: ", error);
+          toast({ variant: "destructive", title: "Veritabanı Hatası", description: "Üye bilgileri kaydedilemedi." });
       }
 
       setIsFormOpen(false);
@@ -159,7 +179,7 @@ export default function AdminPage() {
     }
 
     if (!isAdmin) {
-      return null; // The layout and hook will handle redirecting, so we can just return nothing.
+      return null;
     }
 
     return (
