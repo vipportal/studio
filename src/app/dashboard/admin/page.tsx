@@ -116,7 +116,7 @@ export default function AdminPage() {
       if (editingMember) {
         // Editing existing member
         uid = editingMember.id;
-        memberToSave.id = uid;
+        memberToSave.id = uid; // Ensure the id is set for editing as well
       } else {
         // Adding new member
         if (!memberToSave.phone || !memberToSave.password) {
@@ -127,7 +127,7 @@ export default function AdminPage() {
         try {
             const userCredential = await createUserInTempApp(memberToSave.phone, memberToSave.password);
             uid = userCredential.user.uid;
-            memberToSave.id = uid;
+            memberToSave.id = uid; // This is the crucial step: add the UID to the data object
             
         } catch (error: any) {
             console.error("Firebase user creation failed:", error);

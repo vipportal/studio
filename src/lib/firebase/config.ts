@@ -9,13 +9,13 @@ import { getFirestore, Firestore } from "firebase/firestore";
 // Firebase projenizin yapılandırma bilgilerini buraya girin.
 // Bu bilgileri Firebase konsolunda, Proje Ayarları > Genel sekmesinde bulabilirsiniz.
 const firebaseConfig = {
-    apiKey: "AIzaSyCexoCpkkZaTI1OAHcJ743syavAYGImEqU",
-    authDomain: "vip-portal-5c0bh.firebaseapp.com",
-    projectId: "vip-portal-5c0bh",
-    storageBucket: "vip-portal-5c0bh.firebasestorage.app",
-    messagingSenderId: "343162938148",
-    appId: "1:343162938148:web:5f4cd212f10305e495c9b1",
-    measurementId: "G-DSGWBE1D50"
+  apiKey: "AIzaSyCexoCpkkZaTI1OAHcJ743syavAYGImEqU",
+  authDomain: "vip-portal-5c0bh.firebaseapp.com",
+  projectId: "vip-portal-5c0bh",
+  storageBucket: "vip-portal-5c0bh.firebasestorage.app",
+  messagingSenderId: "343162938148",
+  appId: "1:343162938148:web:c108a818653aea7a95c9b1",
+  measurementId: "G-JLV8XG1YBV"
   };
 
 let app: FirebaseApp | null = null;
