@@ -108,7 +108,7 @@ export default function LoginPage() {
                 <Input
                   id="username"
                   type="text"
-                  placeholder="Kullanıcı adınız veya admin e-postanız"
+                  placeholder="Kullanıcı adı"
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
                   required
